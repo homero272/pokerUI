@@ -2,40 +2,34 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import PokerTable from './components/PokerTable';
 import LoginPage from './components/LoginPage';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import io from 'socket.io-client'
 import API from './API-Interface/API-Interface';
+
+const socket = io.connect("http://localhost:3001");
 function App() {
 
   const [user, setUser] = useState(null);
   const [color, setColor] = useState(0);
+
+  const [message, setMessge] = useState("");
+
+  
+  useEffect(() =>{
+    socket.on("receive_message", (data) =>{
+      //alert(data);
+      console.log("color recieved is :", data);
+      setColor(data);
+    })
+  }, [socket])
+
+
   const handleTestUpdateClick = async () => {
-    try {
-        const api = new API();
+    setColor(color+1);
+    socket.emit("changeColor", {color:color + 1} );
+    
 
-        // Verify user asynchronously
-        const userInfo = await api.verifyUser(user.userName);
-        console.log(user, "@@@@@@");
-        console.log(userInfo.user.stats,"!!!!!!");
-
-        console.log(`API returns user info: ${JSON.stringify(userInfo)}`);
-        if (userInfo.status == "OK") {
-            console.log(`User ${user.userName} doesn't exist, creating it.`);
-            await api.changeColor(user.userName);
-            const userInfo = await api.verifyUser(user.userName);
-            setColor(userInfo.user.stats);
-            console.log("THIS IS THE COLOR",color);
-            // Handle user creation success (if needed)
-
-        } else {
-            console.log("user.userName already exists");
-
-        }
-    } catch (error) {
-        console.error("Error during user verification or creation:", error);
-        // Handle error appropriately (e.g., display error message to user)
-
-    }
-};
+  };
 
   const handleSignIn = (props) =>{
     setUser(props.user);
