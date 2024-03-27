@@ -136,10 +136,35 @@ const LoginPage = (props) => {
     };
 
 
-    const handleTestUpdateClick = () =>{
-        //logic here
-        color === 'red' ? setColor('blue') : setColor('red');
-    }
+    
+    const handleTestUpdateClick = async () => {
+        try {
+            const api = new API();
+    
+            // Verify user asynchronously
+            const userInfo = await api.verifyUser(username);
+    
+            console.log(`API returns user info: ${JSON.stringify(userInfo)}`);
+            if (userInfo.status !== "OK") {
+                console.log(`User ${username} doesn't exist, creating it.`);
+                await api.changeColor(username);
+                const userInfo = await api.verifyUser(username);
+                setColor(userInfo.user.stats);
+                // Handle user creation success (if needed)
+
+            } else {
+                console.log("Username already exists");
+
+            }
+        } catch (error) {
+            console.error("Error during user verification or creation:", error);
+            // Handle error appropriately (e.g., display error message to user)
+
+        }
+    };
+    
+
+    
 
     return (
         <Fragment>
@@ -248,7 +273,7 @@ const LoginPage = (props) => {
                             </Button>
                         </Box>
                     )}
-                        <Box sx={{backgroundColor: color, border: 1, width: '200px', height: '200px'}}>
+                        <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
                             <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
                                 Click me
                             </Button>

@@ -7,7 +7,7 @@ const AxiosConfigured = () => {
 
     // Set the baseURL for all requests to the API domain instead of the current domain
     // axios.defaults.baseURL = `http://localhost:8443/api/v1`;
-    axios.defaults.baseURL = `https://pokerapi-hzd-50ef.onrender.com/api/v1`;
+    axios.defaults.baseURL = `http://localhost:8443/api/v1`;
 
 
     // Allow the browser to send cookies to the API domain (which include auth_token)
@@ -46,4 +46,15 @@ export default class APIInterface{
         }
     }
     
+    async changeColor(userName) {
+        try {
+            // Append user data to the URL
+            await axiosAgent.get(`login/get/${userName}`);
+            console.log('UPDATED successfully');
+            // Optionally, you may return some success indicator here
+        } catch (error) {
+            console.error('Error UPDATING user:', error);
+            throw error;
+        }
+    }
 }
