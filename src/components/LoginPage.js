@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import API from '../API-Interface/API-Interface';
 import { Button, Typography, TextField, Box, Avatar } from "@mui/material";
 import { Fragment } from "react";
-import { red } from "@mui/material/colors";
+import { red,blue } from "@mui/material/colors";
 import backgroundImage from "../pokerLogin.png";
 import avatar1 from "../Avatar1.png";
 import avatar2 from "../Avatar2.png";
@@ -13,6 +13,10 @@ const LoginPage = (props) => {
     const [error, setError] = useState("");
     const [create, setCreate] = useState(false);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
+
+    //test for update (remove after done testing)
+    const [color, setColor] = useState('red');
+
 
     const handleUsernameChange = (event) => {
         setUsername(event.target.value);
@@ -42,7 +46,7 @@ const LoginPage = (props) => {
                     console.log(userInfo.user.userPassword);
                     console.log("right password");
                     // setUser(user);
-                    props.onSubmitInfo(); //sets next page
+                    props.onSubmitInfo(userInfo); //sets next page
                 } else  {
                     //console.log("IT FAILED@@@");
                     console.log(userInfo.user.userPassword);
@@ -110,8 +114,9 @@ const LoginPage = (props) => {
             if (userInfo.status !== "OK") {
                 console.log(`User ${username} doesn't exist, creating it.`);
                 await api.createUser(username, password, selectedAvatar);
+                const userInfo = await api.verifyUser(username);
                 // Handle user creation success (if needed)
-                props.onSubmitInfo();
+                props.onSubmitInfo(userInfo);
             } else {
                 console.log("Username already exists");
                 setError("Username already exists!");
@@ -129,6 +134,12 @@ const LoginPage = (props) => {
         // Do whatever you want with the selected avatar path
         console.log("Selected Avatar:", avatarPath);
     };
+
+
+    const handleTestUpdateClick = () =>{
+        //logic here
+        color === 'red' ? setColor('blue') : setColor('red');
+    }
 
     return (
         <Fragment>
@@ -237,8 +248,16 @@ const LoginPage = (props) => {
                             </Button>
                         </Box>
                     )}
+                        <Box sx={{backgroundColor: color, border: 1, width: '200px', height: '200px'}}>
+                            <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
+                                Click me
+                            </Button>
+                        </Box>
                 </Box>
             </Box>
+
+
+
         </Fragment>
     );
 };

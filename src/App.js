@@ -8,8 +8,8 @@ function App() {
   const [user, setUser] = useState(null);
 
   const handleSignIn = (props) =>{
-    setUser(true);
-    console.log("called from app")
+    setUser(props.user);
+    console.log("called from app, user is: ", props.user);
   }
 
   return (
