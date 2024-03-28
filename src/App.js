@@ -5,14 +5,15 @@ import LoginPage from './components/LoginPage';
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client'
 import API from './API-Interface/API-Interface';
+import Home from './components/HomePage';
 
 const socket = io.connect("http://localhost:3001");
 function App() {
 
   const [user, setUser] = useState(null);
   const [color, setColor] = useState(0);
-
-  const [message, setMessge] = useState("");
+  const [createMatch, setCreateMatch] = useState("false");
+  const [joinMatch, setJoinMatch] = useState("false");
 
   
   useEffect(() =>{
@@ -45,7 +46,7 @@ function App() {
       justifyContent: "center",
     }}>
       { !user ?
-      <LoginPage onSubmitInfo = {handleSignIn}/> : <PokerTable/>
+      <LoginPage onSubmitInfo = {handleSignIn}/> : <Home user={user}/>
       }
 <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
                             <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>

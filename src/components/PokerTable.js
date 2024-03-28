@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Button  from '@mui/material/Button';
 
 const numCommunityCards = 5;
 const cardBoxHeight = 60;

@@ -14,8 +14,7 @@ const LoginPage = (props) => {
     const [create, setCreate] = useState(false);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
 
-    //test for update (remove after done testing)
-    const [color, setColor] = useState('red');
+
 
 
     const handleUsernameChange = (event) => {
@@ -137,31 +136,7 @@ const LoginPage = (props) => {
 
 
     
-    const handleTestUpdateClick = async () => {
-        try {
-            const api = new API();
-    
-            // Verify user asynchronously
-            const userInfo = await api.verifyUser(username);
-    
-            console.log(`API returns user info: ${JSON.stringify(userInfo)}`);
-            if (userInfo.status !== "OK") {
-                console.log(`User ${username} doesn't exist, creating it.`);
-                await api.changeColor(username);
-                const userInfo = await api.verifyUser(username);
-                setColor(userInfo.user.stats);
-                // Handle user creation success (if needed)
 
-            } else {
-                console.log("Username already exists");
-
-            }
-        } catch (error) {
-            console.error("Error during user verification or creation:", error);
-            // Handle error appropriately (e.g., display error message to user)
-
-        }
-    };
     
 
     
@@ -273,11 +248,7 @@ const LoginPage = (props) => {
                             </Button>
                         </Box>
                     )}
-                        <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
-                            <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
-                                Click me
-                            </Button>
-                        </Box>
+
                 </Box>
             </Box>
 
