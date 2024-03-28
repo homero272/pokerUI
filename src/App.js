@@ -7,6 +7,7 @@ import io from 'socket.io-client'
 import API from './API-Interface/API-Interface';
 import Home from './components/HomePage';
 import CreateMatch from './components/CreateMatch';
+import JoinMatch from './components/JoinMatch';
 
 //let socket = null;
 
@@ -17,6 +18,7 @@ function App() {
   const [actionForMatch, setActionForMatch] = useState(null);
   const [socket, setSocket] = useState(null);
   const [roomName, setRoomName] = useState('default');
+  const [arrayOfRooms, setArrayOfRooms] = useState([]);
   
   useEffect(() =>{
     if(socket !== null){
@@ -24,6 +26,12 @@ function App() {
         //alert(data);
         console.log("color recieved is :", data);
         setColor(data);
+      });
+      socket.on("room_created", (data) =>{
+        console.log("someone created room...", data);
+        let temp = arrayOfRooms.splice();
+        temp = [...temp, data];
+        setArrayOfRooms(temp);
       })
     }
     
@@ -36,6 +44,7 @@ function App() {
     }
     setColor(color+1);
     socket.emit("changeColor", {color:color + 1, roomName: roomName} );
+    console.log("array of rooms: ",arrayOfRooms);
     
 
   };
@@ -73,12 +82,16 @@ const handleMatchAction = (props) =>{
 }
 
 const handleCreateRoom =  (props) =>{
+  //props contains room name
   if (props === "")
     return;
-  console.log("creating room: ", props);
+  console.log("creating room: (UI)", props);
   setRoomName(props);
   setActionForMatch("done");
-  socket.emit("joinRoom", props)
+  socket.emit("createRoom", props);
+  let temp = arrayOfRooms.splice();
+  temp = [...temp, props];
+  setArrayOfRooms(temp);
 }
 
 
@@ -92,7 +105,7 @@ const handleCreateRoom =  (props) =>{
     }}>
       { !user ?
       <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} /> 
-        : actionForMatch === "create" ? <CreateMatch handleCreateRoom={handleCreateRoom}/> : <PokerTable/>
+        : actionForMatch === "create" ? <CreateMatch handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch/> : <PokerTable/>
       }
 <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
                             <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
