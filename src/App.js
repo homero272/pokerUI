@@ -16,7 +16,7 @@ function App() {
   const [color, setColor] = useState(0);
   const [actionForMatch, setActionForMatch] = useState(null);
   const [socket, setSocket] = useState(null);
-  const [roomName, setRoomName] = useState('');
+  const [roomName, setRoomName] = useState('default');
   
   useEffect(() =>{
     if(socket !== null){
@@ -35,7 +35,7 @@ function App() {
       return;
     }
     setColor(color+1);
-    socket.emit("changeColor", {color:color + 1} );
+    socket.emit("changeColor", {color:color + 1, roomName: roomName} );
     
 
   };
@@ -73,10 +73,12 @@ const handleMatchAction = (props) =>{
 }
 
 const handleCreateRoom =  (props) =>{
+  if (props === "")
+    return;
   console.log("creating room: ", props);
   setRoomName(props);
   setActionForMatch("done");
-  
+  socket.emit("joinRoom", props)
 }
 
 
