@@ -17,6 +17,10 @@ const Home = (props) => {
 
     }
 
+    const handleAction = (text) =>{
+        console.log("value being passed", text);
+        props.handleMatchAction(text);
+    }
 
 
     console.log(avatar, "Look")
@@ -42,10 +46,10 @@ const Home = (props) => {
                 </Box>
             </Box>
             <Box>
-                <Button variant="contained" color="primary" sx={{ marginRight: 2 }}>
+                <Button variant="contained" color="primary" sx={{ marginRight: 2 }} onClick={() =>handleAction("create")}>
                     Create Match
                 </Button>
-                <Button variant="contained" color="secondary">
+                <Button variant="contained" color="secondary" onClick={() => handleAction("join")}>
                     Join Match
                 </Button>
                 

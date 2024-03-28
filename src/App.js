@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import io from 'socket.io-client'
 import API from './API-Interface/API-Interface';
 import Home from './components/HomePage';
+import CreateMatch from './components/CreateMatch';
 
 //let socket = null;
 
@@ -13,9 +14,9 @@ function App() {
 
   const [user, setUser] = useState(null);
   const [color, setColor] = useState(0);
-  const [createMatch, setCreateMatch] = useState("false");
-  const [joinMatch, setJoinMatch] = useState("false");
+  const [actionForMatch, setActionForMatch] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [roomName, setRoomName] = useState('');
   
   useEffect(() =>{
     if(socket !== null){
@@ -66,6 +67,18 @@ function App() {
     }
 };
 
+const handleMatchAction = (props) =>{
+  console.log(props, "look here");
+  setActionForMatch(props);
+}
+
+const handleCreateRoom =  (props) =>{
+  console.log("creating room: ", props);
+  setRoomName(props);
+  setActionForMatch("done");
+  
+}
+
 
   return (
     <Box sx={{
@@ -76,7 +89,8 @@ function App() {
       justifyContent: "center",
     }}>
       { !user ?
-      <LoginPage onSubmitInfo = {handleSignIn}/> : <Home user={user} socket = {socket} handleSignOut ={handleSignOut}/>
+      <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} /> 
+        : actionForMatch === "create" ? <CreateMatch handleCreateRoom={handleCreateRoom}/> : <PokerTable/>
       }
 <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
                             <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
