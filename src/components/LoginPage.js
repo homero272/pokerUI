@@ -89,6 +89,7 @@ const LoginPage = (props) => {
 
     const handleCreateAccount = () => {
         setCreate(true);
+        
 
     };
     const handleNewSubmit = async () => {

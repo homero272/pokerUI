@@ -6,9 +6,18 @@ import avatar1 from "../Avatar1.png";
 import avatar2 from "../Avatar2.png";
 import { Avatar } from '@mui/material';
 const Home = (props) => {
+    const socket = props.socket;
     const user = props.user;
     const userName = user.userName;
     const avatar = user.avatar === "avatar1" ? avatar1 : avatar2
+
+
+    const handleLogout = () =>{
+         props.handleSignOut();
+
+    }
+
+
 
     console.log(avatar, "Look")
     return (
@@ -39,7 +48,11 @@ const Home = (props) => {
                 <Button variant="contained" color="secondary">
                     Join Match
                 </Button>
+                
             </Box>
+            <Button variant ="contained" color = "error" onClick = {handleLogout}>
+                    Logout
+            </Button>
         </Box>
     );
 };
