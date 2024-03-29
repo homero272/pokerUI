@@ -37,7 +37,7 @@ function App() {
         //setArrayOfRooms(temp);
       });
       socket.on("removeRoom", (data) =>{
-        console.log("Current Rooms: ", data);
+        console.log("Current Rooms: ", arrayOfRooms);
         setArrayOfRooms(data);
         console.log("NEW ROOMS:", data);
         //setArrayOfRooms(prevRooms => prevRooms.filter(room => room !== data));
@@ -130,7 +130,7 @@ const handleJoinMatch = props =>{
     }}>
       { !user ?
       <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} /> 
-        : actionForMatch === "create" ? <CreateMatch handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : <PokerTable/>
+        : actionForMatch === "create" ? <CreateMatch setActionForMatch = {setActionForMatch} handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch setActionForMatch = {setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : <PokerTable/>
       }
 <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
                             <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>

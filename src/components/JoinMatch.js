@@ -19,18 +19,30 @@ const JoinMatch = (props) =>{
         handleSelectMatchCallBack(selectedMatch);
     }
 
+    const handleReturnToMenu = () => {
+        // Stub for handling returning to menu
+        props.setActionForMatch(null);
+        console.log("Returning to menu...");
+    }
 
     return (
         <Fragment>
+
             <Box sx={{
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 width: '100vw',
                 height: '100vh',
-                flexDirection:'column'
-
+                border: 1
             }}>
+
+            <Box sx={{alignSelf: 'flex-start', mt: '-100px' }}>
+                    <Button variant="contained" color="secondary" onClick={handleReturnToMenu}>
+                        Return to Menu
+                    </Button>
+            </Box>
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'center',
@@ -39,18 +51,16 @@ const JoinMatch = (props) =>{
                     height: '50vh',
                     border: 1                    
                 }}>
-                <JoinMatchList arrayOfRooms={props.arrayOfRooms} handleSelectMatch = {handleChoosingMatch}></JoinMatchList>
+                    <JoinMatchList arrayOfRooms={props.arrayOfRooms} handleSelectMatch = {handleChoosingMatch}></JoinMatchList>
                 </Box>
 
-                <Box sx={{}}>
-                <Button variant="contained" color="success" onClick={handleSelectMatch} >
-                    Join
-                </Button>
+                <Box sx={{ marginTop: '20px' }}>
+                    <Button variant="contained" color="success" onClick={handleSelectMatch} >
+                        Join
+                    </Button>
+                </Box>
             </Box>
-            </Box>
-            
         </Fragment>
-
     );
 }
 

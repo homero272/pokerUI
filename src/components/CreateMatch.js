@@ -20,6 +20,12 @@ const CreateMatch = (props) =>{
         console.log(roomName);
         handleCreateRoom(roomName);
     }
+    
+    const handleReturnToMenu = () => {
+        // Stub for handling returning to menu
+        props.setActionForMatch(null);
+        console.log("Returning to menu...");
+    }
     return (
         <Fragment>
             <Box sx={{
@@ -30,7 +36,11 @@ const CreateMatch = (props) =>{
                 height: '100vh',
                 backgroundColor: 'lightgray'
             }}>
-                
+            <Box sx={{}}>
+                    <Button variant="contained" color="secondary" onClick={handleReturnToMenu}>
+                        Return to Menu
+                    </Button>
+            </Box>                
             <Box sx={{
                 display: 'flex',
                 justifyContent: 'center',
