@@ -23,6 +23,7 @@ const Home = (props) => {
     }
 
 
+
     console.log(avatar, "Look")
     return (
         <Box

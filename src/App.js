@@ -28,11 +28,19 @@ function App() {
         setColor(data);
       });
       socket.on("room_created", (data) =>{
-        console.log("someone created room...", data);
-        let temp = arrayOfRooms.splice();
-        temp = [...temp, data];
-        setArrayOfRooms(temp);
-      })
+        console.log("someone created room...", data, "array: ", arrayOfRooms);
+        
+
+        // Use a functional update to ensure the previous state is correctly updated
+        setArrayOfRooms(data);
+        //setArrayOfRooms(temp);
+      });
+      socket.on("removeRoom", (data) =>{
+        console.log("Removing room: ", data);
+        setArrayOfRooms(prevRooms => prevRooms.filter(room => room !== data));
+
+      });
+
     }
     
   }, [socket])
@@ -53,6 +61,7 @@ function App() {
     setUser(props.user);
     setSocket(io.connect("http://localhost:3001"));
     console.log("called from app, user is: ", props.user);
+
     //so props.user is probably what we will add onto the db when logging in
 
   }
@@ -89,9 +98,18 @@ const handleCreateRoom =  (props) =>{
   setRoomName(props);
   setActionForMatch("done");
   socket.emit("createRoom", props);
-  let temp = arrayOfRooms.splice();
-  temp = [...temp, props];
-  setArrayOfRooms(temp);
+  setArrayOfRooms(prevRooms => [...prevRooms, props]);
+}
+
+const handleJoinMatch = props =>{
+  if(props ===""){
+    console.log("SELECT A MATCH!!")
+    return;
+  }
+  setActionForMatch("done");
+  console.log("selected Room from APP.js", props);
+  setRoomName(props);
+  socket.emit("playerJoined", {userName: user.userName, room: props })
 }
 
 
@@ -105,7 +123,7 @@ const handleCreateRoom =  (props) =>{
     }}>
       { !user ?
       <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} /> 
-        : actionForMatch === "create" ? <CreateMatch handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch/> : <PokerTable/>
+        : actionForMatch === "create" ? <CreateMatch handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : <PokerTable/>
       }
 <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
                             <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
