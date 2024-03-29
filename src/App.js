@@ -22,6 +22,7 @@ function App() {
   
   useEffect(() =>{
     if(socket !== null){
+      socket.emit("userConnected", {userName: user.userName});
       socket.on("receive_message", (data) =>{
         //alert(data);
         console.log("color recieved is :", data);
@@ -36,14 +37,16 @@ function App() {
         //setArrayOfRooms(temp);
       });
       socket.on("removeRoom", (data) =>{
-        console.log("Removing room: ", data);
-        setArrayOfRooms(prevRooms => prevRooms.filter(room => room !== data));
+        console.log("Current Rooms: ", data);
+        setArrayOfRooms(data);
+        console.log("NEW ROOMS:", data);
+        //setArrayOfRooms(prevRooms => prevRooms.filter(room => room !== data));
 
       });
 
     }
     
-  }, [socket])
+  }, [socket,user])
 
 
   const handleTestUpdateClick = async () => {
@@ -56,10 +59,14 @@ function App() {
     
 
   };
+  
 
   const handleSignIn = (props) =>{
     setUser(props.user);
     setSocket(io.connect("http://localhost:3001"));
+    
+
+    
     console.log("called from app, user is: ", props.user);
 
     //so props.user is probably what we will add onto the db when logging in
