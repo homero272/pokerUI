@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import JoinMatchList from './JoinMatchList';
+import { IconButton } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home'
 
 
 const JoinMatch = (props) =>{
@@ -38,11 +40,14 @@ const JoinMatch = (props) =>{
                 border: 1
             }}>
 
-            <Box sx={{alignSelf: 'flex-start', mt: '-100px' }}>
-                    <Button variant="contained" color="secondary" onClick={handleReturnToMenu}>
-                        Return to Menu
-                    </Button>
-            </Box>
+            <Box sx={{position: 'absolute', top: 10, left: 10}}>
+                <IconButton  onClick={handleReturnToMenu}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <HomeIcon color='primary' fontSize='large'/> {/* Home icon */}
+                        <Typography variant="caption">Return to Menu</Typography> {/* Subtext */}
+                    </Box>
+                </IconButton>
+            </Box> 
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'center',

@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import PokerTable from './components/PokerTable';
 import LoginPage from './components/LoginPage';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import io from 'socket.io-client'
 import API from './API-Interface/API-Interface';
 import Home from './components/HomePage';
@@ -130,13 +130,16 @@ const handleJoinMatch = props =>{
     }}>
       { !user ?
       <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} /> 
-        : actionForMatch === "create" ? <CreateMatch setActionForMatch = {setActionForMatch} handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch setActionForMatch = {setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : <PokerTable/>
-      }
-<Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
-                            <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
+        : actionForMatch === "create" ? <CreateMatch setActionForMatch = {setActionForMatch} handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch setActionForMatch = {setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : 
+        <Fragment>
+        <PokerTable/>
+       <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
+          <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
                                 Click me
-                            </Button>
-                        </Box>
+          </Button>
+      </Box>
+      </Fragment>
+      }
       
     </Box>
   );
