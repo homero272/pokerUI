@@ -4,8 +4,8 @@ import { Button, Typography, TextField, Box, Avatar } from "@mui/material";
 import { Fragment } from "react";
 import { red,blue } from "@mui/material/colors";
 import backgroundImage from "../pokerLogin.png";
-import avatar1 from "../Avatar1.png";
-import avatar2 from "../Avatar2.png";
+import avatar1 from "../avatars/Avatar1.png";
+import avatar2 from "../avatars/Avatar2.png";
 import bcrypt from 'bcryptjs';
 
 const LoginPage = (props) => {
