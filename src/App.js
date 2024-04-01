@@ -104,7 +104,7 @@ const handleCreateRoom =  (props) =>{
   console.log("creating room: (UI)", props);
   setRoomName(props);
   setActionForMatch("done");
-  socket.emit("createRoom", props);
+  socket.emit("createRoom", {roomName: props, userName: user.userName});
   setArrayOfRooms(prevRooms => [...prevRooms, props]);
 }
 
@@ -132,7 +132,7 @@ const handleJoinMatch = props =>{
       <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} /> 
         : actionForMatch === "create" ? <CreateMatch setActionForMatch = {setActionForMatch} handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch setActionForMatch = {setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : 
         <Fragment>
-        <PokerTable/>
+        <PokerTable roomName={roomName} user={user} socket = {socket}/>
        <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
           <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
                                 Click me
