@@ -6,6 +6,7 @@ import { red,blue } from "@mui/material/colors";
 import backgroundImage from "../pokerLogin.png";
 import avatar1 from "../Avatar1.png";
 import avatar2 from "../Avatar2.png";
+import bcrypt from 'bcryptjs';
 
 const LoginPage = (props) => {
     const [username, setUsername] = useState("");
@@ -27,7 +28,71 @@ const LoginPage = (props) => {
         setError("");
     };
 
-    const handleSubmit = () => {
+    // const handleSubmit = () => {
+    //     if (username === "" || password === "") {
+    //         console.log("Username and Password cant be empty");
+    //         setError("Username and Password cant be empty!!!");
+    //         return;
+    //     }
+
+        
+
+
+    //     // console.log("Username:", username);
+    //     // console.log("Password:", password);
+    //     const api = new API();
+    //     async function passwordCheck() {// this is still worked
+    //         api.verifyUser(username)
+    //             .then( userInfo => {
+    //             console.log(`api returns user info and it is: ${JSON.stringify(userInfo)}`);
+    //             //const user = userInfo.status;
+    //             if( userInfo.user.userPassword == password ) {
+    //                 console.log(userInfo.user.userPassword);
+    //                 console.log("right password");
+    //                 // setUser(user);
+    //                 props.onSubmitInfo(userInfo); //sets next page
+    //             } else  {
+    //                 //console.log("IT FAILED@@@");
+    //                 console.log(userInfo.user.userPassword);
+    //                 console.log(password);
+    //                 console.log("wrong password");
+    //                 setError("WORNG PASSWORD!");
+    //                 //console.log(user.userID);
+    //                 //console.log(userInfo.data.status);
+    //                 //setVerifyUser(false);
+    //                 //setAuthFailed(true);
+    //             }
+    //         });
+    //     }
+    //     async function accountCheck() {// this is still worked
+    //         api.verifyUser(username)
+    //             .then( userInfo => {
+    //             console.log(`api returns user info and it is: ${JSON.stringify(userInfo)}`);
+    //             const user = userInfo.status;
+    //             if( user == "OK" ) {
+    //                 console.log(user.user)
+    //                 console.log(userInfo.user.userPassword);
+    //                 console.log("userInfo.userPassword");
+    //                 passwordCheck();
+    //                 //props.onSubmitInfo();
+    //             } else  {
+    //                 //console.log("IT FAILED@@@");
+    //                 console.log("Username does not exist");
+    //                 setError("Username does not exist!");
+    //                 //console.log(user.userID);
+    //                 //console.log(userInfo.data.status);
+    //                 //setVerifyUser(false);
+    //                 //setAuthFailed(true);
+    //             }
+    //         });
+    //     }
+
+    //     accountCheck();
+    //      //moves to next page
+        
+    // };
+    
+    const handleSubmit = async () => {
         if (username === "" || password === "") {
             console.log("Username and Password cant be empty");
             setError("Username and Password cant be empty!!!");
@@ -36,98 +101,114 @@ const LoginPage = (props) => {
         console.log("Username:", username);
         console.log("Password:", password);
         const api = new API();
-        async function passwordCheck() {// this is still worked
-            api.verifyUser(username)
-                .then( userInfo => {
-                console.log(`api returns user info and it is: ${JSON.stringify(userInfo)}`);
-                //const user = userInfo.status;
-                if( userInfo.user.userPassword == password ) {
-                    console.log(userInfo.user.userPassword);
-                    console.log("right password");
-                    // setUser(user);
+    
+        try {
+            const userInfo = await api.verifyUser(username);
+    
+            if (userInfo.status === "OK") {
+                const hashedPassword = userInfo.user.userPassword;
+                const passwordMatch = await bcrypt.compare(password, hashedPassword.replace(/slash/g,"/"));
+    
+                if (passwordMatch) {
+                    console.log("Login successful");
                     props.onSubmitInfo(userInfo); //sets next page
-                } else  {
-                    //console.log("IT FAILED@@@");
-                    console.log(userInfo.user.userPassword);
-                    console.log(password);
-                    console.log("wrong password");
-                    setError("WORNG PASSWORD!");
-                    //console.log(user.userID);
-                    //console.log(userInfo.data.status);
-                    //setVerifyUser(false);
-                    //setAuthFailed(true);
+                } else {
+                    console.log("Wrong password");
+                    setError("Wrong password!");
                 }
-            });
+            } else {
+                console.log("User not found.");
+                setError("User not found!");
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+            setError("An error occurred during login.");
         }
-        async function accountCheck() {// this is still worked
-            api.verifyUser(username)
-                .then( userInfo => {
-                console.log(`api returns user info and it is: ${JSON.stringify(userInfo)}`);
-                const user = userInfo.status;
-                if( user == "OK" ) {
-                    console.log(user.user)
-                    console.log(userInfo.user.userPassword);
-                    console.log("userInfo.userPassword");
-                    passwordCheck();
-                    //props.onSubmitInfo();
-                } else  {
-                    //console.log("IT FAILED@@@");
-                    console.log("Username does not exist");
-                    setError("Username does not exist!");
-                    //console.log(user.userID);
-                    //console.log(userInfo.data.status);
-                    //setVerifyUser(false);
-                    //setAuthFailed(true);
-                }
-            });
-        }
-
-        accountCheck();
-         //moves to next page
-        
     };
+    
 
     const handleCreateAccount = () => {
         setCreate(true);
         
 
     };
-    const handleNewSubmit = async () => {
-        try {
-            if (username === "" || password === "") {
-                console.log("Username and Password can't be empty");
-                setError("Username and Password can't be empty!!!");
-                return;
-            }
-            if (!selectedAvatar) {
-                setError("Select an Avatar!!!");
-                console.log("Select an Avatar!!!");
-                return;
-            }
+    // const handleNewSubmit = async () => {
+    //     try {
+    //         if (username === "" || password === "") {
+    //             console.log("Username and Password can't be empty");
+    //             setError("Username and Password can't be empty!!!");
+    //             return;
+    //         }
+    //         if (!selectedAvatar) {
+    //             setError("Select an Avatar!!!");
+    //             console.log("Select an Avatar!!!");
+    //             return;
+    //         }
     
-            const api = new API();
+    //         const api = new API();
     
-            // Verify user asynchronously
-            const userInfo = await api.verifyUser(username);
+    //         // Verify user asynchronously
+    //         const userInfo = await api.verifyUser(username);
     
-            console.log(`API returns user info: ${JSON.stringify(userInfo)}`);
-            if (userInfo.status !== "OK") {
-                console.log(`User ${username} doesn't exist, creating it.`);
-                await api.createUser(username, password, selectedAvatar);
-                const userInfo = await api.verifyUser(username);
-                // Handle user creation success (if needed)
-                props.onSubmitInfo(userInfo);
-            } else {
-                console.log("Username already exists");
-                setError("Username already exists!");
-            }
-        } catch (error) {
-            console.error("Error during user verification or creation:", error);
-            // Handle error appropriately (e.g., display error message to user)
-            setError("An error occurred. Please try again later.");
+    //         console.log(`API returns user info: ${JSON.stringify(userInfo)}`);
+    //         if (userInfo.status !== "OK") {
+    //             console.log(`User ${username} doesn't exist, creating it.`);
+    //             await api.createUser(username, password, selectedAvatar);
+    //             const userInfo = await api.verifyUser(username);
+    //             // Handle user creation success (if needed)
+    //             props.onSubmitInfo(userInfo);
+    //         } else {
+    //             console.log("Username already exists");
+    //             setError("Username already exists!");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error during user verification or creation:", error);
+    //         // Handle error appropriately (e.g., display error message to user)
+    //         setError("An error occurred. Please try again later.");
+    //     }
+    // };
+    
+
+
+const handleNewSubmit = async () => {
+    try {
+        if (username === "" || password === "") {
+            console.log("Username and Password can't be empty");
+            setError("Username and Password can't be empty!!!");
+            return;
         }
-    };
-    
+        if (!selectedAvatar) {
+            setError("Select an Avatar!!!");
+            console.log("Select an Avatar!!!");
+            return;
+        }
+
+        let hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+        hashedPassword = hashedPassword.replace(/\//g, "slash");
+        console.log(hashedPassword);
+        const api = new API();
+
+        // Verify user asynchronously
+        const userInfo = await api.verifyUser(username);
+
+        console.log(`API returns user info: ${JSON.stringify(userInfo)}`);
+        if (userInfo.status !== "OK") {
+            console.log(`User ${username} doesn't exist, creating it.`);
+            await api.createUser(username, hashedPassword, selectedAvatar); // Use hashedPassword
+            const userInfo = await api.verifyUser(username);
+            // Handle user creation success (if needed)
+            props.onSubmitInfo(userInfo);
+        } else {
+            console.log("Username already exists");
+            setError("Username already exists!");
+        }
+    } catch (error) {
+        console.error("Error during user verification or creation:", error);
+        // Handle error appropriately (e.g., display error message to user)
+        setError("An error occurred. Please try again later.");
+    }
+};
+
 
     const handleAvatarClick = (avatarPath) => {
         setSelectedAvatar(avatarPath);
