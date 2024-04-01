@@ -58,4 +58,15 @@ export default class APIInterface{
             throw error;
         }
     }
+
+    async updateMoney(money, userName, avatar) {
+        try{
+            await axiosAgent.get(`/money/update/${money}/${userName}/${avatar}`);
+            console.log("money updated successfully");
+        }
+        catch (error){
+            console.error('Error UPDATING money:', error);
+            throw error;            
+        }
+    }
 }

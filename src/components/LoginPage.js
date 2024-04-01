@@ -4,10 +4,10 @@ import { Button, Typography, TextField, Box, Avatar } from "@mui/material";
 import { Fragment } from "react";
 import { red,blue } from "@mui/material/colors";
 import backgroundImage from "../pokerLogin.png";
-import avatar1 from "../avatars/Avatar1.png";
-import avatar2 from "../avatars/Avatar2.png";
+import freeAvatars from "../avatars/FreeAvatars/free";
 import bcrypt from 'bcryptjs';
 
+console.log(freeAvatars)
 const LoginPage = (props) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -313,18 +313,16 @@ const handleNewSubmit = async () => {
                     (
                         <Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center', alignItems: 'center', gap: 5}}>
                             <Typography>Choose your Avatar</Typography>
-                            <Box sx={{ display: "flex", flexDirection: "row", gap: 5, justifyContent: 'center', alignItems: 'center' }}>
+                        <Box sx={{ display: "flex", flexDirection: "row", gap: 5, justifyContent: 'center', alignItems: 'center' }}>
+                            {Object.entries(freeAvatars).map(([avatarName, avatarSrc]) => (
                                 <Avatar
-                                    src={avatar1}
-                                    onClick={() => handleAvatarClick("avatar1")}
-                                    sx={{ cursor: "pointer", border: selectedAvatar === "avatar1" ? "2px solid blue" : "none" }}
-                                />
-                                <Avatar
-                                    src={avatar2}
-                                    onClick={() => handleAvatarClick("avatar2")}
-                                    sx={{ cursor: "pointer", border: selectedAvatar === "avatar2" ? "2px solid blue" : "none" }}
-                                />
-                            </Box>
+                                    key={avatarName}
+                                    src={avatarSrc}
+                                    onClick={() => handleAvatarClick(avatarName)}
+                                    sx={{ cursor: "pointer", border: selectedAvatar === avatarName ? "2px solid blue" : "none" }}
+                                    />
+                             ))}
+                        </Box>
                             <Button variant="contained" color="success" onClick={handleNewSubmit}>
                                 Create
                             </Button>
