@@ -28,6 +28,7 @@ const CardBox = props => {
 
 const PlayerBox = props => {
     const userName = props.user.userName;
+    //this should know what seat we are 
 
     return (
         <Box sx={{
@@ -50,7 +51,7 @@ const PlayerBox = props => {
                 <CardBox/>
             </Box>
             <Typography sx={{color: '#eeeeee'}}>
-                {props.mostRecentUser === "" ? userName : props.mostRecentUser}
+                { props.mostRecentUser  } 
             </Typography>
             <Typography sx={{color: '#eeeeee'}}>
                 chip count
@@ -220,40 +221,90 @@ const PokerTableWithPlayers = props => {
     const [seat4, setSeat4] = useState(false);
     const [seat5, setSeat5] = useState(false);
     const [seat6, setSeat6] = useState(false);
+    const [seatName1, setSeatName1] = useState(props.user.userName);
+    const [seatName2, setSeatName2] = useState(props.user.userName);
+    const [seatName3, setSeatName3] = useState(props.user.userName);
+    const [seatName4, setSeatName4] = useState(props.user.userName);
+    const [seatName5, setSeatName5] = useState(props.user.userName);
+    const [seatName6, setSeatName6] = useState(props.user.userName);
     const [currentSeat, setCurrentSeat] = useState(0);
-    const [mostRecentUser, setMostRecentUser] = useState("");
+    let mostRecentUser = props.user.userName;
 
     useEffect(() =>{
         if(props.socket !== null){
           props.socket.on("receiveSeatNumber", (data) => {
             //alert(data);
             console.log("Seat number recieved is :", data);
-            setMostRecentUser(data.user.userName);
+
+            //we have seat number of what they chose and we have the username of the person who chose it
+           // console.log("temp user:", tempuser, " most recent user: ", mostRecentUser );
 
             switch (data.seatNumber) {
                 case 1:
                   setSeat1(true);
+                  setSeatName1(data.user.userName);
                   break;
                 case 2:
                   setSeat2(true);
+                  setSeatName2(data.user.userName);
                   break;
                 case 3:
                     setSeat3(true);
+                    setSeatName3(data.user.userName);
                   break;
                 case 4:
                     setSeat4(true);
+                    setSeatName4(data.user.userName);
                   break;
                 case 5:
                     setSeat5(true);
+                    setSeatName5(data.user.userName);
                   break;
                 case 6:
                     setSeat6(true);
+                    setSeatName6(data.user.userName);
                   break;
                 default:
                   console.log("Number is not between 1 and 6");
                   break;
             }
           });
+
+          props.socket.on("update_room",(data) =>{
+            console.log("IT GOT CALLED IN UI UPDATE_ROOM");
+                data.forEach((obj,idx) =>{
+                    switch (obj.seatNumber) {
+                        case 1:
+                          setSeat1(true);
+                          setSeatName1(obj.userName);
+                          break;
+                        case 2:
+                          setSeat2(true);
+                          setSeatName2(obj.userName);
+                          break;
+                        case 3:
+                            setSeat3(true);
+                            setSeatName3(obj.userName);
+                          break;
+                        case 4:
+                            setSeat4(true);
+                            setSeatName4(obj.userName);
+                          break;
+                        case 5:
+                            setSeat5(true);
+                            setSeatName5(obj.userName);
+                          break;
+                        case 6:
+                            setSeat6(true);
+                            setSeatName6(obj.userName);
+                          break;
+                        default:
+                          console.log("Number is not between 1 and 6");
+                          break;
+                    }
+                })
+
+          })
     
         }
         
@@ -285,7 +336,8 @@ const PokerTableWithPlayers = props => {
                     alignItems: 'center'
                 }}>
                     {
-                   !seat4 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat4={seat4} setSeat4={setSeat4} seatNumber={4}/> : <PlayerBox mostRecentUser={mostRecentUser} roomName={props.roomName} socket={props.socket} user={props.user}/>
+                   !seat4 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat4={seat4} setSeat4={setSeat4} seatNumber={4}/> 
+                   : <PlayerBox mostRecentUser={seatName4} roomName={props.roomName} socket={props.socket} user={props.user}/>
                 }
                 </Box>
 
@@ -308,7 +360,8 @@ const PokerTableWithPlayers = props => {
                             justifyContent: 'flex-end'
                         }}>
                             {
-                   !seat3 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat3={seat3} setSeat3={setSeat3} seatNumber={3}/> : <PlayerBox mostRecentUser={mostRecentUser} roomName={props.roomName} socket={props.socket} user={props.user}/>
+                   !seat3 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat3={seat3} setSeat3={setSeat3} seatNumber={3}/> 
+                   : <PlayerBox mostRecentUser={seatName3} roomName={props.roomName} socket={props.socket} user={props.user}/>
                 }
                         </Box>
                         <Box sx={{
@@ -319,7 +372,8 @@ const PokerTableWithPlayers = props => {
                             justifyContent: 'flex-end'
                         }}>
                             {
-                   !seat2 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat2={seat2} setSeat2={setSeat2} seatNumber={2}/> : <PlayerBox mostRecentUser={mostRecentUser} roomName={props.roomName} socket={props.socket} user={props.user}/>
+                   !seat2 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat2={seat2} setSeat2={setSeat2} seatNumber={2}/> 
+                   : <PlayerBox mostRecentUser={seatName2} roomName={props.roomName} socket={props.socket} user={props.user}/>
                 }
                         </Box>
                     </Box>
@@ -340,7 +394,8 @@ const PokerTableWithPlayers = props => {
                             alignItems: 'center'
                         }}>
                             {
-                   !seat5 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat5={seat5} setSeat5={setSeat5} seatNumber={5}/> : <PlayerBox mostRecentUser={mostRecentUser} roomName={props.roomName} socket={props.socket} user={props.user}/>
+                   !seat5 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat5={seat5} setSeat5={setSeat5} seatNumber={5}/> 
+                   : <PlayerBox mostRecentUser={seatName5} roomName={props.roomName} socket={props.socket} user={props.user}/>
                 }
                         </Box>
                         <Box sx={{
@@ -350,7 +405,8 @@ const PokerTableWithPlayers = props => {
                             alignItems: 'center'
                         }}>
                             {
-                    !seat6 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat6={seat6} setSeat6={setSeat6} seatNumber={6}/> : <PlayerBox mostRecentUser={mostRecentUser} roomName={props.roomName} socket={props.socket} user={props.user}/>
+                    !seat6 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat6={seat6} setSeat6={setSeat6} seatNumber={6}/> 
+                    : <PlayerBox mostRecentUser={seatName6} roomName={props.roomName} socket={props.socket} user={props.user}/>
                     }
                         </Box>
                     </Box>
@@ -363,7 +419,8 @@ const PokerTableWithPlayers = props => {
                     justifyContent: 'center',
                     alignItems: 'center'
                 }}> {
-                   !seat1 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat1={seat1} setSeat1={setSeat1} seatNumber={1}/> : <PlayerBox mostRecentUser={mostRecentUser} roomName={props.roomName} socket={props.socket} user={props.user}/>
+                   !seat1 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat1={seat1} setSeat1={setSeat1} seatNumber={1}/> 
+                   : <PlayerBox mostRecentUser={seatName1} roomName={props.roomName} socket={props.socket} user={props.user}/>
                 }
                 </Box>
                 
