@@ -214,8 +214,8 @@ class PokerHand {
                 `${this.getValueName(this.cards[4])}s `;
                 output += 'full of ';
                 output += this.cards[1].value === '6' ?
-                `${this.getValueName(this.cards[4])}es` :
-                `${this.getValueName(this.cards[4])}s`;
+                `${this.getValueName(this.cards[1])}es` :
+                `${this.getValueName(this.cards[1])}s`;
                 break;
             case 'Flush':
                 output +=`${this.getValueName(this.cards[4])} high`;
