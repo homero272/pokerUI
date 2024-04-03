@@ -2,6 +2,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button  from '@mui/material/Button';
 import { useState, useEffect } from 'react';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { IconButton } from '@mui/material';
+import { red } from '@mui/material/colors';
 
 const numCommunityCards = 5;
 const cardBoxHeight = 60;
@@ -271,7 +274,8 @@ const PokerTableWithPlayers = props => {
           });
 
           props.socket.on("update_room",(data) =>{
-            console.log("IT GOT CALLED IN UI UPDATE_ROOM");
+
+            console.log("IT GOT CALLED IN UI UPDATE_ROOM, array is: ", data);
                 data.forEach((obj,idx) =>{
                     switch (obj.seatNumber) {
                         case 1:
@@ -304,11 +308,50 @@ const PokerTableWithPlayers = props => {
                     }
                 })
 
+          });
+
+          props.socket.on("groupUpdate_room", (data) =>{
+            switch (data.seatLeaving) {
+                case 1:
+                  setSeat1(false);
+                  setSeatName1(props.user.userName);
+                  break;
+                case 2:
+                  setSeat2(false);
+                  setSeatName2(props.user.userName);
+                  break;
+                case 3:
+                    setSeat3(false);
+                    setSeatName3(props.user.userName);
+                  break;
+                case 4:
+                    setSeat4(false);
+                    setSeatName4(props.user.userName);
+                  break;
+                case 5:
+                    setSeat5(false);
+                    setSeatName5(props.user.userName);
+                  break;
+                case 6:
+                    setSeat6(false);
+                    setSeatName6(props.user.userName);
+                  break;
+                default:
+                  console.log("Number is not between 1 and 6");
+                  break;
+            }
+           
+
           })
     
         }
         
       }, [props.socket])
+
+      const handleLeaveGame = () =>{
+        props.setActionForMatch(null);
+        props.socket.emit("leaveGame");
+      }
 
     return (
         <Box sx={{
@@ -319,6 +362,14 @@ const PokerTableWithPlayers = props => {
             justifyContent: "center",
             backgroundColor: '#111111'
         }}>
+            <Box sx={{position: 'absolute', top: 10, left: 10}}>
+            <IconButton  onClick={handleLeaveGame}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <LogoutIcon  fontSize='large' sx={{ color: red[900] }}/> {/* Home icon */}
+                        <Typography variant="caption" color= "white">Leave Game</Typography> {/* Subtext */}
+                    </Box>
+                </IconButton>
+            </Box>
 
             <Box sx={{
                 height: tableHeight + (playerBoxHeight * 2) + 25,
