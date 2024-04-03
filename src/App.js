@@ -63,7 +63,8 @@ function App() {
 
   const handleSignIn = (props) =>{
     setUser(props.user);
-    setSocket(io.connect("http://localhost:3001"));
+    //setSocket(io.connect("http://localhost:3001"));
+    setSocket(io.connect("https://pokerwebsocket.onrender.com"));
     
 
     
