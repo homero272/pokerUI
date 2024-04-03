@@ -42,6 +42,8 @@ const Home = (props) => {
         // Do whatever you want with the selected avatar path
         console.log("Selected Avatar:", avatarPath);
     };
+
+
     const handleBuyAvatar = async() =>{
         if(money < avatarPrice){
             console.log("Insufficient Funds!!")
@@ -52,6 +54,7 @@ const Home = (props) => {
             setMoney(money - avatarPrice);
             const api = new API();
             setAvatar(freeAvatars[selectedAvatar] || buyableAvatars[selectedAvatar]);
+            props.setUser({...user,  avatar:selectedAvatar, money:money-avatarPrice});
             try {
                 const userInfo = await api.updateMoney(money - avatarPrice,userName, selectedAvatar);
                 setMessage("Purchased Successfully");
