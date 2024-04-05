@@ -291,12 +291,204 @@ const pokerHand36 = new PokerHand([
     new Card('7', 'h'),
 ]);
 
-const pokerHand99 = new PokerHand([
-    new Card('4', 's'),
+const pokerHand37 = new PokerHand([
+    new Card('6', 'h'),
+    new Card('2', 'h'),
+    new Card('5', 'h'),
+    new Card('3', 'h'),
+    new Card('7', 'h'),
+]);
+
+const pokerHand38 = new PokerHand([
+    new Card('J', 's'),
+    new Card('T', 'h'),
+    new Card('A', 'd'),
+    new Card('Q', 's'),
+    new Card('K', 'c'),
+]);
+
+const pokerHand39 = new PokerHand([
+    new Card('T', 's'),
+    new Card('K', 'c'),
+    new Card('Q', 'h'),
+    new Card('A', 's'),
+    new Card('J', 'c'),
+]);
+
+const pokerHand40 = new PokerHand([
+    new Card('T', 's'),
+    new Card('K', 'c'),
+    new Card('Q', 'h'),
+    new Card('9', 's'),
+    new Card('J', 'c'),
+]);
+
+const pokerHand41 = new PokerHand([
+    new Card('J', 's'),
+    new Card('T', 'h'),
+    new Card('9', 'd'),
+    new Card('Q', 's'),
+    new Card('K', 'c'),
+]);
+
+const pokerHand42 = new PokerHand([
+    new Card('J', 's'),
+    new Card('T', 'h'),
+    new Card('9', 'd'),
+    new Card('7', 's'),
+    new Card('8', 'c'),
+]);
+
+const pokerHand43 = new PokerHand([
+    new Card('6', 'd'),
+    new Card('5', 'c'),
+    new Card('9', 'h'),
+    new Card('7', 's'),
+    new Card('8', 'c'),
+]);
+
+const pokerHand44 = new PokerHand([
+    new Card('6', 'd'),
+    new Card('5', 'c'),
+    new Card('8', 'h'),
+    new Card('7', 's'),
+    new Card('4', 'c'),
+]);
+
+const pokerHand45 = new PokerHand([
+    new Card('6', 'd'),
+    new Card('5', 'c'),
+    new Card('3', 'h'),
+    new Card('7', 's'),
+    new Card('4', 'c'),
+]);
+
+const pokerHand46 = new PokerHand([
+    new Card('6', 'd'),
+    new Card('5', 'c'),
+    new Card('3', 'h'),
+    new Card('2', 's'),
+    new Card('4', 'c'),
+]);
+
+const pokerHand47 = new PokerHand([
+    new Card('2', 'd'),
+    new Card('5', 'c'),
+    new Card('3', 'h'),
+    new Card('A', 's'),
+    new Card('4', 'c'),
+]);
+
+const pokerHand48 = new PokerHand([
+    new Card('2', 'h'),
+    new Card('5', 's'),
     new Card('3', 's'),
     new Card('A', 's'),
-    new Card('5', 's'),
-    new Card('2', 's'),
+    new Card('4', 's'),
+]);
+
+const pokerHand49 = new PokerHand([
+    new Card('A', 'd'),
+    new Card('K', 's'),
+    new Card('Q', 's'),
+    new Card('A', 's'),
+    new Card('A', 'h'),
+]);
+
+const pokerHand50 = new PokerHand([
+    new Card('A', 'd'),
+    new Card('A', 's'),
+    new Card('A', 'h'),
+    new Card('K', 's'),
+    new Card('Q', 'h'),
+]);
+
+const pokerHand51 = new PokerHand([
+    new Card('K', 'd'),
+    new Card('A', 's'),
+    new Card('A', 'h'),
+    new Card('A', 'c'),
+    new Card('Q', 'h'),
+]);
+
+const pokerHand500 = new PokerHand([
+    new Card('A', 'd'),
+    new Card('A', 's'),
+    new Card('A', 'h'),
+    new Card('K', 's'),
+    new Card('J', 'h'),
+]);
+
+const pokerHand501 = new PokerHand([
+    new Card('A', 'd'),
+    new Card('A', 's'),
+    new Card('A', 'h'),
+    new Card('Q', 's'),
+    new Card('J', 'h'),
+]);
+
+const pokerHand52 = new PokerHand([
+    new Card('K', 'd'),
+    new Card('K', 's'),
+    new Card('A', 'h'),
+    new Card('K', 'c'),
+    new Card('Q', 'h'),
+]);
+
+const pokerHand53 = new PokerHand([
+    new Card('A', 'd'),
+    new Card('K', 's'),
+    new Card('K', 'h'),
+    new Card('K', 'c'),
+    new Card('Q', 'h'),
+]);
+
+const pokerHand54 = new PokerHand([
+    new Card('A', 'd'),
+    new Card('K', 's'),
+    new Card('Q', 'h'),
+    new Card('K', 'c'),
+    new Card('K', 'h'),
+]);
+
+const pokerHand55 = new PokerHand([
+    new Card('J', 'd'),
+    new Card('K', 's'),
+    new Card('A', 'h'),
+    new Card('K', 'c'),
+    new Card('K', 'h'),
+]);
+
+const pokerHand56 = new PokerHand([
+    new Card('T', 'd'),
+    new Card('K', 's'),
+    new Card('A', 'h'),
+    new Card('K', 'c'),
+    new Card('K', 'h'),
+]);
+
+const pokerHand57 = new PokerHand([
+    new Card('7', 'd'),
+    new Card('K', 's'),
+    new Card('A', 'h'),
+    new Card('K', 'c'),
+    new Card('K', 'h'),
+]);
+
+const pokerHand58 = new PokerHand([
+    new Card('3', 'd'),
+    new Card('K', 's'),
+    new Card('A', 'h'),
+    new Card('K', 'c'),
+    new Card('K', 'h'),
+]);
+
+const pokerHand59 = new PokerHand([
+    new Card('2', 'd'),
+    new Card('K', 's'),
+    new Card('A', 'h'),
+    new Card('K', 'c'),
+    new Card('K', 'h'),
 ]);
 
 pokerHand1.print();
@@ -335,6 +527,31 @@ pokerHand33.print();
 pokerHand34.print();
 pokerHand35.print();
 pokerHand36.print();
+pokerHand37.print();
+pokerHand38.print();
+pokerHand39.print();
+pokerHand40.print();
+pokerHand41.print();
+pokerHand42.print();
+pokerHand43.print();
+pokerHand44.print();
+pokerHand45.print();
+pokerHand46.print();
+pokerHand47.print();
+pokerHand48.print();
+pokerHand49.print();
+pokerHand50.print();
+pokerHand51.print();
+pokerHand500.print();
+pokerHand501.print();
+pokerHand52.print();
+pokerHand53.print();
+pokerHand54.print();
+pokerHand55.print();
+pokerHand56.print();
+pokerHand57.print();
+pokerHand58.print();
+pokerHand59.print();
 
 assert.strictEqual(pokerHand1.compareWith(pokerHand2), 0);
 assert.strictEqual(pokerHand1.compareWith(pokerHand3), 1);
@@ -397,3 +614,127 @@ assert.strictEqual(pokerHand34.compareWith(pokerHand35), 1);
 assert.strictEqual(pokerHand34.compareWith(pokerHand33), -1);
 assert.strictEqual(pokerHand35.compareWith(pokerHand36), 1);
 assert.strictEqual(pokerHand36.compareWith(pokerHand35), -1);
+assert.strictEqual(pokerHand37.compareWith(pokerHand35), -1);
+assert.strictEqual(pokerHand37.compareWith(pokerHand36), -1);
+assert.strictEqual(pokerHand35.compareWith(pokerHand37), 1);
+assert.strictEqual(pokerHand37.compareWith(pokerHand38), 1);
+assert.strictEqual(pokerHand37.compareWith(pokerHand39), 1);
+assert.strictEqual(pokerHand39.compareWith(pokerHand38), 0);
+assert.strictEqual(pokerHand38.compareWith(pokerHand39), 0);
+assert.strictEqual(pokerHand39.compareWith(pokerHand37), -1);
+assert.strictEqual(pokerHand38.compareWith(pokerHand36), -1);
+assert.strictEqual(pokerHand40.compareWith(pokerHand36), -1);
+assert.strictEqual(pokerHand40.compareWith(pokerHand39), -1);
+assert.strictEqual(pokerHand40.compareWith(pokerHand41), 0);
+assert.strictEqual(pokerHand41.compareWith(pokerHand40), 0);
+assert.strictEqual(pokerHand39.compareWith(pokerHand41), 1);
+assert.strictEqual(pokerHand38.compareWith(pokerHand40), 1);
+assert.strictEqual(pokerHand41.compareWith(pokerHand42), 1);
+assert.strictEqual(pokerHand41.compareWith(pokerHand43), 1);
+assert.strictEqual(pokerHand41.compareWith(pokerHand44), 1);
+assert.strictEqual(pokerHand42.compareWith(pokerHand41), -1);
+assert.strictEqual(pokerHand43.compareWith(pokerHand41), -1);
+assert.strictEqual(pokerHand42.compareWith(pokerHand43), 1);
+assert.strictEqual(pokerHand43.compareWith(pokerHand42), -1);
+assert.strictEqual(pokerHand42.compareWith(pokerHand44), 1);
+assert.strictEqual(pokerHand42.compareWith(pokerHand45), 1);
+assert.strictEqual(pokerHand43.compareWith(pokerHand44), 1);
+assert.strictEqual(pokerHand43.compareWith(pokerHand45), 1);
+assert.strictEqual(pokerHand45.compareWith(pokerHand44), -1);
+assert.strictEqual(pokerHand45.compareWith(pokerHand46), 1);
+assert.strictEqual(pokerHand45.compareWith(pokerHand47), 1);
+assert.strictEqual(pokerHand47.compareWith(pokerHand46), -1);
+assert.strictEqual(pokerHand46.compareWith(pokerHand47), 1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand47), 0);
+assert.strictEqual(pokerHand47.compareWith(pokerHand48), 0);
+assert.strictEqual(pokerHand48.compareWith(pokerHand6), -1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand7), -1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand46), -1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand42), -1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand43), -1);
+assert.strictEqual(pokerHand47.compareWith(pokerHand41), -1);
+assert.strictEqual(pokerHand47.compareWith(pokerHand39), -1);
+assert.strictEqual(pokerHand47.compareWith(pokerHand24), -1);
+assert.strictEqual(pokerHand47.compareWith(pokerHand16), -1);
+assert.strictEqual(pokerHand16.compareWith(pokerHand46), 1);
+assert.strictEqual(pokerHand17.compareWith(pokerHand48), 1);
+assert.strictEqual(pokerHand36.compareWith(pokerHand48), 1);
+assert.strictEqual(pokerHand3.compareWith(pokerHand47), 1);
+assert.strictEqual(pokerHand11.compareWith(pokerHand44), 1);
+assert.strictEqual(pokerHand19.compareWith(pokerHand23), 1);
+assert.strictEqual(pokerHand14.compareWith(pokerHand40), 1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand49), 1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand50), 1);
+assert.strictEqual(pokerHand48.compareWith(pokerHand51), 1);
+assert.strictEqual(pokerHand51.compareWith(pokerHand48), -1);
+assert.strictEqual(pokerHand50.compareWith(pokerHand47), -1);
+assert.strictEqual(pokerHand49.compareWith(pokerHand46), -1);
+assert.strictEqual(pokerHand49.compareWith(pokerHand50), 0);
+assert.strictEqual(pokerHand49.compareWith(pokerHand51), 0);
+assert.strictEqual(pokerHand51.compareWith(pokerHand50), 0);
+assert.strictEqual(pokerHand51.compareWith(pokerHand49), 0);
+assert.strictEqual(pokerHand50.compareWith(pokerHand51), 0);
+assert.strictEqual(pokerHand50.compareWith(pokerHand49), 0);
+assert.strictEqual(pokerHand49.compareWith(pokerHand20), -1);
+assert.strictEqual(pokerHand49.compareWith(pokerHand23), -1);
+assert.strictEqual(pokerHand50.compareWith(pokerHand22), -1);
+assert.strictEqual(pokerHand49.compareWith(pokerHand21), -1);
+assert.strictEqual(pokerHand51.compareWith(pokerHand24), -1);
+assert.strictEqual(pokerHand50.compareWith(pokerHand22), -1);
+assert.strictEqual(pokerHand50.compareWith(pokerHand20), -1);
+assert.strictEqual(pokerHand50.compareWith(pokerHand21), -1);
+assert.strictEqual(pokerHand51.compareWith(pokerHand21), -1);
+assert.strictEqual(pokerHand51.compareWith(pokerHand22), -1);
+assert.strictEqual(pokerHand51.compareWith(pokerHand20), -1);
+assert.strictEqual(pokerHand20.compareWith(pokerHand51), 1);
+assert.strictEqual(pokerHand20.compareWith(pokerHand21), 1);
+assert.strictEqual(pokerHand20.compareWith(pokerHand22), 1);
+assert.strictEqual(pokerHand21.compareWith(pokerHand51), 1);
+assert.strictEqual(pokerHand22.compareWith(pokerHand51), 1);
+assert.strictEqual(pokerHand23.compareWith(pokerHand51), 1);
+assert.strictEqual(pokerHand24.compareWith(pokerHand51), 1);
+assert.strictEqual(pokerHand20.compareWith(pokerHand50), 1);
+assert.strictEqual(pokerHand21.compareWith(pokerHand50), 1);
+assert.strictEqual(pokerHand22.compareWith(pokerHand50), 1);
+assert.strictEqual(pokerHand23.compareWith(pokerHand50), 1);
+assert.strictEqual(pokerHand24.compareWith(pokerHand50), 1);
+assert.strictEqual(pokerHand20.compareWith(pokerHand49), 1);
+assert.strictEqual(pokerHand22.compareWith(pokerHand49), 1);
+assert.strictEqual(pokerHand21.compareWith(pokerHand49), 1);
+assert.strictEqual(pokerHand24.compareWith(pokerHand49), 1);
+assert.strictEqual(pokerHand23.compareWith(pokerHand49), 1);
+assert.strictEqual(pokerHand25.compareWith(pokerHand49), 1);
+assert.strictEqual(pokerHand51.compareWith(pokerHand52), 1);
+assert.strictEqual(pokerHand53.compareWith(pokerHand52), 0);
+assert.strictEqual(pokerHand54.compareWith(pokerHand52), 0);
+assert.strictEqual(pokerHand52.compareWith(pokerHand53), 0);
+assert.strictEqual(pokerHand54.compareWith(pokerHand53), 0);
+assert.strictEqual(pokerHand500.compareWith(pokerHand50), -1);
+assert.strictEqual(pokerHand500.compareWith(pokerHand51), -1);
+assert.strictEqual(pokerHand500.compareWith(pokerHand52), 1);
+assert.strictEqual(pokerHand501.compareWith(pokerHand500), -1);
+assert.strictEqual(pokerHand501.compareWith(pokerHand50), -1);
+assert.strictEqual(pokerHand500.compareWith(pokerHand501), 1);
+assert.strictEqual(pokerHand500.compareWith(pokerHand52), 1);
+assert.strictEqual(pokerHand500.compareWith(pokerHand53), 1);
+assert.strictEqual(pokerHand501.compareWith(pokerHand54), 1);
+assert.strictEqual(pokerHand54.compareWith(pokerHand55), 1);
+assert.strictEqual(pokerHand53.compareWith(pokerHand56), 1);
+assert.strictEqual(pokerHand55.compareWith(pokerHand52), -1);
+assert.strictEqual(pokerHand56.compareWith(pokerHand53), -1);
+assert.strictEqual(pokerHand55.compareWith(pokerHand54), -1);
+assert.strictEqual(pokerHand55.compareWith(pokerHand56), 1);
+assert.strictEqual(pokerHand55.compareWith(pokerHand57), 1);
+assert.strictEqual(pokerHand55.compareWith(pokerHand58), 1);
+assert.strictEqual(pokerHand55.compareWith(pokerHand59), 1);
+assert.strictEqual(pokerHand59.compareWith(pokerHand56), -1);
+assert.strictEqual(pokerHand59.compareWith(pokerHand55), -1);
+assert.strictEqual(pokerHand59.compareWith(pokerHand54), -1);
+assert.strictEqual(pokerHand58.compareWith(pokerHand57), -1);
+assert.strictEqual(pokerHand58.compareWith(pokerHand59), 1);
+assert.strictEqual(pokerHand56.compareWith(pokerHand57), 1);
+assert.strictEqual(pokerHand56.compareWith(pokerHand59), 1);
+assert.strictEqual(pokerHand56.compareWith(pokerHand55), -1);
+assert.strictEqual(pokerHand57.compareWith(pokerHand56), -1);
+assert.strictEqual(pokerHand59.compareWith(pokerHand58), -1);
+
