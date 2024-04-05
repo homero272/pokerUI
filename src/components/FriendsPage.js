@@ -33,16 +33,21 @@ const PendingRequestsPage = (props) => {
         props.setPendingFriends(false);
     }
 
-    const handleAcceptFriendRequest = (requestsUserName, requestUserID) => {
+    const handleAcceptFriendRequest = async(requestsUserName, requestUserID) => {
         console.log(`Accepting ${requestsUserName} with ID of ${requestUserID}`);
         // Remove the request from receivedRequests
         setReceivedRequests(prevRequests => prevRequests.filter(request => request.userName1 !== requestsUserName));
+        const api = new API();
+        api.acceptFriend(requestUserID, user.userID);
     }
 
-    const handleRejectFriendRequest = (requestsUserName, requestUserID) => {
+    const handleRejectFriendRequest = async(requestsUserName, requestUserID) => {
         console.log(`Rejecting ${requestsUserName} with ID of ${requestUserID}`);
         // Remove the request from receivedRequests
         setReceivedRequests(prevRequests => prevRequests.filter(request => request.userName1 !== requestsUserName));
+        const api = new API();
+        api.rejectFriend(requestUserID, user.userID);
+
     }
 
     return (
@@ -339,7 +344,7 @@ const FriendsPage = (props) => {
             ) : (
                 <Box sx={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    flexDirection: 'column',
                     alignItems: 'center',
                     width: "100vw",
                     height: '100vh'
@@ -368,49 +373,47 @@ const FriendsPage = (props) => {
                             </Box>
                         </IconButton>
                     </Box> 
-                    {
-                        
-        arrayOfFriends.map((friend) => {
-        // Get friend's user name (either userName1 or userName2)
-        const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
-        
-        // Find the friend's details from arrayOfUsers using their username
-        const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
+                    <Box sx={{ display: 'flex', justifyContent: 'center',flexDirection: 'column', alignItems: 'center', padding: '100px' }}> {/* Display list vertically with padding */}
+                        <Typography variant="h6">My Friends:</Typography>
+                        {arrayOfFriends.map((friend) => {
+                            // Get friend's user name (either userName1 or userName2)
+                            const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
 
-        // Render list item if friend details are found
-        if (friendDetails) {
-            return (
-                
-                <List key={friendDetails.userName} sx={{ border: 1,width: '100%', maxWidth: 360, bgcolor: 'lightgrey' }}>
-                    <ListItem alignItems="flex-start">
-                        <ListItemAvatar>
-                            <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={friendDetails.userName}
-                            secondary={
-                                <Fragment>
-                                    <Typography
-                                        sx={{ display: 'inline' }}
-                                        component="span"
-                                        variant="body2"
-                                        color="text.primary"
-                                    >
-                                        {friendDetails.stats}
-                                    </Typography>
-                                    {" — Main Page..."}
-                                </Fragment>
+                            // Find the friend's details from arrayOfUsers using their username
+                            const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
+
+                            // Render list item if friend details are found
+                            if (friendDetails) {
+                                return (
+                                    <List key={friendDetails.userName} sx={{ border: 1, width: '100%', maxWidth: 360, bgcolor: 'lightgrey',  }}>
+                                        <ListItem alignItems="flex-start">
+                                            <ListItemAvatar>
+                                                <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={friendDetails.userName}
+                                                secondary={
+                                                    <React.Fragment>
+                                                        <Typography
+                                                            sx={{ display: 'inline' }}
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                        >
+                                                            {friendDetails.stats}
+                                                        </Typography>
+                                                        {" — Main Page..."}
+                                                    </React.Fragment>
+                                                }
+                                            />
+                                        </ListItem>
+                                    </List>
+                                );
+                            } else {
+                                return null; // If friend details are not found, don't render anything
                             }
-                        />
-                    </ListItem>
-                </List>
-            );
-        } else {
-            return null; // If friend details are not found, don't render anything
-        }
-    })
-}
-
+                        })}
+                    </Box>
                 </Box>
             )}
         </>
