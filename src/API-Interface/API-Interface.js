@@ -69,4 +69,64 @@ export default class APIInterface{
             throw error;            
         }
     }
+
+    async getAllUsers() {
+        try {
+            const response = await axiosAgent.get('/login/check/all');
+            console.log("success in getting all users");
+            return response.data; 
+        } catch (error) {
+            console.log("error in getAllUsers:", error);
+            throw error;
+        }
+    }
+    
+    async showFriends(userName1, userName2, rStatus){
+        try{
+            const response = await axiosAgent.get(`/friend/show/${userName1}/${userName2}/${rStatus}`)
+            return response.data; 
+        }
+        catch(error){
+            console.log("error in showFriends");
+            throw error;
+        }
+    }
+    async searchFriends(userName){
+        try{
+            const response = await axiosAgent.get(`/friend/search/${userName}`);
+            return response.data; 
+
+        }
+        catch(error){
+            console.log("error in search friends");
+            throw error;
+        }
+    }
+    async addFriend(userID1, userName1,userID2, userName2, rStatus){
+        try{
+            await axiosAgent.get(`/friend/add/${userID1}/${userName1}/${userID2}/${userName2}/${rStatus}`);
+        }
+        catch(error){
+            console.log("error in add friend");
+            throw error;
+        }
+    }
+    async acceptFriend(userID1, userID2){
+        try{
+            await axiosAgent.get(`/friend/accept/${userID1}/${userID2}`);
+        }
+        catch(error){
+            console.log("error in accept friend");
+            throw error;
+        }
+    }
+    async rejectFriend(userID1, userID2){
+        try{
+            await axiosAgent.get(`/friend/reject/${userID1}/${userID2}`);
+        }
+        catch(error){
+            console.log("error in reject friend");
+            throw error;
+        }
+    }
 }

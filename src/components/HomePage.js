@@ -8,6 +8,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import HomeIcon from '@mui/icons-material/Home';
 import freeAvatars from "../avatars/FreeAvatars/free";
 import buyableAvatars from "../avatars/BuyableAvatars/buy"
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import FriendsPage from './FriendsPage';
 
 const Home = (props) => {
     const socket = props.socket;
@@ -19,6 +21,7 @@ const Home = (props) => {
     const [shoppingMenu, setShoppingMenu] = useState(false);
     const [avatarPrice, setAvatarPrice] = useState(0);
     const [message, setMessage] = useState("");
+    const [friendsPage, setFriendsPage] = useState(false);
 
     const handleLogout = () => {
         props.handleSignOut();
@@ -65,8 +68,13 @@ const Home = (props) => {
         }
     }
 
+    const handleFriendsPageClick = (boolean) =>{
+        console.log("navgating to friends page...");
+        setFriendsPage(boolean);
+    }
+
     return (
-        !shoppingMenu ? 
+        !shoppingMenu ?  friendsPage ?  <FriendsPage user = {user} setFriendsPage = {setFriendsPage}/> :
         <Box sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -76,6 +84,18 @@ const Home = (props) => {
             width: '100vw',
             backgroundColor: '#f0f0f0', 
         }}>
+            <Box sx={{
+                position: 'absolute',
+                top: 10,
+                left: 10
+            }}>
+                <IconButton onClick={() => handleFriendsPageClick(true)}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <PeopleAltIcon fontSize='large' color='primary' />
+                        <Typography variant="caption">Friends</Typography>
+                    </Box>
+                </IconButton>
+            </Box>
             <Box>
                 <Typography variant="h4" gutterBottom>
                     Welcome, {userName}
@@ -107,7 +127,7 @@ const Home = (props) => {
                 Logout
             </Button>
         </Box> 
-        :
+         :
         <Box sx={{
             display: 'flex',
             flexDirection: 'column',
