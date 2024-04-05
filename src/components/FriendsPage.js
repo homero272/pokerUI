@@ -20,36 +20,145 @@ import freeAvatars from "../avatars/FreeAvatars/free";
 import buyableAvatars from "../avatars/BuyableAvatars/buy"
 import AddIcon from '@mui/icons-material/Add';
 import ClockIcon from '@mui/icons-material/AccessTime';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 
-const PendingRequestsPage = (props) =>{
+const PendingRequestsPage = (props) => {
+    const { arrayOfRequests, arrayOfUsers, user } = props;
+    const [receivedRequests, setReceivedRequests] = useState(arrayOfRequests.filter(request => request.userName2 === user.userName));
+    const [outgoingRequests] = useState(arrayOfRequests.filter(request => request.userName1 === user.userName));
 
-
-    const handleReturnToFriendsPage = () =>{
-
+    const handleReturnToFriendsPage = () => {
         props.setPendingFriends(false);
     }
+
+    const handleAcceptFriendRequest = (requestsUserName, requestUserID) => {
+        console.log(`Accepting ${requestsUserName} with ID of ${requestUserID}`);
+        // Remove the request from receivedRequests
+        setReceivedRequests(prevRequests => prevRequests.filter(request => request.userName1 !== requestsUserName));
+    }
+
+    const handleRejectFriendRequest = (requestsUserName, requestUserID) => {
+        console.log(`Rejecting ${requestsUserName} with ID of ${requestUserID}`);
+        // Remove the request from receivedRequests
+        setReceivedRequests(prevRequests => prevRequests.filter(request => request.userName1 !== requestsUserName));
+    }
+
     return (
         <Fragment>
-                <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: "100vw",
-                    height: '100vh'
-                }}>
-                    <Box sx={{position: 'absolute', top: 10, left: 0}}>
-                        <IconButton  onClick={handleReturnToFriendsPage}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <ArrowBackIcon sx={{ color: red[900] }} fontSize='large'/> {/* Home icon */}
-                                <Typography variant="caption">Return to Friends</Typography> {/* Subtext */}
-                            </Box>
-                        </IconButton>
-                    </Box> 
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: "100vw",
+                height: '100vh'
+            }}>
+                <Box sx={{ position: 'absolute', top: 10, left: 0 }}>
+                    <IconButton onClick={handleReturnToFriendsPage}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <ArrowBackIcon sx={{ color: red[900] }} fontSize='large' />
+                            <Typography variant="caption">Return to Friends</Typography>
+                        </Box>
+                    </IconButton>
                 </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px' }}> {/* Display list vertically with padding */}
+                    <Typography variant="h6">Received Requests:</Typography>
+                    {receivedRequests.map((friend) => {
+                        // Get friend's user name (either userName1 or userName2)
+                        const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
+
+                        // Find the friend's details from arrayOfUsers using their username
+                        const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
+
+                        // Render list item if friend details are found
+                        if (friendDetails) {
+                            return (
+                                <List key={friendDetails.userName} sx={{ border: 1, width: '100%', maxWidth: 360, bgcolor: 'lightgrey' }}>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={friendDetails.userName}
+                                            secondary={
+                                                <Fragment>
+                                                    <Typography
+                                                        sx={{ display: 'inline' }}
+                                                        component="span"
+                                                        variant="body2"
+                                                        color="text.primary"
+                                                    >
+                                                        {friendDetails.stats}
+                                                    </Typography>
+                                                    {" — Main Page..."}
+                                                </Fragment>
+                                            }
+                                        />
+                                        <IconButton onClick={() => handleAcceptFriendRequest(friendDetails.userName, friendDetails.userID)}>
+                                            <CheckIcon sx={{ color: 'green' }} />
+                                        </IconButton>
+                                        <IconButton onClick={() => handleRejectFriendRequest(friendDetails.userName, friendDetails.userID)}>
+                                            <CloseIcon sx={{ color: 'red' }} />
+                                        </IconButton>
+                                    </ListItem>
+                                </List>
+                            );
+                        } else {
+                            return null; // If friend details are not found, don't render anything
+                        }
+                    })}
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px' }}> {/* Display list vertically with padding */}
+                    <Typography variant="h6">Outgoing Requests:</Typography>
+                    {outgoingRequests.map((friend) => {
+                        // Get friend's user name (either userName1 or userName2)
+                        const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
+
+                        // Find the friend's details from arrayOfUsers using their username
+                        const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
+
+                        // Render list item if friend details are found
+                        if (friendDetails) {
+                            return (
+                                <List key={friendDetails.userName} sx={{ border: 1, width: '100%', maxWidth: 360, bgcolor: 'lightgrey' }}>
+                                    <ListItem alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={friendDetails.userName}
+                                            secondary={
+                                                <Fragment>
+                                                    <Typography
+                                                        sx={{ display: 'inline' }}
+                                                        component="span"
+                                                        variant="body2"
+                                                        color="text.primary"
+                                                    >
+                                                        {friendDetails.stats}
+                                                    </Typography>
+                                                    {" — Main Page..."}
+                                                </Fragment>
+                                            }
+                                        />
+                                    </ListItem>
+                                </List>
+                            );
+                        } else {
+                            return null; // If friend details are not found, don't render anything
+                        }
+                    })}
+                </Box>
+            </Box>
         </Fragment>
-    )
+    );
 }
+
+
+
+
+
 
 const AddFriendsPage = (props) => {
     const { setArrayOfRequests,arrayOfFriends, arrayOfUsers, user, arrayOfRequests } = props;
@@ -199,6 +308,7 @@ const FriendsPage = (props) => {
                 setArrayOfRequests(requests);
                 console.log("all user is:", allUsers);
                 console.log("all friends for current user: ", friends);
+                console.log("requests for user", requests)
             } catch (error) {
                 console.error("Error fetching data:", error);
                 // Handle error
@@ -206,7 +316,7 @@ const FriendsPage = (props) => {
         };
 
         fetchData();
-    }, [user.userName, addFriends]);
+    }, [user.userName, addFriends, pendingFriends]);
 
     const handleReturnToMenu = () => {
         setFriendsPage(false);
@@ -225,7 +335,7 @@ const FriendsPage = (props) => {
             {addFriends ? (
                 <AddFriendsPage user={user}  setArrayOfRequests={setArrayOfRequests} arrayOfRequests={arrayOfRequests} arrayOfFriends={arrayOfFriends} arrayOfUsers={arrayOfUsers} setAddFriends={setAddFriends} />
             ) : pendingFriends ? (
-                <PendingRequestsPage user={user} setPendingFriends={setPendingFriends} arrayOfRequests={arrayOfRequests}/>
+                <PendingRequestsPage user={user} setPendingFriends={setPendingFriends} arrayOfUsers={arrayOfUsers} arrayOfRequests={arrayOfRequests}/>
             ) : (
                 <Box sx={{
                     display: 'flex',
@@ -270,6 +380,7 @@ const FriendsPage = (props) => {
         // Render list item if friend details are found
         if (friendDetails) {
             return (
+                
                 <List key={friendDetails.userName} sx={{ border: 1,width: '100%', maxWidth: 360, bgcolor: 'lightgrey' }}>
                     <ListItem alignItems="flex-start">
                         <ListItemAvatar>
@@ -278,7 +389,7 @@ const FriendsPage = (props) => {
                         <ListItemText
                             primary={friendDetails.userName}
                             secondary={
-                                <React.Fragment>
+                                <Fragment>
                                     <Typography
                                         sx={{ display: 'inline' }}
                                         component="span"
@@ -288,7 +399,7 @@ const FriendsPage = (props) => {
                                         {friendDetails.stats}
                                     </Typography>
                                     {" — Main Page..."}
-                                </React.Fragment>
+                                </Fragment>
                             }
                         />
                     </ListItem>
