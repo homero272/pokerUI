@@ -104,7 +104,8 @@ export default class APIInterface{
     }
     async addFriend(userID1, userName1,userID2, userName2, rStatus){
         try{
-            await axiosAgent.get(`/friend/add/${userID1}/${userName1}/${userID2}/${userName2}/${rStatus}`);
+            const response = await axiosAgent.get(`/friend/add/${userID1}/${userName1}/${userID2}/${userName2}/${rStatus}`);
+            return response.data;
         }
         catch(error){
             console.log("error in add friend");
@@ -113,7 +114,8 @@ export default class APIInterface{
     }
     async acceptFriend(userID1, userID2){
         try{
-            await axiosAgent.get(`/friend/accept/${userID1}/${userID2}`);
+            const response = await axiosAgent.get(`/friend/accept/${userID1}/${userID2}`);
+            return response.data;
         }
         catch(error){
             console.log("error in accept friend");
@@ -122,7 +124,8 @@ export default class APIInterface{
     }
     async rejectFriend(userID1, userID2){
         try{
-            await axiosAgent.get(`/friend/reject/${userID1}/${userID2}`);
+            const response = await axiosAgent.get(`/friend/reject/${userID1}/${userID2}`);
+            return response.data;
         }
         catch(error){
             console.log("error in reject friend");
