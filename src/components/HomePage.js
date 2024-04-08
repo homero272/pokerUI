@@ -22,6 +22,8 @@ const Home = (props) => {
     const [avatarPrice, setAvatarPrice] = useState(0);
     const [message, setMessage] = useState("");
     const [friendsPage, setFriendsPage] = useState(false);
+    const [ownedAvatars,setOwnedAvatars] = useState([]);
+    
 
     const handleLogout = () => {
         props.handleSignOut();
@@ -32,18 +34,28 @@ const Home = (props) => {
         props.handleMatchAction(text);
     };
 
-    const handleShopClick = (boolean) => {
+    const handleShopClick = async(boolean) => {
         setShoppingMenu(boolean);
         console.log("Shop icon clicked");
         setMessage("");
+        const api = new API();
+        let ownedAvatarList = await api.searchAvatars(userName);
+        setOwnedAvatars(ownedAvatarList);
+        console.log("ownedAvatarList: ", ownedAvatarList);
+        Object.entries(ownedAvatarList).map(([avatarName, avatarScr]) => (
+            console.log(avatarScr.avatar, "hello")
+            
+            
+        ))
     };
 
-    const handleAvatarClick = (avatarPath,avatarPrice) => {
-        setSelectedAvatar(avatarPath);
+    const handleAvatarClick = (avatarName,avatarPrice) => {
+        console.log("Selected Avatar1:", avatarName);
+        setSelectedAvatar(avatarName);
         setAvatarPrice(avatarPrice);
         setMessage("");
         // Do whatever you want with the selected avatar path
-        console.log("Selected Avatar:", avatarPath);
+        console.log("Selected Avatar:", avatarName);
     };
 
 
@@ -60,6 +72,10 @@ const Home = (props) => {
             props.setUser({...user,  avatar:selectedAvatar, money:money-avatarPrice});
             try {
                 const userInfo = await api.updateMoney(money - avatarPrice,userName, selectedAvatar);
+
+                //avatars call to save the bought avatar
+                await api.insertAvatar(user.userID, userName, selectedAvatar);
+
                 setMessage("Purchased Successfully");
             } catch (error) {
                 console.error("Error during updating money:", error);
@@ -74,108 +90,132 @@ const Home = (props) => {
     }
 
     return (
-        !shoppingMenu ?  friendsPage ?  <FriendsPage user = {user} setFriendsPage = {setFriendsPage}/> :
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100vh',
-            width: '100vw',
-            backgroundColor: '#f0f0f0', 
-        }}>
-            <Box sx={{
-                position: 'absolute',
-                top: 10,
-                left: 10
-            }}>
-                <IconButton onClick={() => handleFriendsPageClick(true)}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <PeopleAltIcon fontSize='large' color='primary' />
-                        <Typography variant="caption">Friends</Typography>
-                    </Box>
-                </IconButton>
-            </Box>
-            <Box>
-                <Typography variant="h4" gutterBottom>
-                    Welcome, {userName}
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                    <Avatar src={avatar} sx={{ border: 1, borderWidth: 2, width: 120, height: 120 }}/>
-                </Box>
-            </Box>
-            <Box>
-                <Button variant="contained" color="primary" sx={{ marginRight: 2 }} onClick={() => handleAction("create")}>
-                    Create Match
-                </Button>
-                <Button variant="contained" color="secondary" onClick={() => handleAction("join")}>
-                    Join Match
-                </Button>
-            </Box>
-            <Box sx={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'row' }}>
-                <Box sx={{ mr: 20, mt: 1.5 }}>
-                    <Typography>Money: ${money}</Typography>
-                </Box>
-                <IconButton onClick={() => handleShopClick(true)}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <ShoppingCartIcon fontSize='large' />
-                        <Typography variant="caption">Shop</Typography>
-                    </Box>
-                </IconButton>
-            </Box>
-            <Button variant="contained" color="error" onClick={handleLogout}>
-                Logout
-            </Button>
-        </Box> 
-         :
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100vh',
-            width: '100vw',
-            backgroundColor: '#f0f0f0', 
-        }}>
-            <Box sx={{ position: 'absolute', top: 10, left: 10 }}>
-                <IconButton  onClick={() => handleShopClick(false)}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <HomeIcon color='primary' fontSize='large'/> {/* Home icon */}
-                        <Typography variant="caption">Return to Menu</Typography> {/* Subtext */}
-                    </Box>
-                </IconButton>
-            </Box>
-            <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
-                <Typography>Money: ${money}</Typography>       
-            </Box>
-            <Typography variant='h3' mt={4}> Welcome To the Shop</Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 4, border: '1px solid black', p: 2 }}>
-                {Object.entries(buyableAvatars).map(([avatarName, avatarSrc]) => (
-                    <Avatar
-                        key={avatarName}
-                        src={avatarSrc}
-                        onClick={() => handleAvatarClick(avatarName, 10000)}
-                        sx={{ cursor: "pointer", border: selectedAvatar === avatarName ? "2px solid blue" : "none", width: 120, height: 120 }}
-                    />
-                ))}
-            </Box>
+        !shoppingMenu ? friendsPage ? <FriendsPage user={user} setFriendsPage={setFriendsPage} /> :
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
                 alignItems: 'center',
-                mt: 5
+                justifyContent: 'center',
+                height: '100vh',
+                width: '100vw',
+                backgroundColor: '#f0f0f0',
             }}>
-                <Typography>Price: ${avatarPrice}</Typography>
-                <Button onClick = {handleBuyAvatar} variant='contained' color='success' size='large'>
-                    Buy
+                <Box sx={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 10
+                }}>
+                    <IconButton onClick={() => handleFriendsPageClick(true)}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <PeopleAltIcon fontSize='large' color='primary' />
+                            <Typography variant="caption">Friends</Typography>
+                        </Box>
+                    </IconButton>
+                </Box>
+                <Box>
+                    <Typography variant="h4" gutterBottom>
+                        Welcome, {userName}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                        <Avatar src={avatar} sx={{ border: 1, borderWidth: 2, width: 120, height: 120 }} />
+                    </Box>
+                </Box>
+                <Box>
+                    <Button variant="contained" color="primary" sx={{ marginRight: 2 }} onClick={() => handleAction("create")}>
+                        Create Match
+                    </Button>
+                    <Button variant="contained" color="secondary" onClick={() => handleAction("join")}>
+                        Join Match
+                    </Button>
+                </Box>
+                <Box sx={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'row' }}>
+                    <Box sx={{ mr: 20, mt: 1.5 }}>
+                        <Typography>Money: ${money}</Typography>
+                    </Box>
+                    <IconButton onClick={() => handleShopClick(true)}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <ShoppingCartIcon fontSize='large' />
+                            <Typography variant="caption">Shop</Typography>
+                        </Box>
+                    </IconButton>
+                </Box>
+                <Button variant="contained" color="error" onClick={handleLogout}>
+                    Logout
                 </Button>
-                {message === "" ? "" : 
-                <Typography color={message === "Insufficient Funds!!" ? "red" : "green"}>{message}</Typography>}
             </Box>
-            
-        </Box>
+            :
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100vh',
+                width: '100vw',
+                backgroundColor: '#f0f0f0',
+            }}>
+                <Box sx={{ position: 'absolute', top: 10, left: 10 }}>
+                    <IconButton onClick={() => handleShopClick(false)}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <HomeIcon color='primary' fontSize='large' /> {/* Home icon */}
+                            <Typography variant="caption">Return to Menu</Typography> {/* Subtext */}
+                        </Box>
+                    </IconButton>
+                </Box>
+                <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
+                    <Typography>Money: ${money}</Typography>
+                </Box>
+                <Typography variant='h3' mt={4}> Welcome To the Shop</Typography>
+                
+                {/* Display Owned Avatars at the Top */}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 4, border: '1px solid black', p: 2 }}>
+                    {console.log(ownedAvatars, "OWNED AVATARS")}
+                {Object.entries(ownedAvatars).map(([avatarName, avatarScr]) => (
+                        //console.log(avatarName);
+                            <Avatar
+                                key={avatarScr.avatar}
+                                src={freeAvatars[avatarScr.avatar] || buyableAvatars[avatarScr.avatar]}
+                                onClick={() => handleAvatarClick(avatarScr.avatar, 0)} // You can set different prices
+                                sx={{ cursor: "pointer", border: selectedAvatar === avatarScr.avatar ? "2px solid blue" : "none", width: 120, height: 120 }}
+                            />
+                        
+                    ))}
+                </Box>
+                
+                <Typography variant='h3' mt={4}> Buyable Avatars</Typography>
+                {/* Display Buyable Avatars at the Bottom */}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 4, border: '1px solid black', p: 2 }}>
+    {console.log(buyableAvatars, "buyable AVATARS2")}
+    {Object.entries(buyableAvatars).map(([avatarName, avatarSrc]) => (
+        ownedAvatars.some(obj => obj.avatar === avatarName) ? null : (
+            <Avatar
+                key={avatarName}
+                src={freeAvatars[avatarName] || buyableAvatars[avatarName]}
+                onClick={() => handleAvatarClick(avatarName, 10000)} // You can set different prices
+                sx={{ cursor: "pointer", border: selectedAvatar === avatarName ? "2px solid blue" : "none", width: 120, height: 120 }}
+            /> 
+        )
+    ))}
+</Box>
+
+                
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    mt: 5
+                }}>
+                    <Typography>Price: ${avatarPrice}</Typography>
+                    <Button onClick={handleBuyAvatar} variant='contained' color='success' size='large'>
+                        Buy
+                    </Button>
+                    {message === "" ? "" :
+                        <Typography color={message === "Insufficient Funds!!" ? "red" : "green"}>{message}</Typography>}
+                </Box>
+    
+            </Box>
     );
+    
 };
 
 export default Home;

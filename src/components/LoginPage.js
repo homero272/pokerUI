@@ -197,6 +197,13 @@ const handleNewSubmit = async () => {
             await api.createUser(username, hashedPassword, selectedAvatar); // Use hashedPassword
             const userInfo = await api.verifyUser(username);
             // Handle user creation success (if needed)
+
+            //insert created account 
+            console.log("avatar stuff is here: ", userInfo.user, freeAvatars);
+            Object.keys(freeAvatars).forEach(async (obj)=>{
+                //console.log(obj);
+                await api.insertAvatar(userInfo.user.userID, userInfo.user.userName, obj);
+            });
             props.onSubmitInfo(userInfo);
         } else {
             console.log("Username already exists");

@@ -25,6 +25,8 @@ const axiosAgent = AxiosConfigured();
 
 export default class APIInterface{
 
+
+    //LOGIN CALLS AND SOME TEST CALLS (AKA COLOR)
     async verifyUser(userName) {
         return axiosAgent.get(`login/${userName}`)
         .then(userInfo => userInfo.data)
@@ -81,6 +83,9 @@ export default class APIInterface{
         }
     }
     
+
+
+    // FRIENDS CALLS 
     async showFriends(userName1, userName2, rStatus){
         try{
             const response = await axiosAgent.get(`/friend/show/${userName1}/${userName2}/${rStatus}`)
@@ -132,4 +137,29 @@ export default class APIInterface{
             throw error;
         }
     }
+
+
+
+    //AVATAR CALLS 
+    async searchAvatars(userName){
+        try{
+            const response = await axiosAgent.get(`/avatar/search/${userName}`);
+            return response.data;
+        }
+        catch(error){
+            console.log("error in search AVATARS!!");
+            throw error;
+        }
+    }
+    async insertAvatar(userID,userName,avatar){
+        try{
+            const response = await axiosAgent.get(`/avatar/insert/${userID}/${userName}/${avatar}`);
+            return response.data;
+        }
+        catch(error){
+            console.log("error in insert AVATARS!!");
+            throw error;
+        }
+    }
+
 }
