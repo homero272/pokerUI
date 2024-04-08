@@ -23,6 +23,7 @@ const Home = (props) => {
     const [message, setMessage] = useState("");
     const [friendsPage, setFriendsPage] = useState(false);
     const [ownedAvatars,setOwnedAvatars] = useState([]);
+    const [buttonMessage, setButtonMessage] = useState("Buy");
     
 
     const handleLogout = () => {
@@ -49,11 +50,17 @@ const Home = (props) => {
         ))
     };
 
-    const handleAvatarClick = (avatarName,avatarPrice) => {
+    const handleAvatarClick = (avatarName,avatarPrice,owned) => {
         console.log("Selected Avatar1:", avatarName);
         setSelectedAvatar(avatarName);
         setAvatarPrice(avatarPrice);
         setMessage("");
+        if(owned){
+            setButtonMessage("Equip");
+        }
+        else{
+            setButtonMessage("Buy and Equip");
+        }
         // Do whatever you want with the selected avatar path
         console.log("Selected Avatar:", avatarName);
     };
@@ -75,6 +82,10 @@ const Home = (props) => {
 
                 //avatars call to save the bought avatar
                 await api.insertAvatar(user.userID, userName, selectedAvatar);
+                const avatarInfo  = await api.searchAvatars(userName);
+                setOwnedAvatars(avatarInfo);
+                setButtonMessage("Equip");
+                setAvatarPrice(0);
 
                 setMessage("Purchased Successfully");
             } catch (error) {
@@ -152,68 +163,65 @@ const Home = (props) => {
                 height: '100vh',
                 width: '100vw',
                 backgroundColor: '#f0f0f0',
+                overflow: 'auto', // Added overflow to the main container
             }}>
                 <Box sx={{ position: 'absolute', top: 10, left: 10 }}>
                     <IconButton onClick={() => handleShopClick(false)}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <HomeIcon color='primary' fontSize='large' /> {/* Home icon */}
-                            <Typography variant="caption">Return to Menu</Typography> {/* Subtext */}
+                            <HomeIcon color='primary' fontSize='large' />
+                            <Typography variant="caption">Return to Menu</Typography>
                         </Box>
                     </IconButton>
                 </Box>
                 <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
                     <Typography>Money: ${money}</Typography>
                 </Box>
-                <Typography variant='h3' mt={4}> Welcome To the Shop</Typography>
-                
-                {/* Display Owned Avatars at the Top */}
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 4, border: '1px solid black', p: 2 }}>
-                    {console.log(ownedAvatars, "OWNED AVATARS")}
-                {Object.entries(ownedAvatars).map(([avatarName, avatarScr]) => (
-                        //console.log(avatarName);
-                            <Avatar
-                                key={avatarScr.avatar}
-                                src={freeAvatars[avatarScr.avatar] || buyableAvatars[avatarScr.avatar]}
-                                onClick={() => handleAvatarClick(avatarScr.avatar, 0)} // You can set different prices
-                                sx={{ cursor: "pointer", border: selectedAvatar === avatarScr.avatar ? "2px solid blue" : "none", width: 120, height: 120 }}
-                            />
+                <Box sx={{ width: "100%", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <Box sx={{  marginBottom: 'auto' }}>
+                        <Typography variant='h3' mt={4}> Welcome To the Shop</Typography>
+                    </Box>
+                    <Box sx={{ width: "75vw", height: "75vh", overflowY: 'auto' }}> {/* Adjusted height to 75vh */}
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 4, border: '1px solid black', p: 2 }}>
+                            {Object.entries(ownedAvatars).map(([avatarName, avatarScr]) => (
+                                <Avatar
+                                    key={avatarScr.avatar}
+                                    src={freeAvatars[avatarScr.avatar] || buyableAvatars[avatarScr.avatar]}
+                                    onClick={() => handleAvatarClick(avatarScr.avatar, 0, true)}
+                                    sx={{ cursor: "pointer", border: selectedAvatar === avatarScr.avatar ? "2px solid blue" : "none", width: 120, height: 120 }}
+                                />
+                            ))}
+                        </Box>
+                        <Typography variant='h3' mt={4}> Buyable Avatars</Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 4, border: '1px solid black', p: 2 }}>
+                            {Object.entries(buyableAvatars).map(([avatarName, avatarSrc]) => (
+                                ownedAvatars.some(obj => obj.avatar === avatarName) ? null : (
+                                    <Avatar
+                                        key={avatarName}
+                                        src={freeAvatars[avatarName] || buyableAvatars[avatarName]}
+                                        onClick={() => handleAvatarClick(avatarName, 10000, false)}
+                                        sx={{ cursor: "pointer", border: selectedAvatar === avatarName ? "2px solid blue" : "none", width: 120, height: 120 }}
+                                    />
+                                )
+                            ))}
+                        </Box>
+                    </Box>
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                         
-                    ))}
+                    }}>
+                        <Typography>Price: ${avatarPrice}</Typography>
+                        <Button onClick={handleBuyAvatar} variant='contained' color='success' size='large'>
+                            {buttonMessage}
+                        </Button>
+                        {message === "" ? "" :
+                            <Typography color={message === "Insufficient Funds!!" ? "red" : "green"}>{message}</Typography>}
+                    </Box>
                 </Box>
-                
-                <Typography variant='h3' mt={4}> Buyable Avatars</Typography>
-                {/* Display Buyable Avatars at the Bottom */}
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2, mt: 4, border: '1px solid black', p: 2 }}>
-    {console.log(buyableAvatars, "buyable AVATARS2")}
-    {Object.entries(buyableAvatars).map(([avatarName, avatarSrc]) => (
-        ownedAvatars.some(obj => obj.avatar === avatarName) ? null : (
-            <Avatar
-                key={avatarName}
-                src={freeAvatars[avatarName] || buyableAvatars[avatarName]}
-                onClick={() => handleAvatarClick(avatarName, 10000)} // You can set different prices
-                sx={{ cursor: "pointer", border: selectedAvatar === avatarName ? "2px solid blue" : "none", width: 120, height: 120 }}
-            /> 
-        )
-    ))}
-</Box>
-
-                
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    mt: 5
-                }}>
-                    <Typography>Price: ${avatarPrice}</Typography>
-                    <Button onClick={handleBuyAvatar} variant='contained' color='success' size='large'>
-                        Buy
-                    </Button>
-                    {message === "" ? "" :
-                        <Typography color={message === "Insufficient Funds!!" ? "red" : "green"}>{message}</Typography>}
-                </Box>
-    
             </Box>
+            
     );
     
 };
