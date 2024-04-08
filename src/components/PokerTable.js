@@ -5,6 +5,10 @@ import { useState, useEffect } from 'react';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { IconButton } from '@mui/material';
 import { red } from '@mui/material/colors';
+const { Deck } = require('../poker_logic/Deck');
+
+let deck = new Deck();
+deck.shuffle();
 
 const numCommunityCards = 5;
 const cardBoxHeight = 60;
@@ -232,6 +236,71 @@ const PokerTableWithPlayers = props => {
     const [seatName6, setSeatName6] = useState(props.user.userName);
     const [currentSeat, setCurrentSeat] = useState(0);
     let mostRecentUser = props.user.userName;
+    const [cardsDealt, setCardsDealt] = useState([]);
+    const [playerCards, setPlayerCards] = useState([[], [], [], [], [], []]);
+    let playerHoleCards = [[], [], [], [], [], []];
+    
+    const handleDeal = () => {
+        
+        //console.log(deck);
+        let newPlayerCards = [...playerCards];
+
+        if (seat1) {
+            const holeCard1 = deck.deal();
+            const holeCard2 = deck.deal();
+            let holeCards = [...newPlayerCards];
+            holeCards[0] = [...holeCards[0], holeCard1, holeCard2]
+            setPlayerCards(holeCards);
+            playerHoleCards[0].push(holeCard1, holeCard2);
+        }
+        if (seat2) {
+            const holeCard1 = deck.deal();
+            const holeCard2 = deck.deal();
+            let holeCards = [...newPlayerCards];
+            holeCards[1] = [...holeCards[1], holeCard1, holeCard2]
+            setPlayerCards(holeCards);
+            playerHoleCards[1].push(holeCard1, holeCard2);
+        }
+        if (seat3) {
+            const holeCard1 = deck.deal();
+            const holeCard2 = deck.deal();
+            let holeCards = [...newPlayerCards];
+            holeCards[2] = [...holeCards[2], holeCard1, holeCard2]
+            setPlayerCards(holeCards);
+            playerHoleCards[2].push(holeCard1, holeCard2);
+        }
+        if (seat4) {
+            const holeCard1 = deck.deal();
+            const holeCard2 = deck.deal();
+            let holeCards = [...newPlayerCards];
+            holeCards[3] = [...holeCards[3], holeCard1, holeCard2]
+            setPlayerCards(holeCards);
+            playerHoleCards[3].push(holeCard1, holeCard2);
+        }
+        if (seat5) {
+            const holeCard1 = deck.deal();
+            const holeCard2 = deck.deal();
+            let holeCards = [...newPlayerCards];
+            holeCards[4] = [...holeCards[4], holeCard1, holeCard2]
+            setPlayerCards(holeCards);
+            playerHoleCards[4].push(holeCard1, holeCard2);
+        }
+        if (seat6) {
+            const holeCard1 = deck.deal();
+            const holeCard2 = deck.deal();
+            let holeCards = [...newPlayerCards];
+            holeCards[5] = [...holeCards[5], holeCard1, holeCard2]
+            setPlayerCards(holeCards);
+            playerHoleCards[5].push(holeCard1, holeCard2);
+        }
+
+        console.log(playerHoleCards);
+        props.socket.emit("dealCards", {
+            wholeDeck: deck, 
+            cardsDealt: playerHoleCards, 
+            roomName: props.roomName
+        });
+    }
 
     useEffect(() =>{
         if(props.socket !== null){
@@ -343,6 +412,13 @@ const PokerTableWithPlayers = props => {
            
 
           })
+
+          props.socket.on("recievedDealCards", (data) => {
+            console.log("&&&&&&& ",data.wholeDeck);
+            console.log(data.cardsDealt);
+            setPlayerCards(data.cardsDealt);
+            deck = data.wholeDeck;
+          });
     
         }
         
@@ -476,7 +552,9 @@ const PokerTableWithPlayers = props => {
                 </Box>
                 
             </Box>
-
+            <Button variant="contained" color="success" onClick={handleDeal}>
+                Deal
+            </Button>
         </Box>
     );
 }
