@@ -7,9 +7,6 @@ import { IconButton } from '@mui/material';
 import { red } from '@mui/material/colors';
 const { Deck } = require('../poker_logic/Deck');
 
-let deck = new Deck();
-deck.shuffle();
-
 const numCommunityCards = 5;
 const cardBoxHeight = 60;
 const cardBoxWidth = 40;
@@ -19,15 +16,13 @@ const playerBoxWidth = (cardBoxWidth * 2) + spaceBetweenCards;
 const tableHeight = 315;
 const tableWidth = 585;
 
+let deck = [];
+
 const CardBox = props => {  
-    console.log("***** ", props.card)
-    const suitColor = '#0000ff'
-    // const suitColor = props.card.suit === 'c' ? '#00ff00' :
-    //                   props.card.suit === 'd' ? '#0000ff' :
-    //                   props.card.suit === 'h' ? '#ff0000' :
-    //                                             '#000000' ;
+    // set to true to see other users cards, false to only see your cards
+    const [showDown, setShowDown] = useState(false);
     
-    return !props.card ? (
+    return !props.card || (!props.communityCard && props.user !== props.name && !showDown) ? (
         <Box sx={{
             height: cardBoxHeight,
             width: cardBoxWidth,
@@ -50,7 +45,7 @@ const CardBox = props => {
                 paddingLeft: 0.4, 
                 fontSize: '20px'
             }}>
-                {props.card.value}
+                {props.card.value === 'T' ? 10 : props.card.value}
             </Typography>
             <Typography sx={{
                 paddingLeft: 0.4,
@@ -86,8 +81,8 @@ const PlayerBox = props => {
                 display: 'flex',
                 justifyContent: 'space-between',
             }}>
-                <CardBox card={props.holeCards[0]}/>
-                <CardBox card={props.holeCards[1]}/>
+                <CardBox card={props.holeCards[0]} user={props.user.userName} name={props.name}/>
+                <CardBox card={props.holeCards[1]} user={props.user.userName} name={props.name}/>
             </Box>
             <Typography sx={{color: '#eeeeee'}}>
                 { props.mostRecentUser  } 
@@ -219,11 +214,11 @@ const PokerTable = props => {
                     display: 'flex',
                     justifyContent: 'space-between',
                 }}>
-                    <CardBox></CardBox>
-                    <CardBox></CardBox>
-                    <CardBox></CardBox>
-                    <CardBox></CardBox>
-                    <CardBox></CardBox>
+                    <CardBox card={props.communityCards[0]} communityCard={true}></CardBox>
+                    <CardBox card={props.communityCards[1]} communityCard={true}></CardBox>
+                    <CardBox card={props.communityCards[2]} communityCard={true}></CardBox>
+                    <CardBox card={props.communityCards[3]} communityCard={true}></CardBox>
+                    <CardBox card={props.communityCards[4]} communityCard={true}></CardBox>
                 </Box>
                 <Box sx={{
                     height: (tableHeight / 2) - (cardBoxHeight / 2),
@@ -271,9 +266,40 @@ const PokerTableWithPlayers = props => {
     const [cardsDealt, setCardsDealt] = useState([]);
     const [playerCards, setPlayerCards] = useState([[], [], [], [], [], []]);
     let playerHoleCards = [[], [], [], [], [], []];
+    const [communityCards, setCommunityCards] = useState([]);
+
     
-    const handleDeal = () => {
+
+    const dealFlop = () => {
+        let flop = [deck.deal(), deck.deal(), deck.deal()];
+        setCommunityCards(flop);
+
+        props.socket.emit("dealFlop", {
+            flop: flop,
+            roomName: props.roomName
+        });
+    }
+
+    const dealTurn = () => {
+        // const turn = deck.deal();
+        // setCommunityCards(prevCards => [...prevCards, turn]);
+
+        const turn = deck.deal(); // Deal a new turn card
+        const newCommunityCards = [...communityCards]; // Create a copy of the current community cards
+        newCommunityCards.push(turn); // Add the new turn card to the community cards
+
+        setCommunityCards(newCommunityCards);
+
+        props.socket.emit("dealTurn", {
+            turn: turn,
+            roomName: props.roomName
+        });
+    }
+    
+    const dealHoleCards = () => {
         //console.log(deck);
+        deck = new Deck();
+        deck.shuffle();
 
         if (seat1) playerHoleCards[0] = [deck.deal(), deck.deal()];
         if (seat2) playerHoleCards[1] = [deck.deal(), deck.deal()];
@@ -284,11 +310,15 @@ const PokerTableWithPlayers = props => {
         
         setPlayerCards(playerHoleCards);
         console.log(playerHoleCards);
-        props.socket.emit("dealCards", {
+
+        props.socket.emit("dealHoleCards", {
             deck: deck, 
             cardsDealt: playerHoleCards, 
             roomName: props.roomName
         });
+
+        dealFlop();
+        //dealTurn();
     }
 
     useEffect(() =>{
@@ -402,11 +432,19 @@ const PokerTableWithPlayers = props => {
 
           })
 
-          props.socket.on("recievedDealCards", (data) => {
+          props.socket.on("recievedDealHoleCards", (data) => {
             console.log("&&&&&&& ",data.deck);
             console.log(data.cardsDealt);
             setPlayerCards(data.cardsDealt);
             deck = data.deck;
+          });
+
+          props.socket.on("recievedDealFlop", (data) => {
+            setCommunityCards(data.flop);
+          });
+
+          props.socket.on("recievedDealTurn", (data) => {
+            setCommunityCards(data.turn);
           });
     
         }
@@ -453,7 +491,7 @@ const PokerTableWithPlayers = props => {
                 }}>
                     {
                    !seat4 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat4={seat4} setSeat4={setSeat4} seatNumber={4}/> 
-                   : <PlayerBox mostRecentUser={seatName4} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[3]}/>
+                   : <PlayerBox mostRecentUser={seatName4} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[3]} name={seatName4}/>
                 }
                 </Box>
 
@@ -477,7 +515,7 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                    !seat3 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat3={seat3} setSeat3={setSeat3} seatNumber={3}/> 
-                   : <PlayerBox mostRecentUser={seatName3} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[2]}/>
+                   : <PlayerBox mostRecentUser={seatName3} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[2]} name={seatName3}/>
                 }
                         </Box>
                         <Box sx={{
@@ -489,12 +527,12 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                    !seat2 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat2={seat2} setSeat2={setSeat2} seatNumber={2}/> 
-                   : <PlayerBox mostRecentUser={seatName2} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[1]}/>
+                   : <PlayerBox mostRecentUser={seatName2} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[1]} name={seatName2}/>
                 }
                         </Box>
                     </Box>
                     
-                    <PokerTable></PokerTable>
+                    <PokerTable communityCards={communityCards}></PokerTable>
 
                     <Box sx={{
                         height: tableHeight,
@@ -511,7 +549,7 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                    !seat5 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat5={seat5} setSeat5={setSeat5} seatNumber={5}/> 
-                   : <PlayerBox mostRecentUser={seatName5} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[4]}/>
+                   : <PlayerBox mostRecentUser={seatName5} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[4]} name={seatName5}/>
                 }
                         </Box>
                         <Box sx={{
@@ -522,7 +560,7 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                     !seat6 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat6={seat6} setSeat6={setSeat6} seatNumber={6}/> 
-                    : <PlayerBox mostRecentUser={seatName6} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[5]}/>
+                    : <PlayerBox mostRecentUser={seatName6} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[5]} name={seatName6}/>
                     }
                         </Box>
                     </Box>
@@ -536,12 +574,12 @@ const PokerTableWithPlayers = props => {
                     alignItems: 'center'
                 }}> {
                    !seat1 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat1={seat1} setSeat1={setSeat1} seatNumber={1}/> 
-                   : <PlayerBox mostRecentUser={seatName1} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[0]}/>
+                   : <PlayerBox mostRecentUser={seatName1} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={playerCards[0]} name={seatName1}/>
                 }
                 </Box>
                 
             </Box>
-            <Button variant="contained" color="success" onClick={handleDeal}>
+            <Button variant="contained" color="success" onClick={dealHoleCards}>
                 Deal
             </Button>
         </Box>
