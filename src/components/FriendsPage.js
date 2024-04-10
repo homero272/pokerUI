@@ -293,12 +293,13 @@ const AddFriendsPage = (props) => {
 
 
 const FriendsPage = (props) => {
-    const { user, setFriendsPage } = props;
+    const { user, setFriendsPage, socket, onlineUsers } = props;
     const [addFriends, setAddFriends] = useState(false);
     const [pendingFriends, setPendingFriends] = useState(false);
     const [arrayOfUsers, setArrayOfUsers] = useState([]);
     const [arrayOfFriends, setArrayOfFriends] = useState([]);
     const [arrayOfRequests, setArrayOfRequests] = useState([]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -373,47 +374,56 @@ const FriendsPage = (props) => {
                             </Box>
                         </IconButton>
                     </Box> 
-                    <Box sx={{ display: 'flex', justifyContent: 'center',flexDirection: 'column', alignItems: 'center', padding: '100px' }}> {/* Display list vertically with padding */}
-                        <Typography variant="h6">My Friends:</Typography>
-                        {arrayOfFriends.map((friend) => {
-                            // Get friend's user name (either userName1 or userName2)
-                            const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
+                    <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', padding: '100px' }}>
+                    {/* Display list vertically with padding */}
+                    <Typography variant="h6">My Friends:</Typography>
+                    {arrayOfFriends.map((friend) => {
+                        // Get friend's user name (either userName1 or userName2)
+                        const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
 
-                            // Find the friend's details from arrayOfUsers using their username
-                            const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
+                        // Find the friend's details from arrayOfUsers using their username
+                        const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
+                        const onlineUser = onlineUsers.find(user => user.user === friendUserName);
 
-                            // Render list item if friend details are found
-                            if (friendDetails) {
-                                return (
-                                    <List key={friendDetails.userName} sx={{ border: 1, width: '100%', maxWidth: 360, bgcolor: 'lightgrey',  }}>
-                                        <ListItem alignItems="flex-start">
-                                            <ListItemAvatar>
-                                                <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
-                                            </ListItemAvatar>
-                                            <ListItemText
-                                                primary={friendDetails.userName}
-                                                secondary={
-                                                    <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            {friendDetails.stats}
-                                                        </Typography>
-                                                        {" — Main Page..."}
-                                                    </React.Fragment>
-                                                }
-                                            />
-                                        </ListItem>
-                                    </List>
-                                );
-                            } else {
-                                return null; // If friend details are not found, don't render anything
-                            }
-                        })}
-                    </Box>
+                        // Determine if the friend is online
+                        const isOnline = onlineUser !== undefined;
+
+                        // Render list item if friend details are found
+                        if (friendDetails) {
+                            return (
+                                <List key={friendDetails.userName} sx={{ border: 1, width: '100%', maxWidth: 360, bgcolor: 'lightgrey' }}>
+                                    <ListItem alignItems="flex-start">
+                                    {isOnline ? <span style={{ width: '10px', height: '10px', backgroundColor: 'green', borderRadius: '50%', marginLeft: '10px' }}></span> : <span style={{ width: '10px', height: '10px', backgroundColor: 'red', borderRadius: '50%', marginLeft: '10px' }}></span>}
+
+                                        <ListItemAvatar>
+                                            <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={friendDetails.userName}
+                                            secondary={
+                                                <React.Fragment>
+                                                    <Typography
+                                                        sx={{ display: 'inline' }}
+                                                        component="span"
+                                                        variant="body2"
+                                                        color="text.primary"
+                                                    >
+                                                        {friendDetails.stats}
+                                                    </Typography>
+                                                    {" — Main Page..."}
+                                                </React.Fragment>
+                                            }
+                                        />
+                                        {/* Render green circle if online, red circle if offline */}
+                                    </ListItem>
+                                </List>
+                            );
+                        } else {
+                            return null; // If friend details are not found, don't render anything
+                        }
+                    })}
+                </Box>
+
                 </Box>
             )}
         </>

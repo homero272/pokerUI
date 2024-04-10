@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -24,6 +24,7 @@ const Home = (props) => {
     const [friendsPage, setFriendsPage] = useState(false);
     const [ownedAvatars,setOwnedAvatars] = useState([]);
     const [buttonMessage, setButtonMessage] = useState("Buy");
+    const [onlineUsers, setOnlineUsers] = useState([]);
     
 
     const handleLogout = () => {
@@ -45,7 +46,6 @@ const Home = (props) => {
         console.log("ownedAvatarList: ", ownedAvatarList);
         Object.entries(ownedAvatarList).map(([avatarName, avatarScr]) => (
             console.log(avatarScr.avatar, "hello")
-            
             
         ))
     };
@@ -95,13 +95,25 @@ const Home = (props) => {
         }
     }
 
+    
+
+    useEffect(() =>{
+        socket.on("sendConnectedUsers", (data)=>{
+            setOnlineUsers(data);
+            console.log(data, "online Users");
+        })
+
+    }, [socket]);
+
     const handleFriendsPageClick = (boolean) =>{
         console.log("navgating to friends page...");
         setFriendsPage(boolean);
+        socket.emit("getConnectedUsers");
+
     }
 
     return (
-        !shoppingMenu ? friendsPage ? <FriendsPage user={user} setFriendsPage={setFriendsPage} /> :
+        !shoppingMenu ? friendsPage ? <FriendsPage onlineUsers= {onlineUsers} socket = {socket} user={user} setFriendsPage={setFriendsPage} /> :
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
