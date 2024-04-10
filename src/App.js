@@ -130,7 +130,7 @@ const handleJoinMatch = props =>{
       justifyContent: "center",
     }}>
       { !user ?
-      <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home setUser={setUser} user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} /> 
+      <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home setUser={setUser} user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} setActionForMatch = {setActionForMatch} handleSelectMatch = {handleJoinMatch} setRoomName={setRoomName}/> 
         : actionForMatch === "create" ? <CreateMatch setActionForMatch = {setActionForMatch} handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch setActionForMatch = {setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : 
         <Fragment>
         <PokerTable roomName={roomName} user={user} socket = {socket} setActionForMatch= {setActionForMatch}/>

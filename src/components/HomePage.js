@@ -12,9 +12,9 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FriendsPage from './FriendsPage';
 
 const Home = (props) => {
-    const socket = props.socket;
-    const user = props.user;
+    const {socket, user, handleMatchAction, setActionForMatch, handleSelectMatch, setRoomName} = props;
     const userName = user.userName;
+
     const [avatar,setAvatar] = useState(freeAvatars[user.avatar] || buyableAvatars[user.avatar]);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
     const [money, setMoney] = useState(user.money);
@@ -25,6 +25,7 @@ const Home = (props) => {
     const [ownedAvatars,setOwnedAvatars] = useState([]);
     const [buttonMessage, setButtonMessage] = useState("Buy");
     const [onlineUsers, setOnlineUsers] = useState([]);
+    const [friendsRooms, setFriendsRooms] = useState([]);
     
 
     const handleLogout = () => {
@@ -102,6 +103,10 @@ const Home = (props) => {
             setOnlineUsers(data);
             console.log(data, "online Users");
         })
+        socket.on("sendFriendsRooms", (data)=>{
+            setFriendsRooms(data);
+            console.log(data, "friends Rooms");
+        })
 
     }, [socket]);
 
@@ -109,11 +114,14 @@ const Home = (props) => {
         console.log("navgating to friends page...");
         setFriendsPage(boolean);
         socket.emit("getConnectedUsers");
+        console.log(friendsRooms, "people in games      onlineUsers: ", onlineUsers);
+
+        
 
     }
 
     return (
-        !shoppingMenu ? friendsPage ? <FriendsPage onlineUsers= {onlineUsers} socket = {socket} user={user} setFriendsPage={setFriendsPage} /> :
+        !shoppingMenu ? friendsPage ? <FriendsPage setRoomName={setRoomName} handleMatchAction = {handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleSelectMatch} friendsRooms ={friendsRooms} onlineUsers= {onlineUsers} socket = {socket} user={user} setFriendsPage={setFriendsPage} /> :
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',

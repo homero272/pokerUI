@@ -14,7 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
-import {List} from '@mui/material';
+import {List, Button} from '@mui/material';
 import {ListItem} from '@mui/material';
 import freeAvatars from "../avatars/FreeAvatars/free";
 import buyableAvatars from "../avatars/BuyableAvatars/buy"
@@ -49,6 +49,8 @@ const PendingRequestsPage = (props) => {
         api.rejectFriend(requestUserID, user.userID);
 
     }
+
+
 
     return (
         <Fragment>
@@ -293,7 +295,7 @@ const AddFriendsPage = (props) => {
 
 
 const FriendsPage = (props) => {
-    const { user, setFriendsPage, socket, onlineUsers } = props;
+    const { user, setFriendsPage, socket, onlineUsers, friendsRooms, handleMatchAction, setActionForMatch, handleSelectMatch, setRoomName} = props;
     const [addFriends, setAddFriends] = useState(false);
     const [pendingFriends, setPendingFriends] = useState(false);
     const [arrayOfUsers, setArrayOfUsers] = useState([]);
@@ -335,6 +337,13 @@ const FriendsPage = (props) => {
     const handlePendingFriends = (boolean) => {
         setPendingFriends(boolean);
     };
+    const handleJoinGame = (room) =>{
+        console.log("room passed is: ", room);
+        setActionForMatch("done");
+        setRoomName(room);
+        socket.emit("playerJoined", {userName: user.userName, room: room});
+        
+    }
 
     return (
         <>
@@ -375,54 +384,64 @@ const FriendsPage = (props) => {
                         </IconButton>
                     </Box> 
                     <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', padding: '100px' }}>
-                    {/* Display list vertically with padding */}
-                    <Typography variant="h6">My Friends:</Typography>
-                    {arrayOfFriends.map((friend) => {
-                        // Get friend's user name (either userName1 or userName2)
-                        const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
+    {/* Display list vertically with padding */}
+    <Typography variant="h6">My Friends:</Typography>
+    {arrayOfFriends.map((friend) => {
+        // Get friend's user name (either userName1 or userName2)
+        const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
 
-                        // Find the friend's details from arrayOfUsers using their username
-                        const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
-                        const onlineUser = onlineUsers.find(user => user.user === friendUserName);
+        // Find the friend's details from arrayOfUsers using their username
+        const friendDetails = arrayOfUsers.find(user => user.userName === friendUserName);
+        const onlineUser = onlineUsers.find(user => user.user === friendUserName);
+        const friendsInRoom = friendsRooms.find(user => user.userName === friendUserName);
 
-                        // Determine if the friend is online
-                        const isOnline = onlineUser !== undefined;
+        // Determine if the friend is online
+        const isOnline = onlineUser !== undefined;
 
-                        // Render list item if friend details are found
-                        if (friendDetails) {
-                            return (
-                                <List key={friendDetails.userName} sx={{ border: 1, width: '100%', maxWidth: 360, bgcolor: 'lightgrey' }}>
-                                    <ListItem alignItems="flex-start">
-                                    {isOnline ? <span style={{ width: '10px', height: '10px', backgroundColor: 'green', borderRadius: '50%', marginLeft: '10px' }}></span> : <span style={{ width: '10px', height: '10px', backgroundColor: 'red', borderRadius: '50%', marginLeft: '10px' }}></span>}
+        // Log friendsInRoom to console for debugging
+        console.log("Friend's Room:", friendsRooms);
 
-                                        <ListItemAvatar>
-                                            <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={friendDetails.userName}
-                                            secondary={
-                                                <React.Fragment>
-                                                    <Typography
-                                                        sx={{ display: 'inline' }}
-                                                        component="span"
-                                                        variant="body2"
-                                                        color="text.primary"
-                                                    >
-                                                        {friendDetails.stats}
-                                                    </Typography>
-                                                    {" — Main Page..."}
-                                                </React.Fragment>
-                                            }
-                                        />
-                                        {/* Render green circle if online, red circle if offline */}
-                                    </ListItem>
-                                </List>
-                            );
-                        } else {
-                            return null; // If friend details are not found, don't render anything
-                        }
-                    })}
-                </Box>
+        // Render list item if friend details are found
+        if (friendDetails) {
+            return (
+                <List key={friendDetails.userName} sx={{ border: 1, width: '100%', maxWidth: 360, bgcolor: 'lightgrey' }}>
+                    <ListItem alignItems="flex-start">
+                        {isOnline ? <span style={{ width: '10px', height: '10px', backgroundColor: 'green', borderRadius: '50%', marginLeft: '10px' }}></span> : <span style={{ width: '10px', height: '10px', backgroundColor: 'red', borderRadius: '50%', marginLeft: '10px' }}></span>}
+                        <ListItemAvatar>
+                            <Avatar alt={friendDetails.userName} src={freeAvatars[friendDetails.avatar] || buyableAvatars[friendDetails.avatar]} />
+                        </ListItemAvatar>
+                        <ListItemText
+                            primary={friendDetails.userName}
+                            secondary={
+                                <React.Fragment>
+                                    <Typography
+                                        sx={{ display: 'inline' }}
+                                        component="span"
+                                        variant="body2"
+                                        color="text.primary"
+                                    >
+                                        {friendDetails.stats}
+                                    </Typography>
+                                    {" — Main Page..."}
+                                </React.Fragment>
+                            }
+                        />
+                        {/* Render join game button if friend is in a room */}
+                        {friendsInRoom && (
+                            <Button variant="contained" color="primary" onClick={() => handleJoinGame(friendsInRoom.room)}>
+                                Join Game
+                            </Button>
+                        )}
+                    </ListItem>
+                </List>
+            );
+        } else {
+            return null; // If friend details are not found, don't render anything
+        }
+    })}
+</Box>
+
+
 
                 </Box>
             )}
