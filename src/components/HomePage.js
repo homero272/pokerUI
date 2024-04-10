@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -10,7 +10,8 @@ import freeAvatars from "../avatars/FreeAvatars/free";
 import buyableAvatars from "../avatars/BuyableAvatars/buy"
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FriendsPage from './FriendsPage';
-
+import { keyframes } from '@emotion/react';
+import '../App.css';
 const Home = (props) => {
     const {socket, user, handleMatchAction, setActionForMatch, handleSelectMatch, setRoomName} = props;
     const userName = user.userName;
@@ -116,9 +117,24 @@ const Home = (props) => {
         socket.emit("getConnectedUsers");
         console.log(friendsRooms, "people in games      onlineUsers: ", onlineUsers);
 
-        
-
     }
+
+    
+    
+
+    const rotate = keyframes`
+    from {
+      transform: rotateY(-20deg);
+      box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.6);
+    }
+    to {
+      transform: rotateY(20deg);
+      box-shadow: -10px 10px 15px rgba(0, 0, 0, 0.6);
+    }
+  `;
+  
+
+
 
     return (
         !shoppingMenu ? friendsPage ? <FriendsPage setRoomName={setRoomName} handleMatchAction = {handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleSelectMatch} friendsRooms ={friendsRooms} onlineUsers= {onlineUsers} socket = {socket} user={user} setFriendsPage={setFriendsPage} /> :
@@ -147,9 +163,52 @@ const Home = (props) => {
                     <Typography variant="h4" gutterBottom>
                         Welcome, {userName}
                     </Typography>
+                    
                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                        <Avatar src={avatar} sx={{ border: 1, borderWidth: 2, width: 120, height: 120 }} />
-                    </Box>
+  <Box
+    sx={{
+      perspective: '500px',
+      borderRadius: '50%',
+      overflow: 'hidden',
+      boxShadow: '0px 0px 8px rgba(0,0,0,0.6)',
+      position: 'relative',
+      transition: 'transform 0.5s, box-shadow 0.5s',
+      transform: 'rotateY(0deg)', // Start with no rotation
+      animation: `${rotate} 2s infinite alternate`, // Add continuous rotation here
+      '&:hover': {
+        boxShadow: '10px 0px 15px rgba(0,0,0,0.9)', // Move shadow with the rotation
+      },
+      '&:before': {
+        content: '""',
+        display: 'block',
+        position: 'absolute',
+        top: '10%',
+        bottom: '10%',
+        left: 0,
+        right: 0,
+        borderRadius: '50%',
+        //border: '1px solid rgba(255, 99, 71, 0.6)',
+        transform: 'scale(0.9)',
+        transition: 'transform 0.5s, border 0.5s',
+        zIndex: 1, // Ensure the coin edge is not behind the avatar
+      },
+      zIndex: 2, // The avatar itself should be on top
+    }}
+  >
+    <Avatar
+      src={avatar}
+      sx={{
+        width: 120,
+        height: 120,
+        border: '2px solid rgba(0, 0, 0, 0.9)',
+        zIndex: 2, // Ensure the avatar image is on top
+        position: 'relative', // Required for z-index to take effect
+      }}
+    />
+  </Box>
+</Box>
+
+
                 </Box>
                 <Box>
                     <Button variant="contained" color="primary" sx={{ marginRight: 2 }} onClick={() => handleAction("create")}>

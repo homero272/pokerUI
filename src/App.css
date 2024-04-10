@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+/* App.css */
+.avatarCoin {
+  perspective: 500px;
+  /* ... other styles ... */
+}
+
+.avatarCoin:hover::before {
+  animation: rotateCoin 2s alternate infinite ease-in-out;
+}
+
+/* ... other styles ... */
+
+@keyframes rotateCoin {
+  from { transform: rotateY(-20deg); }
+  to { transform: rotateY(20deg); }
+}
