@@ -8,7 +8,8 @@ import API from './API-Interface/API-Interface';
 import Home from './components/HomePage';
 import CreateMatch from './components/CreateMatch';
 import JoinMatch from './components/JoinMatch';
-
+import LandingPage from './components/LandingPage';
+import { setRandomFallback } from 'bcryptjs';
 //let socket = null;
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [roomName, setRoomName] = useState('default');
   const [arrayOfRooms, setArrayOfRooms] = useState([]);
-  const [host, setHost] = useState("");
+  const [landingPage, setLandingPage] = useState(true);
   
   useEffect(() =>{
     if(socket !== null){
@@ -86,6 +87,7 @@ function App() {
   const handleSignOut = () => {
     console.log("Logging out: ", socket.id);
     setUser(null);
+    setLandingPage(true);
 
     if (socket) {
         socket.disconnect();
@@ -103,13 +105,11 @@ const handleCreateRoom =  (props) =>{
   //props contains room name
   if (props === "")
     return;
-  setHost(user.userName);
   console.log("creating room: (UI)", props);
   setRoomName(props);
   setActionForMatch("done");
   socket.emit("createRoom", {roomName: props, userName: user.userName});
   setArrayOfRooms(prevRooms => [...prevRooms, props]);
-  
 }
 
 const handleJoinMatch = props =>{
@@ -123,30 +123,38 @@ const handleJoinMatch = props =>{
   socket.emit("playerJoined", {userName: user.userName, room: props })
 }
 
-
-  return (
-    <Box sx={{
-      height: '100vh',
-      width: '100vw',
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}>
-      { !user ?
-      <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home setUser={setUser} user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} setActionForMatch = {setActionForMatch} handleSelectMatch = {handleJoinMatch} setRoomName={setRoomName}/> 
-        : actionForMatch === "create" ? <CreateMatch setActionForMatch = {setActionForMatch} handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch setActionForMatch = {setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : 
+return (
+  <Box sx={{
+    height: '100vh',
+    width: '100vw',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}>
+    {landingPage ? (
+      <LandingPage setLandingPage={setLandingPage} />
+    ) : (
+      !user ? (
+        <LoginPage onSubmitInfo={handleSignIn} />
+      ) : !actionForMatch ? (
+        <Home setUser={setUser} user={user} socket={socket} handleSignOut={handleSignOut} handleMatchAction={handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleJoinMatch} setRoomName={setRoomName} />
+      ) : actionForMatch === "create" ? (
+        <CreateMatch setActionForMatch={setActionForMatch} handleCreateRoom={handleCreateRoom} />
+      ) : actionForMatch === "join" ? (
+        <JoinMatch setActionForMatch={setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch={handleJoinMatch} />
+      ) : (
         <Fragment>
-        <PokerTable host = {host}roomName={roomName} user={user} socket = {socket} setActionForMatch= {setActionForMatch}/>
-       <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
-          <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
-                                Click me
-          </Button>
-      </Box>
-      </Fragment>
-      }
-      
-    </Box>
-  );
+          <PokerTable roomName={roomName} user={user} socket={socket} setActionForMatch={setActionForMatch} />
+          <Box sx={{ backgroundColor: color % 2 === 0 ? 'red' : 'blue', border: 1, width: '200px', height: '200px' }}>
+            <Button variant="contained" color="primary" onClick={handleTestUpdateClick}>
+              Click me
+            </Button>
+          </Box>
+        </Fragment>
+      )
+    )}
+  </Box>
+);
 }
 
 export default App;

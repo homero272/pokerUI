@@ -211,12 +211,31 @@ const Home = (props) => {
 
                 </Box>
                 <Box>
-                    <Button variant="contained" color="primary" sx={{ marginRight: 2 }} onClick={() => handleAction("create")}>
+                <Box>
+                    <Button variant="contained" color="primary" sx={{
+                        //borderRadius: '50%',
+                        overflow: 'hidden',
+                        boxShadow: '0px 0px 8px rgba(0,0,0,0.6)',
+                        transition: 'box-shadow 0.5s',
+                        marginRight:2,
+                        '&:hover': {
+                        boxShadow: '0px 0px 12px rgba(0,0,0,0.8)',
+                        },
+                    }} onClick={() => handleAction("create")}>
                         Create Match
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={() => handleAction("join")}>
+                    <Button variant="contained" color="secondary" sx={{
+                        //borderRadius: '50%',
+                        overflow: 'hidden',
+                        boxShadow: '0px 0px 8px rgba(0,0,0,0.6)',
+                        transition: 'box-shadow 0.5s',
+                        '&:hover': {
+                        boxShadow: '0px 0px 12px rgba(0,0,0,0.8)',
+                        },
+                    }} onClick={() => handleAction("join")}>
                         Join Match
                     </Button>
+                </Box>
                 </Box>
                 <Box sx={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'row' }}>
                     <Box sx={{ mr: 20, mt: 1.5 }}>
@@ -229,7 +248,15 @@ const Home = (props) => {
                         </Box>
                     </IconButton>
                 </Box>
-                <Button variant="contained" color="error" onClick={handleLogout}>
+                <Button variant="contained" color="error" sx={{
+                    //borderRadius: '50%',
+                    overflow: 'hidden',
+                    boxShadow: '0px 0px 8px rgba(0,0,0,0.6)',
+                    transition: 'box-shadow 0.5s',
+                    '&:hover': {
+                    boxShadow: '0px 0px 12px rgba(0,0,0,0.8)',
+                    },
+                }} onClick={handleLogout}>
                     Logout
                 </Button>
             </Box>
