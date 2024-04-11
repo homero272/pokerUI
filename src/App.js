@@ -20,6 +20,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [roomName, setRoomName] = useState('default');
   const [arrayOfRooms, setArrayOfRooms] = useState([]);
+  const [host, setHost] = useState("");
   const [landingPage, setLandingPage] = useState(true);
   
   useEffect(() =>{
@@ -107,6 +108,7 @@ const handleCreateRoom =  (props) =>{
     return;
   console.log("creating room: (UI)", props);
   setRoomName(props);
+  setHost(user.userName);
   setActionForMatch("done");
   socket.emit("createRoom", {roomName: props, userName: user.userName});
   setArrayOfRooms(prevRooms => [...prevRooms, props]);
@@ -144,7 +146,7 @@ return (
         <JoinMatch setActionForMatch={setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch={handleJoinMatch} />
       ) : (
         <Fragment>
-          <PokerTable roomName={roomName} user={user} socket={socket} setActionForMatch={setActionForMatch} />
+          <PokerTable host = {host} roomName={roomName} user={user} socket={socket} setActionForMatch={setActionForMatch} />
           <Box sx={{ backgroundColor: color % 2 === 0 ? 'red' : 'blue', border: 1, width: '200px', height: '200px' }}>
             <Button variant="contained" color="primary" onClick={handleTestUpdateClick}>
               Click me
