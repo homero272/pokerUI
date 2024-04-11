@@ -235,8 +235,8 @@ class PokerHand {
                 `${this.getValueName(this.cards[4])}s `;
                 output += 'and ';
                 output += this.cards[1].value === '6' ?
-                `${this.getValueName(this.cards[4])}es` :
-                `${this.getValueName(this.cards[4])}s`;
+                `${this.getValueName(this.cards[2])}es` :
+                `${this.getValueName(this.cards[2])}s`;
                 break;
             case 'Pair':
                 output += this.cards[4].value === '6' ?

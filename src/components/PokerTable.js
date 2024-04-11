@@ -26,7 +26,7 @@ const CardBox = props => {
         <Box sx={{
             height: cardBoxHeight,
             width: cardBoxWidth,
-            backgroundColor: '#00ffff',
+            backgroundColor: '#ff00ff',
             borderRadius: '10%'
         }}>
 
@@ -35,10 +35,10 @@ const CardBox = props => {
         <Box sx={{
             height: cardBoxHeight,
             width: cardBoxWidth,
-            backgroundColor: props.card.suit === 'c' ? '#00cc00' :
-                             props.card.suit === 'd' ? '#0000cc' :
-                             props.card.suit === 'h' ? '#cc0000' :
-                                                       '#cccccc',
+            backgroundColor: props.card.suit === 'c' ? '#158c11' :
+                             props.card.suit === 'd' ? '#116ad8' :
+                             props.card.suit === 'h' ? '#f02b35' :
+                                                       '#555555',
             borderRadius: '10%'
         }}>
             <Typography sx={{
@@ -267,31 +267,34 @@ const PokerTableWithPlayers = props => {
     const [playerCards, setPlayerCards] = useState([[], [], [], [], [], []]);
     let playerHoleCards = [[], [], [], [], [], []];
     const [communityCards, setCommunityCards] = useState([]);
+    let _communityCards = [];
 
-    
+    const dealRiver = () => {
+        _communityCards = [..._communityCards, deck.deal()]; 
+        setCommunityCards(_communityCards);
 
-    const dealFlop = () => {
-        let flop = [deck.deal(), deck.deal(), deck.deal()];
-        setCommunityCards(flop);
-
-        props.socket.emit("dealFlop", {
-            flop: flop,
+        props.socket.emit("dealRiver", {
+            river: _communityCards,
             roomName: props.roomName
         });
     }
 
     const dealTurn = () => {
-        // const turn = deck.deal();
-        // setCommunityCards(prevCards => [...prevCards, turn]);
-
-        const turn = deck.deal(); // Deal a new turn card
-        const newCommunityCards = [...communityCards]; // Create a copy of the current community cards
-        newCommunityCards.push(turn); // Add the new turn card to the community cards
-
-        setCommunityCards(newCommunityCards);
+        _communityCards = [..._communityCards, deck.deal()]; 
+        setCommunityCards(_communityCards);
 
         props.socket.emit("dealTurn", {
-            turn: turn,
+            turn: _communityCards,
+            roomName: props.roomName
+        });
+    }
+
+    const dealFlop = () => {
+        _communityCards = [deck.deal(), deck.deal(), deck.deal()];
+        setCommunityCards(_communityCards);
+
+        props.socket.emit("dealFlop", {
+            flop: _communityCards,
             roomName: props.roomName
         });
     }
@@ -318,7 +321,8 @@ const PokerTableWithPlayers = props => {
         });
 
         dealFlop();
-        //dealTurn();
+        dealTurn();
+        dealRiver();
     }
 
     useEffect(() =>{
@@ -445,6 +449,10 @@ const PokerTableWithPlayers = props => {
 
           props.socket.on("recievedDealTurn", (data) => {
             setCommunityCards(data.turn);
+          });
+
+          props.socket.on("recievedDealRiver", (data) => {
+            setCommunityCards(data.river);
           });
     
         }
