@@ -19,6 +19,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [roomName, setRoomName] = useState('default');
   const [arrayOfRooms, setArrayOfRooms] = useState([]);
+  const [host, setHost] = useState("");
   
   useEffect(() =>{
     if(socket !== null){
@@ -102,11 +103,13 @@ const handleCreateRoom =  (props) =>{
   //props contains room name
   if (props === "")
     return;
+  setHost(user.userName);
   console.log("creating room: (UI)", props);
   setRoomName(props);
   setActionForMatch("done");
   socket.emit("createRoom", {roomName: props, userName: user.userName});
   setArrayOfRooms(prevRooms => [...prevRooms, props]);
+  
 }
 
 const handleJoinMatch = props =>{
@@ -133,7 +136,7 @@ const handleJoinMatch = props =>{
       <LoginPage onSubmitInfo = {handleSignIn}/> : !actionForMatch? <Home setUser={setUser} user={user} socket = {socket} handleSignOut ={handleSignOut} handleMatchAction = {handleMatchAction} setActionForMatch = {setActionForMatch} handleSelectMatch = {handleJoinMatch} setRoomName={setRoomName}/> 
         : actionForMatch === "create" ? <CreateMatch setActionForMatch = {setActionForMatch} handleCreateRoom={handleCreateRoom}/> : actionForMatch === "join" ? <JoinMatch setActionForMatch = {setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch = {handleJoinMatch}/> : 
         <Fragment>
-        <PokerTable roomName={roomName} user={user} socket = {socket} setActionForMatch= {setActionForMatch}/>
+        <PokerTable host = {host}roomName={roomName} user={user} socket = {socket} setActionForMatch= {setActionForMatch}/>
        <Box sx={{backgroundColor: color%2 === 0 ? 'red':'blue', border: 1, width: '200px', height: '200px'}}>
           <Button variant = "contained" color = "primary" onClick={handleTestUpdateClick}>
                                 Click me

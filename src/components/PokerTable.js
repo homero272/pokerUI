@@ -303,6 +303,7 @@ const PokerTableWithPlayers = props => {
         //console.log(deck);
         deck = new Deck();
         deck.shuffle();
+       
 
         if (seat1) playerHoleCards[0] = [deck.deal(), deck.deal()];
         if (seat2) playerHoleCards[1] = [deck.deal(), deck.deal()];
@@ -459,6 +460,8 @@ const PokerTableWithPlayers = props => {
         
       }, [props.socket])
 
+      console.log("host is :", props.host);
+
       const handleLeaveGame = () =>{
         props.setActionForMatch(null);
         props.socket.emit("leaveGame");
@@ -587,9 +590,11 @@ const PokerTableWithPlayers = props => {
                 </Box>
                 
             </Box>
+            { props.host === props.user.userName ?
             <Button variant="contained" color="success" onClick={dealHoleCards}>
                 Deal
-            </Button>
+            </Button> : ""
+            }
         </Box>
     );
 }
