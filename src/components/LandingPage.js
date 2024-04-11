@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -8,7 +9,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 
 const LandingPage = (props) => {
-    const [tabValue, setTabValue] = React.useState(0);
+    const [tabValue, setTabValue] = useState(0);
     const{ setLandingPage }= props;
     const handleChangeTab = (event, newValue) => {
         setTabValue(newValue);

@@ -88,8 +88,12 @@ const Home = (props) => {
                 setOwnedAvatars(avatarInfo);
                 setButtonMessage("Equip");
                 setAvatarPrice(0);
-
-                setMessage("Purchased Successfully");
+                if(buttonMessage === "Equip"){
+                    setMessage("Equipped Successfully");
+                }
+                else{
+                    setMessage("Purchased Successfully");
+                }
             } catch (error) {
                 console.error("Error during updating money:", error);
                 //setError("An error occurred during updating money.");
