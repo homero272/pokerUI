@@ -85,8 +85,8 @@ const LandingPage = (props) => {
                         <img src={logo2} alt="Logo" style={{
                                 background:'transparent',
                                  zIndex: 2,
-                                 width: '80px',
-                                 height: '80px',
+                                 width: '100px',
+                                 height: '100px',
                                  borderRadius: '50%',
                                  border: '2px solid black',
                                  position: 'relative', }} />
