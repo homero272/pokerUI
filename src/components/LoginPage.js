@@ -223,12 +223,12 @@ const handleNewSubmit = async () => {
         console.log("Selected Avatar:", avatarPath);
     };
 
+    const handleKeyPress = (event) => {
+        if (event.key === "Enter") {
+            handleSubmit();
+        }
+    };
 
-    
-
-    
-
-    
 
     return (
         <Fragment>
@@ -239,7 +239,8 @@ const handleNewSubmit = async () => {
                     justifyContent: "center",
                     alignItems: "center",
                     gap: 1,
-                    backgroundImage: `url(${backgroundImage})`,
+                    //backgroundImage: `url(${backgroundImage})`,
+                    backgroundColor:'#00000b',
                     width: "100vw",
                     height: "100vh",
                     backgroundSize: "cover"
@@ -251,20 +252,30 @@ const handleNewSubmit = async () => {
                         flexDirection: "column",
                         justifyContent: "center",
                         alignItems: "center",
-                        gap: 1
+                        gap: 1,
+                        
                     }}
                 >
-                    <Typography variant="h5">Login</Typography>
+                    <Typography variant="h5" color="white">Login</Typography>
                     <TextField
                         label="Username"
                         value={username}
                         onChange={handleUsernameChange}
                         margin="normal"
+                        onKeyDown={handleKeyPress}
                         fullWidth
                         // this sets max length of input
                         inputProps={
                             {maxLength: 15}
                         }
+                        InputLabelProps={{
+                            style: { color: 'white' } // Style for the label
+                        }}
+                        InputProps={{
+                            style: { color: 'white' },
+                             // Style for the input field
+                        }}
+                        
                     />
                     <TextField
                         type="password"
@@ -272,11 +283,21 @@ const handleNewSubmit = async () => {
                         value={password}
                         onChange={handlePasswordChange}
                         margin="normal"
+                        onKeyDown={handleKeyPress}
                         fullWidth
-                        // this sets max length of input
+                                              // this sets max length of input
                         inputProps={
                             {maxLength: 15}
                         }
+                        InputLabelProps={{
+                            style: { color: 'white' } // Style for the label
+                        }}
+
+                        InputProps={{
+                            style: { color: 'white'} ,
+                            
+                            // Style for the input field
+                        }}
                     />
                     {error !== "" ? (
                         <Typography color="red">
@@ -291,6 +312,8 @@ const handleNewSubmit = async () => {
                         variant="contained"
                         color="primary"
                         onClick={handleSubmit}
+                          
+                        tabIndex={0}                     
                     >
                         Login
                     </Button> : ""
@@ -304,7 +327,7 @@ const handleNewSubmit = async () => {
                                 alignItems: "baseline"
                             }}
                         >
-                            <Typography variant="caption" style={{ marginRight: 1 }}>
+                            <Typography variant="caption" style={{ marginRight: 1, color:'lightgrey' }}>
                                 Don't have an account?
                             </Typography>
                             <Button
