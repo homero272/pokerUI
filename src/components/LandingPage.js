@@ -9,9 +9,27 @@ import Tabs from '@mui/material/Tabs';
 import banner from '../pokerbanner.png';
 import logo from '../circleLogo.png';
 import logo2 from '../croppedLogo.png';
-
+import GlobalStyle from './GlobalStyle';
 import { keyframes } from '@emotion/react';
 import { AutoAwesome } from '@mui/icons-material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const normal = createTheme({
+    typography: {
+      fontFamily: [
+        'normal',
+
+      ].join(','),
+    },
+  });
+  const heavy = createTheme({
+    typography: {
+      fontFamily: [
+        'heavy',
+
+      ].join(','),
+    },
+  });
 
 const LandingPage = (props) => {
     const [tabValue, setTabValue] = useState(0);
@@ -26,7 +44,7 @@ const LandingPage = (props) => {
         console.log("Sign in button clicked");
         setLandingPage(false);
     };
-    const rotate = keyframes`
+    let rotate = keyframes`
     0% {
         transform: rotateY(0deg);
         filter: drop-shadow(5px 5px 15px rgba(255,255, 255, 0.6));
@@ -48,9 +66,15 @@ const LandingPage = (props) => {
         filter: drop-shadow(5px 5px 15px rgba(255,255, 255, 0.6));
     }
 `;
+
+/**
+ * bgcolor: 'rgba(0,0,0,.9)'
+ */
     return (
         <>
-            <AppBar position="absolute" sx={{ bgcolor: '#00000b', height:'14%', justifyContent:'center'}}>
+        
+        <ThemeProvider theme={heavy}>
+            <AppBar position="fixed" sx={{ bgcolor: 'rgba(0,0,0,.9)', height:'19%', justifyContent:'center'}}>
                 <Toolbar >
                     {/* Place circular logo here */}
                     <Box
@@ -92,8 +116,8 @@ const LandingPage = (props) => {
                                  position: 'relative', }} />
                     </Box>
 
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'white' }}>
-                        App Name
+                    <Typography variant="h6" component="div" sx={{marginLeft:5, flexGrow: 1, color: 'white'}}>
+                        POKER
                     </Typography>
                     <Tabs value={tabValue} onChange={handleChangeTab}>
                         <Tab label="Home" sx={{ color: 'white' }} />
@@ -102,18 +126,18 @@ const LandingPage = (props) => {
                     <Button color="inherit" onClick={handleSignIn} sx={{ color: 'white' }}>Sign In</Button>
                 </Toolbar>
             </AppBar>
-            
+            </ThemeProvider>
             {/* Place banner here */}
             
-            
-            <Box sx={{ paddingTop: '64px' ,width:'100vw', position: 'fixed', top: '64px', left: '0'  }}>
+            <ThemeProvider theme={normal}>
+            <Box sx={{width:'100vw', position: 'fixed', left: '0'  }}>
                 <Box
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        height: 'calc(100vh - 64px)', // Adjusted height to fill the remaining space
+                        height: 'calc(100vh)', // Adjusted height to fill the remaining space
                         width: '100vw',
                         backgroundColor: '#00000b', // Dark background color
                         color: 'white', // Text color
@@ -122,7 +146,7 @@ const LandingPage = (props) => {
                         //padding: '20px', // Added padding for content
                     }}
                 >
-                    
+                    {/* marginTOp is waht we will make into a ternary to hardcode the banner placement */}
                     <img src={banner} alt="Banner" style={{ width: '100vw', maxHeight: '60vh', objectFit: 'cover', position: 'relative', marginTop:'30%'}} />
 
                     {tabValue === 0 && (
@@ -130,7 +154,7 @@ const LandingPage = (props) => {
                         <Box sx={{width:'50vw' ,position:'relative'}}>
                             
                             <Typography variant="h3" gutterBottom>
-                                Welcome to Our App
+                                Welcome to Our Poker Game!
                             </Typography>
                             <Typography variant="body1" gutterBottom>
                             landing page.
@@ -201,6 +225,7 @@ const LandingPage = (props) => {
                     )}
                 </Box>
             </Box>
+            </ThemeProvider>
             
         </>
     );

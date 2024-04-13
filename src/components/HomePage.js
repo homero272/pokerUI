@@ -11,7 +11,26 @@ import buyableAvatars from "../avatars/BuyableAvatars/buy"
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FriendsPage from './FriendsPage';
 import { keyframes } from '@emotion/react';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import '../App.css';
+
+
+const heavy = createTheme({
+    typography: {
+      fontFamily: [
+        'heavy',
+
+      ].join(','),
+    },
+    palette: {
+        primary: {
+          main: '#9caab7', // replace with your desired hex color
+        },
+        // ... other color settings
+      },
+  });
+
+
 const Home = (props) => {
     const {socket, user, handleMatchAction, setActionForMatch, handleSelectMatch, setRoomName} = props;
     const userName = user.userName;
@@ -129,11 +148,11 @@ const Home = (props) => {
     const rotate = keyframes`
     from {
       transform: rotateY(-20deg);
-      box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.6);
+      box-shadow: 10px 10px 15px rgba(255, 255, 255, 0.6);
     }
     to {
       transform: rotateY(20deg);
-      box-shadow: -10px 10px 15px rgba(0, 0, 0, 0.6);
+      box-shadow: -10px 10px 15px rgba(255, 255, 255, 0.6);
     }
   `;
   
@@ -141,7 +160,10 @@ const Home = (props) => {
 
 
     return (
+
+        
         !shoppingMenu ? friendsPage ? <FriendsPage setRoomName={setRoomName} handleMatchAction = {handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleSelectMatch} friendsRooms ={friendsRooms} onlineUsers= {onlineUsers} socket = {socket} user={user} setFriendsPage={setFriendsPage} /> :
+        <ThemeProvider theme={heavy}>
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -149,7 +171,7 @@ const Home = (props) => {
                 justifyContent: 'center',
                 height: '100vh',
                 width: '100vw',
-                backgroundColor: '#f0f0f0',
+                backgroundColor: '#00000b',
             }}>
                 <Box sx={{
                     position: 'absolute',
@@ -159,12 +181,12 @@ const Home = (props) => {
                     <IconButton onClick={() => handleFriendsPageClick(true)}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <PeopleAltIcon fontSize='large' color='primary' />
-                            <Typography variant="caption">Friends</Typography>
+                            <Typography variant="caption" sx={{color:'white'}}>Friends</Typography>
                         </Box>
                     </IconButton>
                 </Box>
                 <Box>
-                    <Typography variant="h4" gutterBottom>
+                    <Typography variant="h4" gutterBottom sx={{color:'white'}}>
                         Welcome, {userName}
                     </Typography>
                     
@@ -172,15 +194,16 @@ const Home = (props) => {
   <Box
     sx={{
       perspective: '500px',
+      
       borderRadius: '50%',
       overflow: 'hidden',
-      boxShadow: '0px 0px 8px rgba(0,0,0,0.6)',
+      boxShadow: '0px 0px 8px rgba(255,255,255,0.6)',
       position: 'relative',
       transition: 'transform 0.5s, box-shadow 0.5s',
       transform: 'rotateY(0deg)', // Start with no rotation
       animation: `${rotate} 2s infinite alternate`, // Add continuous rotation here
       '&:hover': {
-        boxShadow: '10px 0px 15px rgba(0,0,0,0.9)', // Move shadow with the rotation
+        boxShadow: '10px 0px 15px rgba(255,255,255,0.9)', // Move shadow with the rotation
       },
       '&:before': {
         content: '""',
@@ -204,7 +227,8 @@ const Home = (props) => {
       sx={{
         width: 120,
         height: 120,
-        border: '2px solid rgba(0, 0, 0, 0.9)',
+        backgroundColor:'white',
+        border: '5px solid black',
         zIndex: 2, // Ensure the avatar image is on top
         position: 'relative', // Required for z-index to take effect
       }}
@@ -243,12 +267,12 @@ const Home = (props) => {
                 </Box>
                 <Box sx={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'row' }}>
                     <Box sx={{ mr: 20, mt: 1.5 }}>
-                        <Typography>Money: ${money}</Typography>
+                        <Typography sx={{color:'white'}}>Money: ${money}</Typography>
                     </Box>
                     <IconButton onClick={() => handleShopClick(true)}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <ShoppingCartIcon fontSize='large' />
-                            <Typography variant="caption">Shop</Typography>
+                            <ShoppingCartIcon color='primary'fontSize='large' />
+                            <Typography variant="caption" sx={{color:'white'}}>Shop</Typography>
                         </Box>
                     </IconButton>
                 </Box>
@@ -264,6 +288,7 @@ const Home = (props) => {
                     Logout
                 </Button>
             </Box>
+            </ThemeProvider>
             :
             <Box sx={{
                 display: 'flex',
@@ -332,7 +357,9 @@ const Home = (props) => {
                 </Box>
             </Box>
             
+            
     );
+    
     
 };
 

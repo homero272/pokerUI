@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from '../API-Interface/API-Interface';
 import { Button, Typography, TextField, Box, Avatar } from "@mui/material";
 import { Fragment } from "react";
@@ -6,6 +6,33 @@ import { red,blue } from "@mui/material/colors";
 import backgroundImage from "../pokerLogin.png";
 import freeAvatars from "../avatars/FreeAvatars/free";
 import bcrypt from 'bcryptjs';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { keyframes } from '@emotion/react';
+import logo2 from '../croppedLogo.png';
+
+
+const normal = createTheme({
+    typography: {
+      fontFamily: [
+        'normal',
+
+      ].join(','),
+    },
+  });
+  const heavy = createTheme({
+    typography: {
+      fontFamily: [
+        'heavy',
+
+      ].join(','),
+    },
+    palette: {
+        primary: {
+          main: '#9caab7', // replace with your desired hex color
+        },
+        // ... other color settings
+      },
+  });
 
 console.log(freeAvatars)
 const LoginPage = (props) => {
@@ -14,7 +41,34 @@ const LoginPage = (props) => {
     const [error, setError] = useState("");
     const [create, setCreate] = useState(false);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
+    const [userInfo,setUserInfo] = useState({user:""});
+    const [rotate,setRotate] = useState(keyframes`
+    from {
+      transform: rotateY(-20deg);
+      box-shadow: 10px 10px 15px rgba(255,255, 255, 0.6);
+    }
+    to {
+      transform: rotateY(20deg);
+      box-shadow: -10px 10px 15px rgba(255,255, 255, 0.6);
+    }
+    `);
 
+    const [login,setLogin] = useState(true);
+    
+    useEffect(() => {
+        let timer;
+        if(!login){
+        // This timeout will run the function after 8000 milliseconds (8 seconds)
+        timer = setTimeout(() => {
+            console.log('This will run 8 seconds after login state changes.');
+            // Set state or perform any action after the delay
+            props.onSubmitInfo(userInfo);
+        }, 7500);
+        }
+
+        // Cleanup function to clear the timer if the component unmounts or the dependencies change
+        return () => clearTimeout(timer);
+    }, [login]); // Dependencies array, this effect will rerun when `login` changes
 
 
 
@@ -98,6 +152,9 @@ const LoginPage = (props) => {
             setError("Username and Password cant be empty!!!");
             return;
         }
+
+
+        
         console.log("Username:", username);
         console.log("Password:", password);
         const api = new API();
@@ -111,7 +168,25 @@ const LoginPage = (props) => {
     
                 if (passwordMatch) {
                     console.log("Login successful");
-                    props.onSubmitInfo(userInfo); //sets next page
+                    setRotate(keyframes`
+                    0% {
+                        transform: rotateY(-360deg) scale(1);
+                        box-shadow: 10px 10px 15px rgba(255,255, 255, 0.6);
+                      }
+                      50% {
+                        transform: rotateY(0deg) scale(.5);
+                        box-shadow: 0px 0px 15px rgba(255,255, 255, 0.6);
+                      }
+        
+                      100% {
+                        transform: rotateY(360deg) scale(0.25);
+                        box-shadow: -10px 10px 15px rgba(255,255, 255, 0.6);
+                      }
+                    `);
+                    setUserInfo(userInfo);
+                    setLogin(false);
+                    
+                    //props.onSubmitInfo(userInfo); //sets next page
                 } else {
                     console.log("Wrong password");
                     setError("Wrong password!");
@@ -204,7 +279,25 @@ const handleNewSubmit = async () => {
                 //console.log(obj);
                 await api.insertAvatar(userInfo.user.userID, userInfo.user.userName, obj);
             });
-            props.onSubmitInfo(userInfo);
+            setRotate(keyframes`
+            0% {
+                transform: rotateY(-360deg) scale(1);
+                box-shadow: 10px 10px 15px rgba(255,255, 255, 0.6);
+              }
+              50% {
+                transform: rotateY(0deg) scale(.5);
+                box-shadow: 0px 0px 15px rgba(255,255, 255, 0.6);
+              }
+
+              100% {
+                transform: rotateY(360deg) scale(0.25);
+                box-shadow: -10px 10px 15px rgba(255,255, 255, 0.6);
+              }
+              
+            `);
+            setUserInfo(userInfo);
+            setLogin(false);
+            //props.onSubmitInfo(userInfo);
         } else {
             console.log("Username already exists");
             setError("Username already exists!");
@@ -217,6 +310,8 @@ const handleNewSubmit = async () => {
 };
 
 
+
+
     const handleAvatarClick = (avatarPath) => {
         setSelectedAvatar(avatarPath);
         // Do whatever you want with the selected avatar path
@@ -225,13 +320,55 @@ const handleNewSubmit = async () => {
 
     const handleKeyPress = (event) => {
         if (event.key === "Enter") {
-            handleSubmit();
+            if(create==false){
+                handleSubmit();
+            }
+            else{
+                handleNewSubmit();
+            }
+            
         }
     };
 
+//     const rotate = keyframes`
+//     0% {
+//         transform: rotateY(0deg);
+//         filter: drop-shadow(5px 5px 15px rgba(255,255, 255, 0.6));
+//     }
+//     25% {
+//         transform: rotateY(90deg);
+//         filter: drop-shadow(0px 5px 10px rgba(255,255, 255, 0.3));
+//     }
+//     50% {
+//         transform: rotateY(180deg);
+//         filter: drop-shadow(-5px 5px 5px rgba(255,255, 255,0.1));
+//     }
+//     75% {
+//         transform: rotateY(270deg);
+//         filter: drop-shadow(0px 5px 10px rgba(255,255, 255, 0.3));
+//     }
+//     100% {
+//         transform: rotateY(360deg);
+//         filter: drop-shadow(5px 5px 15px rgba(255,255, 255, 0.6));
+//     }
+// `;
+
+
+// let rotate = keyframes`
+// from {
+//   transform: rotateY(-20deg);
+//   box-shadow: 10px 10px 15px rgba(255,255, 255, 0.6);
+// }
+// to {
+//   transform: rotateY(20deg);
+//   box-shadow: -10px 10px 15px rgba(255,255, 255, 0.6);
+// }
+// `;
 
     return (
         <Fragment>
+            <ThemeProvider theme={heavy}>
+   
             <Box
                 sx={{
                     display: "flex",
@@ -243,62 +380,125 @@ const handleNewSubmit = async () => {
                     backgroundColor:'#00000b',
                     width: "100vw",
                     height: "100vh",
-                    backgroundSize: "cover"
+                    backgroundSize: "cover",
+
                 }}
             >
-                <Box
+
+            
+            <Box
+                        sx={{
+                            perspective: '500px',
+                            borderRadius: '50%',
+                            zIndex:0,
+                            overflow: 'hidden',
+                            boxShadow: '0px 0px 0px rgba(0,0,0,0.6)',
+                            position: 'fixed',
+                            transition: 'transform 0.5s, box-shadow 0.5s',
+                            transform: 'rotateY(0deg)', // Start with no rotation
+                            animation: `${rotate} 8s infinite alternate`, // Add continuous rotation here
+                            '&:hover': {
+                                boxShadow: '0px 0px 5px rgba(255, 255, 255, 0.9)', // Move shadow with the rotation
+                            },
+                            '&:before': {
+                                content: '""',
+                                display: 'none',
+                                position: 'absolute',
+                                top: '10%',
+                                bottom: '10%',
+                                left: 0,
+                                right: 0,
+                                borderRadius: '50%',
+                                transform: 'scale(0.9)',
+                                transition: 'transform 0.5s, border 0.5s',
+                                zIndex: 0, // Ensure the coin edge is not behind the avatar
+                            },
+                            zIndex: 0, // The avatar itself should be on top
+                        }}
+                    >
+                        <img src={logo2} alt="Logo" style={{
+                                background:'transparent',
+                                 zIndex: 0,
+                                 width: '600px',
+                                 height: '600px',
+                                 borderRadius: '50%',
+                                 border: '2px solid black',
+                                 
+                                  }} />
+                    </Box> 
+
+                    {login ? (
+                    <Box
                     sx={{
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "center",
                         alignItems: "center",
+                        width: create === false ? '20%' : '35%',
                         gap: 1,
-                        
+                        border:3,
+                        borderColor:'white',
+                        position: 'relative', // Ensure it's positioned so zIndex takes effect
+    zIndex: 1, // Higher zIndex to appear above the logo
+    backgroundColor: 'rgba(0, 0, 11, 0.15)', // Semi-transparent white background
+    backdropFilter: 'blur(5px)', // Optional: apply a blur to the content behind the box
+    borderRadius: '10px', 
                     }}
                 >
-                    <Typography variant="h5" color="white">Login</Typography>
-                    <TextField
-                        label="Username"
-                        value={username}
-                        onChange={handleUsernameChange}
-                        margin="normal"
-                        onKeyDown={handleKeyPress}
-                        fullWidth
-                        // this sets max length of input
-                        inputProps={
-                            {maxLength: 15}
-                        }
-                        InputLabelProps={{
-                            style: { color: 'white' } // Style for the label
-                        }}
-                        InputProps={{
-                            style: { color: 'white' },
-                             // Style for the input field
-                        }}
-                        
-                    />
-                    <TextField
-                        type="password"
-                        label="Password"
-                        value={password}
-                        onChange={handlePasswordChange}
-                        margin="normal"
-                        onKeyDown={handleKeyPress}
-                        fullWidth
-                                              // this sets max length of input
-                        inputProps={
-                            {maxLength: 15}
-                        }
-                        InputLabelProps={{
-                            style: { color: 'white' } // Style for the label
-                        }}
 
-                        InputProps={{
-                            style: { color: 'white'} ,
+                    
+                    <Box sx={{display:'flex', flexDirection:'column',alignContent:'center'}}>
+                        
+                    <Typography variant="h5" color="white">Login</Typography>
+                    
+                    <Box sx={{mt:'15px',border:1,borderRadius: '10px', backdropFilter: 'blur(500px)',borderColor:'rgba(7, 55, 68, 0)',height:'50%',display:'flex', flexDirection:'column', justifyContent:'center',alignItems:'center'}}>
+                        <TextField
+                            label="Username"
+                            value={username}
+                            onChange={handleUsernameChange}
+                            margin="normal"
+                            onKeyDown={handleKeyPress}
                             
-                            // Style for the input field
-                        }}
-                    />
+                            // this sets max length of input
+                            inputProps={
+                                {maxLength: 15}
+                            }
+                            InputLabelProps={{
+                                style: { color: 'white' } // Style for the label
+                            }}
+                            InputProps={{
+                                style: { color: 'white' },
+                                // Style for the input field
+                            }}
+                            
+                        />
+                    
+                    
+                    
+                        <TextField
+                            type="password"
+                            label="Password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                            margin="normal"
+                            onKeyDown={handleKeyPress}
+                            fullWidth
+                                                // this sets max length of input
+                            inputProps={
+                                {maxLength: 15}
+                            }
+                            InputLabelProps={{
+                                style: { color: 'white' } // Style for the label
+                            }}
+
+                            InputProps={{
+                                style: { color: 'white'} ,
+                                
+                                // Style for the input field
+                            }}
+                        />
+                    </Box>
+                </Box>
                     {error !== "" ? (
                         <Typography color="red">
                             {error}
@@ -332,7 +532,8 @@ const handleNewSubmit = async () => {
                             </Typography>
                             <Button
                                 variant="contained"
-                                color="primary"
+                                
+                                style={{ backgroundColor: '#132632', color: 'white' }}
                                 size="small"
                                 onClick={handleCreateAccount}
                             >
@@ -341,7 +542,7 @@ const handleNewSubmit = async () => {
                         </Box>
                     ) : 
                     (
-                        <Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center', alignItems: 'center', gap: 5}}>
+                        <Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center', alignItems: 'center', gap: 5, color:'white'}}>
                             <Typography>Choose your Avatar</Typography>
                         <Box sx={{ display: "flex", flexDirection: "row", gap: 5, justifyContent: 'center', alignItems: 'center' }}>
                             {Object.entries(freeAvatars).map(([avatarName, avatarSrc]) => (
@@ -349,20 +550,21 @@ const handleNewSubmit = async () => {
                                     key={avatarName}
                                     src={avatarSrc}
                                     onClick={() => handleAvatarClick(avatarName)}
-                                    sx={{ cursor: "pointer", border: selectedAvatar === avatarName ? "2px solid blue" : "none" }}
+                                    sx={{ cursor: "pointer", border: selectedAvatar === avatarName ? "2px solid blue" : "2px solid white" ,backgroundColor:'white'}}
                                     />
                              ))}
                         </Box>
-                            <Button variant="contained" color="success" onClick={handleNewSubmit}>
+                            <Button variant="contained" color="primary" onClick={handleNewSubmit}>
                                 Create
                             </Button>
                         </Box>
                     )}
 
                 </Box>
+                ) : null}
             </Box>
 
-
+            </ThemeProvider>
 
         </Fragment>
     );

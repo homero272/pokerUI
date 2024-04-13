@@ -11,7 +11,7 @@ import JoinMatch from './components/JoinMatch';
 import LandingPage from './components/LandingPage';
 import { setRandomFallback } from 'bcryptjs';
 //let socket = null;
-
+import GlobalStyle from './components/GlobalStyle';
 function App() {
 
   const [user, setUser] = useState(null);
@@ -66,8 +66,8 @@ function App() {
 
   const handleSignIn = (props) =>{
     setUser(props.user);
-    //setSocket(io.connect("http://localhost:3001"));
-    setSocket(io.connect("https://pokerwebsocket.onrender.com"));
+    setSocket(io.connect("http://localhost:3001"));
+    //setSocket(io.connect("https://pokerwebsocket.onrender.com"));
     
 
     
@@ -126,6 +126,7 @@ const handleJoinMatch = props =>{
 }
 
 return (
+  
   <Box sx={{
     height: '100vh',
     width: '100vw',
@@ -133,6 +134,7 @@ return (
     alignItems: "center",
     justifyContent: "center",
   }}>
+    <GlobalStyle/>
     {landingPage ? (
       <LandingPage setLandingPage={setLandingPage} />
     ) : (
