@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from '../API-Interface/API-Interface';
-import { Button, Typography, TextField, Box, Avatar } from "@mui/material";
+import { Button, Typography, TextField, Box, Avatar,useMediaQuery } from "@mui/material";
 import { Fragment } from "react";
 import { red,blue } from "@mui/material/colors";
 import backgroundImage from "../pokerLogin.png";
@@ -9,6 +9,9 @@ import bcrypt from 'bcryptjs';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { keyframes } from '@emotion/react';
 import logo2 from '../croppedLogo.png';
+import { useTheme } from '@mui/material/styles';
+
+
 
 
 const normal = createTheme({
@@ -20,17 +23,38 @@ const normal = createTheme({
     },
   });
   const heavy = createTheme({
-    typography: {
-      fontFamily: [
-        'heavy',
 
-      ].join(','),
-    },
     palette: {
         primary: {
           main: '#9caab7', // replace with your desired hex color
         },
         // ... other color settings
+      },
+
+      components: {
+        MuiTypography: {
+          defaultProps: {
+            variantMapping: {
+              h3: 'h1',
+              h4: 'h2',
+              body1: 'p',
+            },
+          },
+        },
+      },
+      typography: {
+        fontFamily: ['heavy',].join(','),
+        h3: {
+          fontSize: '1.5rem', // base size for desktop
+          '@media (max-width:600px)': { // media query for devices smaller than 600px
+            fontSize: '1.25rem', // smaller font size for mobile devices
+          },
+        },
+        body1: {
+          '@media (max-width:600px)': {
+            fontSize: '0.875rem',
+          },
+        },
       },
   });
 
@@ -329,6 +353,7 @@ const handleNewSubmit = async () => {
             
         }
     };
+    
 
 //     const rotate = keyframes`
 //     0% {
