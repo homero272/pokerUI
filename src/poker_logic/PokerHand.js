@@ -1,6 +1,5 @@
 const { Card } = require('./Card');
 const { Deck } = require('./Deck');
-const assert = require('assert');
 
 const numCardsInPokerHand = 5;
 
@@ -33,6 +32,9 @@ const handRanks = [
 
 class PokerHand {
     constructor(cards) {
+        if (cards.length !== numCardsInPokerHand)
+            throw new Error(`Poker hand must have ${numCardsInPokerHand} cards, received ${cards.length}`);
+
         this.cards = this.sortCards(cards);
 
         // 2x3x4x5xAx -> Ax2x3x4x5x
@@ -280,17 +282,11 @@ class PokerHand {
     /* methods for determining poker hand */
 
     isQuads() {
-        assert.strictEqual(this.cards.length, numCardsInPokerHand, 
-        `Poker hand should have ${numCardsInPokerHand} cards`);
-
         return this.cards[0].value === this.cards[3].value ||
                this.cards[1].value === this.cards[4].value;
     }
 
     isFullHouse() {
-        assert.strictEqual(this.cards.length, numCardsInPokerHand, 
-        `Poker hand should have ${numCardsInPokerHand} cards`);
-
         return (this.cards[0].value === this.cards[1].value &&
                 this.cards[2].value === this.cards[4].value) ||
                (this.cards[0].value === this.cards[2].value &&
@@ -298,9 +294,6 @@ class PokerHand {
     }
 
     isFlush() {
-        assert.strictEqual(this.cards.length, numCardsInPokerHand, 
-        `Poker hand should have ${numCardsInPokerHand} cards`);
-
         for (let i = 1; i < numCardsInPokerHand; i++) {
             if (this.cards[i].suit !== this.cards[i - 1].suit)
                 return false;
@@ -310,9 +303,6 @@ class PokerHand {
     }
 
     isStraight() {
-        assert.strictEqual(this.cards.length, numCardsInPokerHand, 
-        `Poker hand should have ${numCardsInPokerHand} cards`);
-
         if (this.isWheelStraight())
             return true;
 
@@ -329,9 +319,6 @@ class PokerHand {
 
     // checks if cards is a wheel straight - Ax2x3x4x5x or 2x3x4x5xAx
     isWheelStraight() {
-        assert.strictEqual(this.cards.length, numCardsInPokerHand, 
-        `Poker hand should have ${numCardsInPokerHand} cards`);
-
         return (this.cards[0].value === 'A' &&
                 this.cards[1].value === '2' &&
                 this.cards[2].value === '3' &&
@@ -369,4 +356,4 @@ class PokerHand {
     }
 }
 
-module.exports = { PokerHand };
+module.exports = { PokerHand, numCardsInPokerHand };

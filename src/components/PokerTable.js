@@ -6,6 +6,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { IconButton } from '@mui/material';
 import { red } from '@mui/material/colors';
 const { Deck } = require('../poker_logic/Deck');
+const { PokerHand, numCardsInPokerHand } = require('../poker_logic/PokerHand');
 
 const numCommunityCards = 5;
 const cardBoxHeight = 60;
@@ -115,7 +116,8 @@ const EmptySeat = props => {
             case 2:
               console.log("Two");
               props.setSeat2(true);
-              props.setCurrentSeat(2);props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 2} );
+              props.setCurrentSeat(2);
+              props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 2} );
               break;
             case 3:
               console.log("Three");
@@ -323,6 +325,65 @@ const PokerTableWithPlayers = props => {
     const [bigBlind, setBigBlind] = useState(0);
     let _bigBlind = 0;
     let seatsWithPlayers = [];
+
+    // returns all C(7, 5) combos of poker hands a player can have
+    // given their 2 hole cards and the 5 community cards
+    // 
+    // returns 2d array
+    function generateCombos(cards) {
+        let combos = [];
+        const combo = new Array(numCardsInPokerHand);
+    
+        const generate = (start, index) => {
+            if (index === numCardsInPokerHand) {
+                combos.push(combo.slice()); 
+                return;
+            }
+            for (let i = start; i < cards.length; i++) {
+                combo[index] = cards[i];
+                generate(i + 1, index + 1);
+            }
+        };
+    
+        generate(0, 0);
+        return combos;
+    }
+
+    // returns all the players best poker hand
+    const getPlayersBestHands = () => {
+        // maps players hole cards to the 5 community cards
+        const holeCardsAndCommunityCards = _holeCards.map(cards => {
+            return cards.length !== 0 ? [...cards, ..._communityCards] : [];
+        });
+        console.log(holeCardsAndCommunityCards);
+
+        // combos is 3d array where the outter array is an array of size
+        // 6 and the inner array is an array of arrays representing each
+        // players C(7, 5) possible hand combos from that player's 2 hole 
+        // cards and the 5 community cards
+        const combos = [];
+        for (let i = 0; i < holeCardsAndCommunityCards.length; i++) {        
+            combos.push(generateCombos(holeCardsAndCommunityCards[i]));
+        }
+        console.log(combos);
+
+        let bestHands = [];
+        combos.forEach(playerCombos => {
+            let bestHand = null;
+            playerCombos.forEach(combo => {
+                const pokerHand = new PokerHand(combo);
+                if (!bestHand || pokerHand.compareWith(bestHand) > 0) {
+                    bestHand = pokerHand;
+                }
+            });
+            bestHands.push(bestHand);
+        });
+        bestHands.forEach(hand => {
+            if (hand) {
+                hand.print();
+            }
+        });
+    }
     
     // shifts the dealer button, sb, and bb 1 spot to the left
     const rotateBlinds = () => {
@@ -334,6 +395,8 @@ const PokerTableWithPlayers = props => {
         if (seat4) seatsWithPlayers.push(4);
         if (seat5) seatsWithPlayers.push(5);
         if (seat6) seatsWithPlayers.push(6);
+
+        if (seatsWithPlayers.length < 2) return;
 
         const newDealerButtonIndex = (seatsWithPlayers.indexOf(dealerButton) + 1) % seatsWithPlayers.length;
         const newDealerButtonSeat = seatsWithPlayers[newDealerButtonIndex];
@@ -453,6 +516,10 @@ const PokerTableWithPlayers = props => {
         dealFlop();
         dealTurn();
         dealRiver();
+        console.log(`seaaaat: ${currentSeat}`)
+        console.log(`communnnnity cards: ${communityCards}`)
+        getPlayersBestHands();
+
     }
 
     useEffect(() => {
@@ -610,8 +677,8 @@ const PokerTableWithPlayers = props => {
     console.log("host is :", props.host);
 
     const handleLeaveGame = () => {
-    props.setActionForMatch(null);
-    props.socket.emit("leaveGame");
+        props.setActionForMatch(null);
+        props.socket.emit("leaveGame");
     }
 
     return (
