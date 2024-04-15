@@ -378,11 +378,7 @@ const PokerTableWithPlayers = props => {
             });
             bestHands.push(bestHand);
         });
-        bestHands.forEach(hand => {
-            if (hand) {
-                hand.print();
-            }
-        });
+        console.log(bestHands);
     }
     
     // shifts the dealer button, sb, and bb 1 spot to the left
