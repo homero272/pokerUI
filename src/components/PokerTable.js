@@ -401,15 +401,25 @@ const PokerTableWithPlayers = props => {
 
         if (seatsWithPlayers.length < 2) return;
 
-        const newDealerButtonIndex = (seatsWithPlayers.indexOf(dealerButton) + 1) % seatsWithPlayers.length;
+        // Move the big blind to the next position
+        const newBigBlindIndex = (seatsWithPlayers.indexOf(bigBlind) + 1) % seatsWithPlayers.length;
+        const newBigBlindSeat = seatsWithPlayers[newBigBlindIndex];
+
+        // Set the small blind to the right of the big blind
+        const newSmallBlindIndex = (newBigBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
+        const newSmallBlindSeat = seatsWithPlayers[newSmallBlindIndex];
+
+        // Set the dealer button to the right of the small blind
+        const newDealerButtonIndex = (newSmallBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
         const newDealerButtonSeat = seatsWithPlayers[newDealerButtonIndex];
 
-        console.log(`%%%${newDealerButtonIndex} %%%${newDealerButtonSeat}`);
-        console.log(seatsWithPlayers.length, "#####");
+        //console.log(`%%%${newDealerButtonIndex} %%%${newDealerButtonSeat}`);
+        //console.log(seatsWithPlayers.length, "#####");
+        console.log(`newBBindex: ${newBigBlindIndex} newSBindex: ${newSmallBlindIndex} newButtonIndex: ${newDealerButtonIndex}`)
 
         _dealerButton = newDealerButtonSeat;
-        _smallBlind = seatsWithPlayers[(newDealerButtonIndex + 1) % seatsWithPlayers.length];
-        _bigBlind = seatsWithPlayers[(newDealerButtonIndex + 2) % seatsWithPlayers.length];
+        _smallBlind = newSmallBlindSeat;
+        _bigBlind = newBigBlindSeat;
 
         setDealerButton(_dealerButton);
         setSmallBlind(_smallBlind);
