@@ -325,6 +325,8 @@ const PokerTableWithPlayers = props => {
     const [bigBlind, setBigBlind] = useState(0);
     let _bigBlind = 0;
     let seatsWithPlayers = [];
+    const [bestHands, setBestHands] = useState([]);
+    let _bestHands = [];
 
     // returns all C(7, 5) combos of poker hands a player can have
     // given their 2 hole cards and the 5 community cards
@@ -367,7 +369,6 @@ const PokerTableWithPlayers = props => {
         }
         console.log(combos);
 
-        let bestHands = [];
         combos.forEach(playerCombos => {
             let bestHand = null;
             playerCombos.forEach(combo => {
@@ -376,9 +377,15 @@ const PokerTableWithPlayers = props => {
                     bestHand = pokerHand;
                 }
             });
-            bestHands.push(bestHand);
+            _bestHands.push(bestHand);
         });
-        console.log(bestHands);
+        setBestHands(_bestHands);
+        console.log(_bestHands);
+
+        props.socket.emit("playersBestHands", {
+            bestHands: _bestHands,
+            roomName: props.roomName
+        });
     }
     
     // shifts the dealer button, sb, and bb 1 spot to the left
@@ -666,6 +673,16 @@ const PokerTableWithPlayers = props => {
           props.socket.on("recievedStartGame", (data) => {
             setGameStarted(true);
           });
+
+          props.socket.on("recievedPlayersBestHands", (data) => {
+            let pokerHands = [];
+            data.bestHands.forEach(hand => {
+                const newPokerHand = !hand ? null : new PokerHand(hand.cards);
+                pokerHands.push(newPokerHand);
+            });
+            setBestHands(pokerHands);
+            console.log(pokerHands);
+          });
         }
         
     }, [props.socket])
@@ -684,7 +701,8 @@ const PokerTableWithPlayers = props => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: '#111111'
+            backgroundColor: '#111111',
+            flexDirection: 'column'
         }}>
             <Box sx={{position: 'absolute', top: 10, left: 10}}>
             <IconButton  onClick={handleLeaveGame}>
@@ -808,7 +826,13 @@ const PokerTableWithPlayers = props => {
             <Button variant="contained" color="success" onClick={dealHoleCards}>
                 Deal
             </Button> : ""
-            }
+            } 
+            <Typography sx={{
+                color: "#eeeeee"
+            }}>{
+                bestHands[currentSeat - 1]?.print() || ""
+            }</Typography>
+
         </Box>
     );
 }

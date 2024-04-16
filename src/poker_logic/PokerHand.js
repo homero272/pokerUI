@@ -192,11 +192,12 @@ class PokerHand {
     }
 
     print() {
+        /*
         this.cards.forEach(card => {
             card.print();
         });
-
-        let output = ` ~ ${this.hand} ~ `;
+        */
+        let output = `${this.hand}, `;
 
         switch (this.hand) {
             case 'Royal Flush':
@@ -251,6 +252,7 @@ class PokerHand {
         }
 
         console.log(output);
+        return output;
     }
 
     // compares two PokerHand objects
