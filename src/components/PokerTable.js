@@ -425,21 +425,29 @@ const PokerTableWithPlayers = props => {
         if (seat5) seatsWithPlayers.push(5);
         if (seat6) seatsWithPlayers.push(6);
 
-        
-
         if (seatsWithPlayers.length < 2) return;
 
-        const newDealerButtonIndex = (seatsWithPlayers.indexOf(dealerButton) + 1) % seatsWithPlayers.length;
+        // Move the big blind to the next position
+        const newBigBlindIndex = (seatsWithPlayers.indexOf(bigBlind) + 1) % seatsWithPlayers.length;
+        const newBigBlindSeat = seatsWithPlayers[newBigBlindIndex];
+
+        // Set the small blind to the right of the big blind
+        const newSmallBlindIndex = (newBigBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
+        const newSmallBlindSeat = seatsWithPlayers[newSmallBlindIndex];
+
+        // Set the dealer button to the right of the small blind
+        const newDealerButtonIndex = (newSmallBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
         const newDealerButtonSeat = seatsWithPlayers[newDealerButtonIndex];
 
-        console.log(`%%%${newDealerButtonIndex} %%%${newDealerButtonSeat}`);
-        console.log(seatsWithPlayers.length, "#####");
+        //console.log(`%%%${newDealerButtonIndex} %%%${newDealerButtonSeat}`);
+        //console.log(seatsWithPlayers.length, "#####");
+        console.log(`newBBindex: ${newBigBlindIndex} newSBindex: ${newSmallBlindIndex} newButtonIndex: ${newDealerButtonIndex}`)
 
         _dealerButton = newDealerButtonSeat;
-        _smallBlind = seatsWithPlayers[(newDealerButtonIndex + 1) % seatsWithPlayers.length];
-        _bigBlind = seatsWithPlayers[(newDealerButtonIndex + 2) % seatsWithPlayers.length];
-        
-        switch (_dealerButton) {
+        _smallBlind = newSmallBlindSeat;
+        _bigBlind = newBigBlindSeat;
+
+	    switch (_dealerButton) {
             case 1:
               setPlayerTurn(seatName1)
               break;
@@ -468,7 +476,6 @@ const PokerTableWithPlayers = props => {
         setDealerButton(_dealerButton);
         setSmallBlind(_smallBlind);
         setBigBlind(_bigBlind);
-        
 
         console.log(seatsWithPlayers);
         console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
