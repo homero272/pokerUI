@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react';
-import { Canvas, useLoader } from '@react-three/fiber';
+import React, { Suspense, useState, useEffect, useRef } from 'react';
+import { Canvas, useLoader, useFrame } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { TextureLoader } from 'three';
 import { OrbitControls, SpotLight, Stage } from '@react-three/drei';
@@ -14,7 +14,7 @@ manager.setURLModifier((url) => {
 });
 
 const PokerTable = ({ position }) => {
-  const gltf = useLoader(GLTFLoader, '/tabletextures/testtable.glb', (loader) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/wholeroom.gltf', (loader) => {
     loader.setPath('/models/');
     loader.setResourcePath(texturePath);
     loader.manager = manager;
@@ -64,26 +64,33 @@ const AllChips = ({ position }) => {
 
 //   return <primitive object={gltf.scene} position={position} scale={[0.05, 0.05, 0.05]} />;
 // };
+const Players = ({ visibility }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/wholeroom3.gltf');
 
-const Room = ({ position, onChairClick }) => {
-  const gltf = useLoader(GLTFLoader, '/tabletextures/finalroom.gltf', (loader) => {
-    loader.setPath('/models/');
-    loader.setResourcePath(texturePath);
-    loader.manager = manager;
-  });
+  return gltf.scene.children.filter(child => child.name.startsWith("player")).map(child => (
+    <primitive
+      key={child.name}
+      object={child}
+      visible={visibility[child.name]}
+    />
+  ));
+};
+
+const Room = ({ position, visibility, setVisibility }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/wholeroom3.gltf');
 
   const handleClick = (event, chair) => {
-    
-    console.log(`Chair clicked: ${chair.name}`);
+    const playerName = `player${chair.name.replace(/\D/g, '')}`;
+    setVisibility(prev => ({
+      ...prev,
+      [playerName]: !prev[playerName]
+    }));
   };
 
   return (
     <group position={position} scale={[0.05, 0.05, 0.05]}>
-      {gltf.scene.children.map((child) => {
-        console.log(child,"obj");
-        if (child.children[0].isMesh && child.name.startsWith("chair")) {
-          // Correctly applying the `onClick` handler to each chair mesh.
-          console.log(child.name);
+      {gltf.scene.children.map(child => {
+        if (child.children.length > 0 && child.children[0].isMesh && child.name.startsWith("chair")) {
           return (
             <mesh
               key={child.name}
@@ -95,40 +102,420 @@ const Room = ({ position, onChairClick }) => {
               scale={child.scale}
             />
           );
-        } else {
-          return <primitive key={child.name} object={child} />;
+        } else if (!child.name.startsWith("player")) {
+          return <primitive key={child.name} object={child} visible={true} />;
         }
       })}
+      
     </group>
   );
 };
 
 
-const PokerTableWithPlayers = () => (
-  <>
-    <Canvas style={{ backgroundColor: 'black', position: 'absolute', top: 0, left: 0 }}>
-      <Suspense fallback={null}>
-        <ambientLight intensity={0.1} />
-        <SpotLight position={[0, 5, 0]} intensity={1} angle={0.3} penumbra={0.5} castShadow />
-        <Stage
-          intensity={1}
-          environment="city"
-          contactShadow={false}
-          shadows={true}
-        >
-          {/* <PokerTable position={[0, 0, 0]} />*/}
-          {/* <AllChips position={[0,.4,0]}/> */}
-          <Room position={[0,1,0]}/>
-        </Stage>
-        <OrbitControls />
-      </Suspense>
-    </Canvas>
-    <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
-      <Button variant="contained" color="primary">
-        My Button
-      </Button>
-    </div>
-  </>
-);
+const SimpleRoom = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/roomnochairorplayer.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+
+const Player1 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/player1.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+
+const Player2 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/player2.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Player3 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/player3.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Player4 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/player4.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Player5 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/player5.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Player6 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/player6.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+
+const Chair1 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/chair1.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Chair2 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/chair2.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Chair3 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/chair3.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Chair4 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/chair4.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Chair5 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/chair5.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+const Chair6 = ({ isVisible }) => {
+  const gltf = useLoader(GLTFLoader, '/tabletextures/chair6.gltf');
+  const meshRef = useRef();
+
+  // Update the mesh visibility based on the state toggle
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+  );
+};
+
+const Player = ({ id, isVisible }) => {
+  const gltf = useLoader(GLTFLoader, `/tabletextures/player${id}.gltf`);
+  const meshRef = useRef();
+
+  if (meshRef.current) {
+    meshRef.current.visible = isVisible;
+  }
+
+  return (
+    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} visible={isVisible}  />
+  );
+};
+
+const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, roomName, socket }) => {
+  const gltf = useLoader(GLTFLoader, `/tabletextures/chair${id}.gltf`);
+  const meshRef = useRef();
+  
+
+
+  if (meshRef.current) {
+    meshRef.current.visible = true;
+  }
+  return (
+    <primitive
+      ref={meshRef}
+      object={gltf.scene}
+      geometry={gltf.scene.children[0].geometry}
+      material={gltf.scene.children[0].material}
+      scale={[0.05, 0.05, 0.05]}
+      onClick={() => togglePlayerVisibility(id)}
+    />
+  );
+};
+
+const PokerTableWithPlayers = (props) => {
+
+  const [seatName1, setSeatName1] = useState(props.user.userName);
+  const [seatName2, setSeatName2] = useState(props.user.userName);
+  const [seatName3, setSeatName3] = useState(props.user.userName);
+  const [seatName4, setSeatName4] = useState(props.user.userName);
+  const [seatName5, setSeatName5] = useState(props.user.userName);
+  const [seatName6, setSeatName6] = useState(props.user.userName);
+  const [currentSeat, setCurrentSeat] = useState(null);
+  const [visibility, setVisibility] = useState({
+    player1: false,
+    player2: false,
+    player3: false,
+    player4: false,
+    player5: false,
+    player6: false
+  });
+
+
+  useEffect(() => {
+    if(props.socket !== null) {
+      props.socket.on("receiveSeatNumber", (data) => {
+        //alert(data);
+        console.log("Seat number recieved is :", data);
+
+        //we have seat number of what they chose and we have the username of the person who chose it
+       // console.log("temp user:", tempuser, " most recent user: ", mostRecentUser );
+       const key = `player${data.seatNumber}`;
+       setVisibility(prev => ({
+         ...prev,
+         [key]: true
+       }));
+        switch (data.seatNumber) {
+            case 1:
+              
+              setSeatName1(data.user.userName);
+              break;
+            case 2:
+              
+              setSeatName2(data.user.userName);
+              break;
+            case 3:
+                
+                setSeatName3(data.user.userName);
+              break;
+            case 4:
+                
+                setSeatName4(data.user.userName);
+              break;
+            case 5:
+                
+                setSeatName5(data.user.userName);
+              break;
+            case 6:
+                
+                setSeatName6(data.user.userName);
+              break;
+            default:
+              console.log("Number is not between 1 and 6");
+              break;
+        }
+      });
+      props.socket.on("update_room",(data) => {
+        //const key = `player${data.seatNumber}`;
+       
+        console.log("IT GOT CALLED IN UI UPDATE_ROOM, array is: ", data);
+            data.forEach((obj,idx) =>{
+              const key = `player${obj.seatNumber}`;
+              setVisibility(prev => ({
+                ...prev,
+                [key]: true
+              }));
+                switch (obj.seatNumber) {
+                    case 1:
+                      
+                      setSeatName1(obj.userName);
+                      break;
+                    case 2:
+                      
+                      setSeatName2(obj.userName);
+                      break;
+                    case 3:
+                        
+                        setSeatName3(obj.userName);
+                      break;
+                    case 4:
+                        
+                        setSeatName4(obj.userName);
+                      break;
+                    case 5:
+                        
+                        setSeatName5(obj.userName);
+                      break;
+                    case 6:
+                        
+                        setSeatName6(obj.userName);
+                      break;
+                    default:
+                      console.log("Number is not between 1 and 6");
+                      break;
+                }
+            })
+
+      });
+
+      props.socket.on("groupUpdate_room", (data) => {
+        const key = `player${data.seatLeaving}`;
+        setVisibility(prev => ({
+          ...prev,
+          [key]: false
+        }));
+        switch (data.seatLeaving) {
+            case 1:
+              
+              setSeatName1(props.user.userName);
+              break;
+            case 2:
+              
+              setSeatName2(props.user.userName);
+              break;
+            case 3:
+                
+                setSeatName3(props.user.userName);
+              break;
+            case 4:
+                
+                setSeatName4(props.user.userName);
+              break;
+            case 5:
+                
+                setSeatName5(props.user.userName);
+              break;
+            case 6:
+                
+                setSeatName6(props.user.userName);
+              break;
+            default:
+              console.log("Number is not between 1 and 6");
+              break;
+        }
+       
+
+      })
+
+
+
+
+
+
+
+    }
+    }, [props.socket])
+
+
+    const handleLeaveGame = () => {
+      props.setActionForMatch(null);
+      props.socket.emit("leaveGame");
+  }
+  const togglePlayerVisibility = (id) => {
+    if(currentSeat){
+      return;
+    }
+    setCurrentSeat(id);
+    props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: id } );
+    console.log(visibility,"viz");
+    const key = `player${id}`;
+    setVisibility(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+  
+  return (
+    <>
+      <Canvas style={{ backgroundColor: 'black', position: 'absolute', top: 0, left: 0 }}>
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.1} />
+          <SpotLight position={[0, 5, 0]} intensity={1} angle={0.3} penumbra={0.5} castShadow />
+          <Stage intensity={1} environment="city" contactShadow={false} shadows={true}>
+            <SimpleRoom isVisible={true}/>
+            {Array.from({ length: 6 }, (_, i) => (
+              <React.Fragment key={i}>
+                <Player id={i + 1} isVisible={visibility[`player${i + 1}`]} />
+                <Chair id={i + 1} togglePlayerVisibility={togglePlayerVisibility} isVisible={true} setCurrentSeat={setCurrentSeat} seatNumber={i+1} user = {props.user} roomName ={props.roomName} socket={props.socket}/>
+              </React.Fragment>
+            ))}
+          </Stage>
+          <OrbitControls />
+        </Suspense>
+      </Canvas>
+      <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
+        <button onClick={handleLeaveGame}>
+          Leave
+        </button>
+      </div>
+    </>
+  );
+};
 
 export default PokerTableWithPlayers;

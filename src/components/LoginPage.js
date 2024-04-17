@@ -87,7 +87,7 @@ const LoginPage = (props) => {
             console.log('This will run 8 seconds after login state changes.');
             // Set state or perform any action after the delay
             props.onSubmitInfo(userInfo);
-        }, 7500);
+        }, 2500); //7500
         }
 
         // Cleanup function to clear the timer if the component unmounts or the dependencies change
@@ -421,7 +421,7 @@ const handleNewSubmit = async () => {
                             position: 'fixed',
                             transition: 'transform 0.5s, box-shadow 0.5s',
                             transform: 'rotateY(0deg)', // Start with no rotation
-                            animation: `${rotate} 8s infinite alternate`, // Add continuous rotation here
+                            animation: `${rotate} 3s infinite alternate`, // Add continuous rotation here 8s
                             '&:hover': {
                                 boxShadow: '0px 0px 5px rgba(255, 255, 255, 0.9)', // Move shadow with the rotation
                             },
