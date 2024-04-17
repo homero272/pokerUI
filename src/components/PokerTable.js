@@ -352,6 +352,7 @@ const PokerTableWithPlayers = props => {
     const [bestHands, setBestHands] = useState([]);
     let _bestHands = [];
     const [playerTurn, setPlayerTurn] = useState(false);
+    const [playerTurnIndex, setPlayerTurnIndex] = useState(null);
     
 
     // returns all C(7, 5) combos of poker hands a player can have
@@ -439,6 +440,7 @@ const PokerTableWithPlayers = props => {
         const newDealerButtonIndex = (newSmallBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
         const newDealerButtonSeat = seatsWithPlayers[newDealerButtonIndex];
 
+
         //console.log(`%%%${newDealerButtonIndex} %%%${newDealerButtonSeat}`);
         //console.log(seatsWithPlayers.length, "#####");
         console.log(`newBBindex: ${newBigBlindIndex} newSBindex: ${newSmallBlindIndex} newButtonIndex: ${newDealerButtonIndex}`)
@@ -447,7 +449,14 @@ const PokerTableWithPlayers = props => {
         _smallBlind = newSmallBlindSeat;
         _bigBlind = newBigBlindSeat;
 
-	    switch (_dealerButton) {
+        setDealerButton(_dealerButton);
+        setSmallBlind(_smallBlind);
+        setBigBlind(_bigBlind);
+
+        let tempPlayerTurnIndex = newSmallBlindSeat;
+        setPlayerTurnIndex(tempPlayerTurnIndex);
+
+	    switch (tempPlayerTurnIndex) {
             case 1:
               setPlayerTurn(seatName1)
               break;
@@ -473,9 +482,7 @@ const PokerTableWithPlayers = props => {
 
         console.log("current persons turn is seat :", _dealerButton)
 
-        setDealerButton(_dealerButton);
-        setSmallBlind(_smallBlind);
-        setBigBlind(_bigBlind);
+ 
 
         console.log(seatsWithPlayers);
         console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
@@ -484,7 +491,8 @@ const PokerTableWithPlayers = props => {
             dealerButton: _dealerButton,
             smallBlind: _smallBlind,
             bigBlind: _bigBlind,
-            roomName: props.roomName
+            roomName: props.roomName,
+            playerTurnIndex: tempPlayerTurnIndex
         });
     }
 
@@ -510,9 +518,11 @@ const PokerTableWithPlayers = props => {
         _dealerButton = randomSeat;
         _smallBlind = seatsWithPlayers[(randomIndex + 1) % seatsWithPlayers.length];
         _bigBlind = seatsWithPlayers[(randomIndex + 2) % seatsWithPlayers.length];
-        
 
-        switch (_dealerButton) {
+        let tempPlayerTurnIndex = _smallBlind;
+        setPlayerTurnIndex(tempPlayerTurnIndex);
+
+        switch (tempPlayerTurnIndex) {
             case 1:
               setPlayerTurn(seatName1)
               break;
@@ -545,12 +555,14 @@ const PokerTableWithPlayers = props => {
 
         console.log(seatsWithPlayers);
         console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
+        console.log(`ITS seats ${tempPlayerTurnIndex} TURN!! (caller)`);
 
         props.socket.emit("initBlinds", {
             dealerButton: _dealerButton,
             smallBlind: _smallBlind,
             bigBlind: _bigBlind,
-            roomName: props.roomName
+            roomName: props.roomName,
+            playerTurnIndex: tempPlayerTurnIndex
         });
     }
 
@@ -750,8 +762,10 @@ const PokerTableWithPlayers = props => {
             setDealerButton(data.dealerButton);
             setSmallBlind(data.smallBlind);
             setBigBlind(data.bigBlind);
+            setPlayerTurnIndex(data.playerTurnIndex);
             console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
-            switch (data.dealerButton) {
+            console.log(`ITS seats ${data.playerTurnIndex} TURN!! (calleeeeee)`);
+            switch (data.playerTurnIndex) {
                 case 1:
                   setPlayerTurn(seatName1)
                   break;
@@ -780,9 +794,10 @@ const PokerTableWithPlayers = props => {
             setDealerButton(data.dealerButton);
             setSmallBlind(data.smallBlind);
             setBigBlind(data.bigBlind);
+            setPlayerTurnIndex(data.playerTurnIndex)
             console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
             console.log("current persons turn is seat: ", data.dealerButton);
-            switch (data.dealerButton) {
+            switch (data.playerTurnIndex) {
                 case 1:
                   setPlayerTurn(seatName1)
                   break;
@@ -805,6 +820,7 @@ const PokerTableWithPlayers = props => {
                   console.log("Number is not between 1 and 6");
                   break;
             }
+
           });
     
           props.socket.on("recievedStartGame", (data) => {
@@ -821,8 +837,10 @@ const PokerTableWithPlayers = props => {
             console.log(pokerHands);
           });
           props.socket.on("recievedCheckAction", (data)=>{
-            setDealerButton(data.dealerButton);
+            setPlayerTurnIndex(data.playerTurnIndex)
             setPlayerTurn(data.playerTurn);
+
+            console.log("check action called from other user, new players turn is :", data.playerTurn);
           })
         }
         
@@ -843,11 +861,11 @@ const PokerTableWithPlayers = props => {
         if (seat4) seatsWithPlayers.push(4);
         if (seat5) seatsWithPlayers.push(5);
         if (seat6) seatsWithPlayers.push(6);
-        const newDealerButtonIndex = (seatsWithPlayers.indexOf(dealerButton) + 1) % seatsWithPlayers.length;
-        const newDealerButtonSeat = seatsWithPlayers[newDealerButtonIndex];
-        setDealerButton(newDealerButtonSeat);
+        const newPlayerActionIndex = (seatsWithPlayers.indexOf(playerTurnIndex) + 1) % seatsWithPlayers.length;
+        const newPlayerActionSeat = seatsWithPlayers[newPlayerActionIndex];
+        setPlayerTurnIndex(newPlayerActionSeat);
         let _playerTurn;
-        switch (newDealerButtonSeat) {
+        switch (newPlayerActionSeat) {
             case 1:
               setPlayerTurn(seatName1)
               _playerTurn = seatName1;
@@ -876,7 +894,7 @@ const PokerTableWithPlayers = props => {
               console.log("Number is not between 1 and 6");
               break;
         }
-        props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, dealerButton: newDealerButtonSeat});
+        props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
 
     }
 
@@ -916,7 +934,7 @@ const PokerTableWithPlayers = props => {
                 }}>
                     {
                    !seat4 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat4={seat4} setSeat4={setSeat4} seatNumber={4}/> 
-                   : <PlayerBox isCurrentTurn={dealerButton === 4} mostRecentUser={seatName4} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[3]} name={seatName4}/>
+                   : <PlayerBox isCurrentTurn={playerTurnIndex === 4} mostRecentUser={seatName4} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[3]} name={seatName4}/>
                 }
                 </Box>
 
@@ -940,7 +958,7 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                    !seat3 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat3={seat3} setSeat3={setSeat3} seatNumber={3}/> 
-                   : <PlayerBox isCurrentTurn={dealerButton === 3} mostRecentUser={seatName3} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[2]} name={seatName3}/>
+                   : <PlayerBox isCurrentTurn={playerTurnIndex === 3} mostRecentUser={seatName3} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[2]} name={seatName3}/>
                 }
                         </Box>
                         <Box sx={{
@@ -952,7 +970,7 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                    !seat2 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat2={seat2} setSeat2={setSeat2} seatNumber={2}/> 
-                   : <PlayerBox isCurrentTurn={dealerButton === 2} mostRecentUser={seatName2} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[1]} name={seatName2}/>
+                   : <PlayerBox isCurrentTurn={playerTurnIndex === 2} mostRecentUser={seatName2} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[1]} name={seatName2}/>
                 }
                         </Box>
                     </Box>
@@ -978,7 +996,7 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                    !seat5 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat5={seat5} setSeat5={setSeat5} seatNumber={5}/> 
-                   : <PlayerBox isCurrentTurn={dealerButton === 5} mostRecentUser={seatName5} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[4]} name={seatName5}/>
+                   : <PlayerBox isCurrentTurn={playerTurnIndex === 5} mostRecentUser={seatName5} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[4]} name={seatName5}/>
                 }
                         </Box>
                         <Box sx={{
@@ -989,7 +1007,7 @@ const PokerTableWithPlayers = props => {
                         }}>
                             {
                     !seat6 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat6={seat6} setSeat6={setSeat6} seatNumber={6}/> 
-                    : <PlayerBox  isCurrentTurn={dealerButton === 6} mostRecentUser={seatName6} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[5]} name={seatName6}/>
+                    : <PlayerBox  isCurrentTurn={playerTurnIndex === 6} mostRecentUser={seatName6} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[5]} name={seatName6}/>
                     }
                         </Box>
                     </Box>
@@ -1003,7 +1021,7 @@ const PokerTableWithPlayers = props => {
                     alignItems: 'center'
                 }}> {
                    !seat1 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat1={seat1} setSeat1={setSeat1} seatNumber={1}/> 
-                   : <PlayerBox  isCurrentTurn={dealerButton === 1} mostRecentUser={seatName1} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[0]} name={seatName1}/>
+                   : <PlayerBox  isCurrentTurn={playerTurnIndex === 1} mostRecentUser={seatName1} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[0]} name={seatName1}/>
                 }
                 </Box>
                 
@@ -1018,7 +1036,7 @@ const PokerTableWithPlayers = props => {
             }}>{
                 bestHands[currentSeat - 1]?.print() || ""
             }</Typography>
-            { playerTurn === props.user.userName ?
+            { playerTurnIndex === currentSeat ?
                 <Button variant='contained' color='success' onClick={checkAction}>Check</Button>
                 : ""
             }
