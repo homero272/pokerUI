@@ -1,10 +1,13 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
-import { Canvas, useLoader, useFrame } from '@react-three/fiber';
+import { Canvas, useLoader, useFrame ,extend, useThree} from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { TextureLoader } from 'three';
-import { OrbitControls, SpotLight, Stage } from '@react-three/drei';
+import { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls';
+
+import {SpotLight, Stage } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button } from '@mui/material';
+import { Vector3 } from 'three';
 const texturePath = '/tabletextures/';
 const manager = new THREE.LoadingManager();
 manager.setURLModifier((url) => {
@@ -319,6 +322,30 @@ const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, r
   );
 };
 
+extend({ OrbitControlsImpl });
+
+const OrbitControls = () => {
+  const { camera, gl } = useThree();
+  const controls = useRef();
+
+  useEffect(() => {
+    // This sets the focus point of the controls which effectively is the point around which the camera will rotate
+    controls.current.target.set(0, 0, 0); // Adjust this target to where you want the head to be focused initially.
+    controls.current.update();
+  }, [camera]);
+
+  useFrame(() => controls.current && controls.current.update());
+
+  return (
+    <orbitControlsImpl
+      ref={controls}
+      args={[camera, gl.domElement]}
+      enableZoom={false} // Disable zooming
+      enablePan={false}  // Disable panning
+      enableRotate={true} // Enable rotation
+    />
+  );
+};
 const PokerTableWithPlayers = (props) => {
 
   const [seatName1, setSeatName1] = useState(props.user.userName);
@@ -490,10 +517,16 @@ const PokerTableWithPlayers = (props) => {
       [key]: !prev[key]
     }));
   };
+    // Define initial camera position and rotation
+    const cameraPosition = new Vector3(10, 2, -3); // Example position
+  
   
   return (
     <>
-      <Canvas style={{ backgroundColor: 'black', position: 'absolute', top: 0, left: 0 }}>
+      <Canvas
+        style={{ backgroundColor: 'black', position: 'absolute', top: 0, left: 0 }}
+        camera={{ position: [0, 0, 0], fov: 10 }} // Camera positioned at a height of 2 units, looking forward from a distance of 5 units
+      >
         <Suspense fallback={null}>
           <ambientLight intensity={0.1} />
           <SpotLight position={[0, 5, 0]} intensity={1} angle={0.3} penumbra={0.5} castShadow />
@@ -507,6 +540,7 @@ const PokerTableWithPlayers = (props) => {
             ))}
           </Stage>
           <OrbitControls />
+
         </Suspense>
       </Canvas>
       <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
