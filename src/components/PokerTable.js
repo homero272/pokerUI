@@ -125,7 +125,7 @@ const SimpleRoom = ({ isVisible }) => {
   }
 
   return (
-    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} />
+    <primitive ref={meshRef} object={gltf.scene} scale={[1, 1, 1]} />
   );
 };
 
@@ -291,13 +291,13 @@ const Chair6 = ({ isVisible }) => {
 const Player = ({ id, isVisible }) => {
   const gltf = useLoader(GLTFLoader, `/tabletextures/player${id}.gltf`);
   const meshRef = useRef();
-
+  console.log(gltf,"gltf");
   if (meshRef.current) {
     meshRef.current.visible = isVisible;
   }
 
   return (
-    <primitive ref={meshRef} object={gltf.scene} scale={[0.05, 0.05, 0.05]} visible={isVisible}  />
+    <primitive ref={meshRef} object={gltf.scene} scale={[1, 1, 1]} visible={isVisible}  />
   );
 };
 
@@ -316,7 +316,7 @@ const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, r
       object={gltf.scene}
       geometry={gltf.scene.children[0].geometry}
       material={gltf.scene.children[0].material}
-      scale={[0.05, 0.05, 0.05]}
+      scale={[1, 1, 1]}
       onClick={() => togglePlayerVisibility(id)}
     />
   );
@@ -330,7 +330,7 @@ const OrbitControls = () => {
 
   useEffect(() => {
     // This sets the focus point of the controls which effectively is the point around which the camera will rotate
-    controls.current.target.set(0, 0, 0); // Adjust this target to where you want the head to be focused initially.
+    controls.current.target.set(0,0, 0); // Adjust this target to where you want the head to be focused initially.
     controls.current.update();
   }, [camera]);
 
@@ -339,8 +339,9 @@ const OrbitControls = () => {
   return (
     <orbitControlsImpl
       ref={controls}
+      fov={1}
       args={[camera, gl.domElement]}
-      enableZoom={false} // Disable zooming
+      enableZoom={true} // Disable zooming
       enablePan={false}  // Disable panning
       enableRotate={true} // Enable rotation
     />
@@ -517,19 +518,19 @@ const PokerTableWithPlayers = (props) => {
       [key]: !prev[key]
     }));
   };
-    // Define initial camera position and rotation
-    const cameraPosition = new Vector3(10, 2, -3); // Example position
+    // Define initial camera position and rotation //7,8,-8
+    const [cameraPosition,setCameraPosition] = useState(new Vector3(0,0,0)); // Example position
   
-  
+  //[7, 4, -5], fov: 10
   return (
     <>
       <Canvas
         style={{ backgroundColor: 'black', position: 'absolute', top: 0, left: 0 }}
-        camera={{ position: [0, 0, 0], fov: 10 }} // Camera positioned at a height of 2 units, looking forward from a distance of 5 units
+        camera={{ position: cameraPosition.toArray(), fov: 50 }} // Camera positioned at a height of 2 units, looking forward from a distance of 5 units
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.1} />
-          <SpotLight position={[0, 5, 0]} intensity={1} angle={0.3} penumbra={0.5} castShadow />
+
           <Stage intensity={1} environment="city" contactShadow={false} shadows={true}>
             <SimpleRoom isVisible={true}/>
             {Array.from({ length: 6 }, (_, i) => (
