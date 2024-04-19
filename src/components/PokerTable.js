@@ -3,11 +3,12 @@ import { Canvas, useLoader, useFrame ,extend, useThree} from '@react-three/fiber
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { TextureLoader } from 'three';
 import { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls';
-
 import {SpotLight, Stage } from '@react-three/drei';
 import * as THREE from 'three';
-import { Button } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import { Vector3 } from 'three';
+const { Deck } = require('../poker_logic/Deck');
+const { PokerHand, numCardsInPokerHand } = require('../poker_logic/PokerHand');
 const texturePath = '/tabletextures/';
 const manager = new THREE.LoadingManager();
 manager.setURLModifier((url) => {
@@ -197,8 +198,10 @@ const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, r
 // };
 
 
-const Cards = ({ id }) => {
-  const gltf = useLoader(GLTFLoader, `/tabletextures/pokerdeck/${id}h.glb`);
+const Cards = ({ id, typeCard, card }) => {
+  
+  console.log(`LOOK THIS IS THE CARD ${card.value + card.suit}`)
+  const gltf = useLoader(GLTFLoader, `/tabletextures/pokerdeck/${card.value + card.suit}.glb`);
   const cardRef = useRef();
   let position, rotation, scale;
   // Define the position, rotation, and scale
@@ -206,29 +209,29 @@ const Cards = ({ id }) => {
   //if comunity card we will do a switch from 0-4 (passing CC, index 0-4).... switch to determine the postion to set it to
   //if player card we will do a switch from 1-6 (passing pc, index1-6 )... switch to determine and if condition (0 or 1)for each to determine position
   switch (id) {
-    case 2:
+    case 0:
       position = new THREE.Vector3(1.871, 1.5039156776787426, -0.626);
       rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
       scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
       
       break;
-    case 3:
+    case 1:
         
     position = new THREE.Vector3(1.560, 1.504, -0.911);
     rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
     scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
       break;
-    case 4:
+    case 2:
       position = new THREE.Vector3(1.27, 1.504, -1.21);
       rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
       scale = new THREE.Vector3(0.25, 0.25, 0.25); 
       break;
-    case 5:
+    case 3:
       position = new THREE.Vector3(0.938, 1.504, -1.481);
       rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
       scale = new THREE.Vector3(0.25, 0.25, 0.25); 
       break;
-    case 6:
+    case 4:
       position = new THREE.Vector3(0.627, 1.504, -1.796);
       rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
       scale = new THREE.Vector3(0.25, 0.25, 0.25); 
@@ -308,6 +311,10 @@ const OrbitControls = (props) => {
   enableRotate={true} // Enable rotation
   />;
 };
+
+
+let deck;
+
 const PokerTableWithPlayers = (props) => {
 
   const [seatName1, setSeatName1] = useState(props.user.userName);
@@ -325,6 +332,299 @@ const PokerTableWithPlayers = (props) => {
     player5: false,
     player6: false
   });
+  const [gameStarted, setGameStarted] = useState(false);
+  const [holeCards, setHoleCards] = useState([[], [], [], [], [], []]);
+  let _holeCards = [[], [], [], [], [], []];
+  const [communityCards, setCommunityCards] = useState([]);
+  let _communityCards = [];
+  const [dealerButton, setDealerButton] = useState(0);
+  let _dealerButton = 0;
+  const [smallBlind, setSmallBlind] = useState(0);
+  let _smallBlind = 0;
+  const [bigBlind, setBigBlind] = useState(0);
+  let _bigBlind = 0;
+  let seatsWithPlayers = [];
+  const [bestHands, setBestHands] = useState([]);
+  let _bestHands = [];
+  const [playerTurn, setPlayerTurn] = useState(false);
+  const [playerTurnIndex, setPlayerTurnIndex] = useState(null);
+
+
+    // returns all C(7, 5) combos of poker hands a player can have
+    // given their 2 hole cards and the 5 community cards
+    // 
+    // returns 2d array
+    function generateCombos(cards) {
+      let combos = [];
+      const combo = new Array(numCardsInPokerHand);
+  
+      const generate = (start, index) => {
+          if (index === numCardsInPokerHand) {
+              combos.push(combo.slice()); 
+              return;
+          }
+          for (let i = start; i < cards.length; i++) {
+              combo[index] = cards[i];
+              generate(i + 1, index + 1);
+          }
+      };
+  
+      generate(0, 0);
+      return combos;
+  }
+
+      // returns all the players best poker hand
+      const getPlayersBestHands = () => {
+        // maps players hole cards to the 5 community cards
+        const holeCardsAndCommunityCards = _holeCards.map(cards => {
+            return cards.length !== 0 ? [...cards, ..._communityCards] : [];
+        });
+        console.log(holeCardsAndCommunityCards);
+
+        // combos is 3d array where the outter array is an array of size
+        // 6 and the inner array is an array of arrays representing each
+        // players C(7, 5) possible hand combos from that player's 2 hole 
+        // cards and the 5 community cards
+        const combos = [];
+        for (let i = 0; i < holeCardsAndCommunityCards.length; i++) {        
+            combos.push(generateCombos(holeCardsAndCommunityCards[i]));
+        }
+        console.log(combos);
+
+        combos.forEach(playerCombos => {
+            let bestHand = null;
+            playerCombos.forEach(combo => {
+                const pokerHand = new PokerHand(combo);
+                if (!bestHand || pokerHand.compareWith(bestHand) > 0) {
+                    bestHand = pokerHand;
+                }
+            });
+            _bestHands.push(bestHand);
+        });
+        setBestHands(_bestHands);
+        console.log(_bestHands);
+
+        props.socket.emit("playersBestHands", {
+            bestHands: _bestHands,
+            roomName: props.roomName
+        });
+    }
+
+        // shifts the dealer button, sb, and bb 1 spot to the left
+        const rotateBlinds = () => {
+          seatsWithPlayers = [];
+  
+          if (visibility["player1"]) seatsWithPlayers.push(1);
+          if (visibility["player2"]) seatsWithPlayers.push(2);
+          if (visibility["player3"]) seatsWithPlayers.push(3);
+          if (visibility["player4"]) seatsWithPlayers.push(4);
+          if (visibility["player5"]) seatsWithPlayers.push(5);
+          if (visibility["player6"]) seatsWithPlayers.push(6);
+  
+          if (seatsWithPlayers.length < 2) return;
+  
+          // Move the big blind to the next position
+          const newBigBlindIndex = (seatsWithPlayers.indexOf(bigBlind) + 1) % seatsWithPlayers.length;
+          const newBigBlindSeat = seatsWithPlayers[newBigBlindIndex];
+  
+          // Set the small blind to the right of the big blind
+          const newSmallBlindIndex = (newBigBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
+          const newSmallBlindSeat = seatsWithPlayers[newSmallBlindIndex];
+  
+          // Set the dealer button to the right of the small blind
+          const newDealerButtonIndex = (newSmallBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
+          const newDealerButtonSeat = seatsWithPlayers[newDealerButtonIndex];
+  
+  
+          //console.log(`%%%${newDealerButtonIndex} %%%${newDealerButtonSeat}`);
+          //console.log(seatsWithPlayers.length, "#####");
+          console.log(`newBBindex: ${newBigBlindIndex} newSBindex: ${newSmallBlindIndex} newButtonIndex: ${newDealerButtonIndex}`)
+  
+          _dealerButton = newDealerButtonSeat;
+          _smallBlind = newSmallBlindSeat;
+          _bigBlind = newBigBlindSeat;
+  
+          setDealerButton(_dealerButton);
+          setSmallBlind(_smallBlind);
+          setBigBlind(_bigBlind);
+  
+          let tempPlayerTurnIndex = newSmallBlindSeat;
+          setPlayerTurnIndex(tempPlayerTurnIndex);
+  
+        switch (tempPlayerTurnIndex) {
+              case 1:
+                setPlayerTurn(seatName1)
+                break;
+              case 2:
+                  setPlayerTurn(seatName2)
+                break;
+              case 3:
+                  setPlayerTurn(seatName3)
+                break;
+              case 4:
+                  setPlayerTurn(seatName4)
+                break;
+              case 5:
+                  setPlayerTurn(seatName5)
+                break;
+              case 6:
+                  setPlayerTurn(seatName6)
+                break;
+              default:
+                console.log("Number is not between 1 and 6");
+                break;
+          }
+  
+          console.log("current persons turn is seat :", _dealerButton)
+  
+   
+  
+          console.log(seatsWithPlayers);
+          console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
+  
+          props.socket.emit("rotateBlinds", {
+              dealerButton: _dealerButton,
+              smallBlind: _smallBlind,
+              bigBlind: _bigBlind,
+              roomName: props.roomName,
+              playerTurnIndex: tempPlayerTurnIndex
+          });
+      }
+      // used at start of game, picks a random seat with a player
+    // to be in the dealer button. the next seat to his left with a 
+    // player will be the small blind, and the next seat with a
+    // player to the left of the sb will be the big blind. If only
+    // 2 players, the button is the sb and other player is bb
+    const initBlinds = () => {
+      if (visibility["player1"]) seatsWithPlayers.push(1);
+      if (visibility["player2"]) seatsWithPlayers.push(2);
+      if (visibility["player3"]) seatsWithPlayers.push(3);
+      if (visibility["player4"]) seatsWithPlayers.push(4);
+      if (visibility["player5"]) seatsWithPlayers.push(5);
+      if (visibility["player6"]) seatsWithPlayers.push(6);
+
+      // not enough players
+      if (seatsWithPlayers.length < 2) return;
+
+      const randomIndex = Math.floor(Math.random() * seatsWithPlayers.length);
+      const randomSeat = seatsWithPlayers[randomIndex];
+
+      _dealerButton = randomSeat;
+      _smallBlind = seatsWithPlayers[(randomIndex + 1) % seatsWithPlayers.length];
+      _bigBlind = seatsWithPlayers[(randomIndex + 2) % seatsWithPlayers.length];
+
+      let tempPlayerTurnIndex = _smallBlind;
+      setPlayerTurnIndex(tempPlayerTurnIndex);
+
+      switch (tempPlayerTurnIndex) {
+          case 1:
+            setPlayerTurn(seatName1)
+            break;
+          case 2:
+              setPlayerTurn(seatName2)
+            break;
+          case 3:
+              setPlayerTurn(seatName3)
+            break;
+          case 4:
+              setPlayerTurn(seatName4)
+            break;
+          case 5:
+              setPlayerTurn(seatName5)
+            break;
+          case 6:
+              setPlayerTurn(seatName6)
+            break;
+          default:
+            console.log("Number is not between 1 and 6");
+            break;
+      }
+      setDealerButton(_dealerButton);
+      setSmallBlind(_smallBlind);
+      setBigBlind(_bigBlind);
+      
+      
+      console.log("current persons turn is seat :", _dealerButton);
+
+
+      console.log(seatsWithPlayers);
+      console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
+      console.log(`ITS seats ${tempPlayerTurnIndex} TURN!! (caller)`);
+
+      props.socket.emit("initBlinds", {
+          dealerButton: _dealerButton,
+          smallBlind: _smallBlind,
+          bigBlind: _bigBlind,
+          roomName: props.roomName,
+          playerTurnIndex: tempPlayerTurnIndex
+      });
+  }
+  const dealRiver = () => {
+    _communityCards = [..._communityCards, deck.deal()]; 
+    setCommunityCards(_communityCards);
+
+    props.socket.emit("dealRiver", {
+        river: _communityCards,
+        roomName: props.roomName
+    });
+}
+
+const dealTurn = () => {
+  _communityCards = [..._communityCards, deck.deal()]; 
+  setCommunityCards(_communityCards);
+
+  props.socket.emit("dealTurn", {
+      turn: _communityCards,
+      roomName: props.roomName
+  });
+}
+
+const dealFlop = () => {
+  _communityCards = [deck.deal(), deck.deal(), deck.deal()];
+  setCommunityCards(_communityCards);
+
+  props.socket.emit("dealFlop", {
+      flop: _communityCards,
+      roomName: props.roomName
+  });
+}
+
+const dealHoleCards = () => {
+  //console.log(deck);
+  rotateBlinds();
+  deck = new Deck();
+  deck.shuffle();
+
+  if (visibility["player1"]) _holeCards[0] = [deck.deal(), deck.deal()];
+  if (visibility["player2"]) _holeCards[1] = [deck.deal(), deck.deal()];
+  if (visibility["player3"]) _holeCards[2] = [deck.deal(), deck.deal()];
+  if (visibility["player4"]) _holeCards[3] = [deck.deal(), deck.deal()];
+  if (visibility["player5"]) _holeCards[4] = [deck.deal(), deck.deal()];
+  if (visibility["player6"]) _holeCards[5] = [deck.deal(), deck.deal()];
+  
+  setHoleCards(_holeCards);
+  console.log(_holeCards);
+
+  props.socket.emit("dealHoleCards", {
+      deck: deck, 
+      holeCards: _holeCards, 
+      roomName: props.roomName
+  });
+
+  dealFlop();
+  dealTurn();
+  dealRiver();
+  console.log(`seaaaat: ${currentSeat}`)
+  console.log(`communnnnity cards: ${communityCards}`)
+  getPlayersBestHands();
+  setGameStarted(true);
+  props.socket.emit("startGame", {
+    roomName: props.roomName
+});
+
+}
+
+
   const cameraRef = useRef();
 
   useEffect(() => {
@@ -452,8 +752,109 @@ const PokerTableWithPlayers = (props) => {
 
       })
 
+      props.socket.on("recievedDealHoleCards", (data) => {
+        console.log("&&&&&&& ",data.deck);
+        console.log(data.holeCards);
+        setHoleCards(data.holeCards);
+        deck = data.deck;
+      });
 
+      props.socket.on("recievedDealFlop", (data) => {
+        setCommunityCards(data.flop);
+      });
 
+      props.socket.on("recievedDealTurn", (data) => {
+        setCommunityCards(data.turn);
+      });
+
+      props.socket.on("recievedDealRiver", (data) => {
+        setCommunityCards(data.river);
+      });
+
+      props.socket.on("recievedInitBlinds", (data) => {
+        setDealerButton(data.dealerButton);
+        setSmallBlind(data.smallBlind);
+        setBigBlind(data.bigBlind);
+        setPlayerTurnIndex(data.playerTurnIndex);
+        console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
+        console.log(`ITS seats ${data.playerTurnIndex} TURN!! (calleeeeee)`);
+        switch (data.playerTurnIndex) {
+            case 1:
+              setPlayerTurn(seatName1)
+              break;
+            case 2:
+                setPlayerTurn(seatName2)
+              break;
+            case 3:
+                setPlayerTurn(seatName3)
+              break;
+            case 4:
+                setPlayerTurn(seatName4)
+              break;
+            case 5:
+                setPlayerTurn(seatName5)
+              break;
+            case 6:
+                setPlayerTurn(seatName6)
+              break;
+            default:
+              console.log("Number is not between 1 and 6");
+              break;
+        }
+      });
+
+      props.socket.on("recievedRotateBlinds", (data) => {
+        setDealerButton(data.dealerButton);
+        setSmallBlind(data.smallBlind);
+        setBigBlind(data.bigBlind);
+        setPlayerTurnIndex(data.playerTurnIndex)
+        console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
+        console.log("current persons turn is seat: ", data.dealerButton);
+        switch (data.playerTurnIndex) {
+            case 1:
+              setPlayerTurn(seatName1)
+              break;
+            case 2:
+                setPlayerTurn(seatName2)
+              break;
+            case 3:
+                setPlayerTurn(seatName3)
+              break;
+            case 4:
+                setPlayerTurn(seatName4)
+              break;
+            case 5:
+                setPlayerTurn(seatName5)
+              break;
+            case 6:
+                setPlayerTurn(seatName6)
+              break;
+            default:
+              console.log("Number is not between 1 and 6");
+              break;
+        }
+
+      });
+
+      props.socket.on("recievedStartGame", (data) => {
+        setGameStarted(true);
+      });
+
+      props.socket.on("recievedPlayersBestHands", (data) => {
+        let pokerHands = [];
+        data.bestHands.forEach(hand => {
+            const newPokerHand = !hand ? null : new PokerHand(hand.cards);
+            pokerHands.push(newPokerHand);
+        });
+        setBestHands(pokerHands);
+        console.log(pokerHands);
+      });
+      props.socket.on("recievedCheckAction", (data)=>{
+        setPlayerTurnIndex(data.playerTurnIndex)
+        setPlayerTurn(data.playerTurn);
+
+        console.log("check action called from other user, new players turn is :", data.playerTurn);
+      })
 
 
 
@@ -466,6 +867,52 @@ const PokerTableWithPlayers = (props) => {
       props.setActionForMatch(null);
       props.socket.emit("leaveGame");
   }
+
+  const checkAction = () =>{
+    seatsWithPlayers = [];
+
+    if (visibility["player1"]) seatsWithPlayers.push(1);
+    if (visibility["player2"]) seatsWithPlayers.push(2);
+    if (visibility["player3"]) seatsWithPlayers.push(3);
+    if (visibility["player4"]) seatsWithPlayers.push(4);
+    if (visibility["player5"]) seatsWithPlayers.push(5);
+    if (visibility["player6"]) seatsWithPlayers.push(6);
+    const newPlayerActionIndex = (seatsWithPlayers.indexOf(playerTurnIndex) + 1) % seatsWithPlayers.length;
+    const newPlayerActionSeat = seatsWithPlayers[newPlayerActionIndex];
+    setPlayerTurnIndex(newPlayerActionSeat);
+    let _playerTurn;
+    switch (newPlayerActionSeat) {
+        case 1:
+          setPlayerTurn(seatName1)
+          _playerTurn = seatName1;
+          break;
+        case 2:
+            setPlayerTurn(seatName2)
+            _playerTurn = seatName2;
+          break;
+        case 3:
+            setPlayerTurn(seatName3)
+            _playerTurn = seatName3;
+          break;
+        case 4:
+            setPlayerTurn(seatName4)
+            _playerTurn = seatName4;
+          break;
+        case 5:
+            setPlayerTurn(seatName5)
+            _playerTurn = seatName5;
+          break;
+        case 6:
+            setPlayerTurn(seatName6)
+            _playerTurn = seatName6;
+          break;
+        default:
+          console.log("Number is not between 1 and 6");
+          break;
+    }
+    props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
+
+}
   const togglePlayerVisibility = (id) => {
     const key = `player${id}`;
     if (currentSeat) return;
@@ -633,12 +1080,16 @@ const onCanvasCreated = ({ camera }) => {
                 <Chair id={i + 1} togglePlayerVisibility={togglePlayerVisibility} isVisible={true} setCurrentSeat={setCurrentSeat} seatNumber={i+1} user = {props.user} roomName ={props.roomName} socket={props.socket}/>
               </React.Fragment>
             ))}
-            <Cards id={2}/>
-            <Cards id={3}/>
-            <Cards id={4}/>
-            <Cards id={5}/>
-            <Cards id={6}/>
-            
+            {gameStarted && communityCards.length > 0 && (
+              <>
+                <Cards id={0} typeCard={'community'} card={communityCards[0]} />
+                <Cards id={1} typeCard={'community'} card={communityCards[1]} />
+                <Cards id={2} typeCard={'community'} card={communityCards[2]} />
+                <Cards id={3} typeCard={'community'} card={communityCards[3]} />
+                <Cards id={4} typeCard={'community'} card={communityCards[4]} />
+              </>
+            )}
+
           </Stage>
           {/* <OrbitControls setCameraData={setCameraData}/> */}
 
@@ -664,6 +1115,14 @@ const onCanvasCreated = ({ camera }) => {
           
         </div>
       </div>
+
+      <Box sx={{position: 'absolute',top: 20, right: 20}}>
+      { props.host === props.user.userName ?
+            <Button variant="contained" color="success" onClick={dealHoleCards}>
+                Deal
+            </Button> : ""
+            } 
+      </Box>
     </>
   );
 };
