@@ -862,9 +862,10 @@ const dealHoleCards = () => {
     }
     }, [props.socket])
 
-
+    console.log("host is: ", props.host);
     const handleLeaveGame = () => {
       props.setActionForMatch(null);
+      props.setHost("");
       props.socket.emit("leaveGame");
   }
 
@@ -1080,13 +1081,17 @@ const onCanvasCreated = ({ camera }) => {
                 <Chair id={i + 1} togglePlayerVisibility={togglePlayerVisibility} isVisible={true} setCurrentSeat={setCurrentSeat} seatNumber={i+1} user = {props.user} roomName ={props.roomName} socket={props.socket}/>
               </React.Fragment>
             ))}
+
+            {/* if(visible["player1"])
+            <Card id{0} typeCard="player1" card={holeCrads[0]/>
+            <Card id{1} typeCard="player1" card={holeCrads[1]/> */}
             {gameStarted && communityCards.length > 0 && (
               <>
-                <Cards id={0} typeCard={'community'} card={communityCards[0]} />
+                {/* <Cards id={0} typeCard={'community'} card={communityCards[0]} />
                 <Cards id={1} typeCard={'community'} card={communityCards[1]} />
                 <Cards id={2} typeCard={'community'} card={communityCards[2]} />
                 <Cards id={3} typeCard={'community'} card={communityCards[3]} />
-                <Cards id={4} typeCard={'community'} card={communityCards[4]} />
+                <Cards id={4} typeCard={'community'} card={communityCards[4]} /> */}
               </>
             )}
 
@@ -1121,8 +1126,14 @@ const onCanvasCreated = ({ camera }) => {
             <Button variant="contained" color="success" onClick={dealHoleCards}>
                 Deal
             </Button> : ""
-            } 
+      } 
       </Box>
+      <Box sx={{position: 'absolute',top: 80, right: 20}}>
+      { !gameStarted ? "" : playerTurnIndex === currentSeat ?
+                <Button variant='contained' color='success' onClick={checkAction}>Check</Button>
+                : ""
+      }
+       </Box>
     </>
   );
 };

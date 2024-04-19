@@ -148,7 +148,7 @@ return (
         <JoinMatch setActionForMatch={setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch={handleJoinMatch} />
       ) : (
         <Fragment>
-          <PokerTable host = {host} roomName={roomName} user={user} socket={socket} setActionForMatch={setActionForMatch} />
+          <PokerTable host = {host} setHost={setHost} roomName={roomName} user={user} socket={socket} setActionForMatch={setActionForMatch} />
           {/* <Box sx={{ backgroundColor: color % 2 === 0 ? 'red' : 'blue', border: 1, width: '200px', height: '200px' }}>
             <Button variant="contained" color="primary" onClick={handleTestUpdateClick}>
               Click me
