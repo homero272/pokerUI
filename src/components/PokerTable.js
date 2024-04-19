@@ -3,7 +3,7 @@ import { Canvas, useLoader, useFrame ,extend, useThree} from '@react-three/fiber
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { TextureLoader } from 'three';
 import { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls';
-import {SpotLight, Stage } from '@react-three/drei';
+import {SpotLight, Stage, Html, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button, Box } from '@mui/material';
 import { Vector3 } from 'three';
@@ -70,7 +70,7 @@ const AllChips = ({ position }) => {
 // };
 const Players = ({ visibility }) => {
   const gltf = useLoader(GLTFLoader, '/tabletextures/wholeroom3.gltf');
-
+  console.log(gltf, "LOOK HERE");
   return gltf.scene.children.filter(child => child.name.startsWith("player")).map(child => (
     <primitive
       key={child.name}
@@ -133,7 +133,7 @@ const SimpleRoom = ({ isVisible }) => {
 const Player = ({ id, isVisible }) => {
   const gltf = useLoader(GLTFLoader, `/tabletextures/player${id}.gltf`);
   const meshRef = useRef();
-  // console.log(gltf,"gltf");
+  console.log(gltf,"gltf PLAYER");
   if (meshRef.current) {
     meshRef.current.visible = isVisible;
   }
@@ -332,6 +332,14 @@ const PokerTableWithPlayers = (props) => {
     player5: false,
     player6: false
   });
+  const namePositions = {
+    player1: [3.923879107980736, 3.4749514605206433, 1.0414440423770173],
+    player2: [4.399886094460785,3.4749514605206433, -0.8129757847962559],
+    player3: [3.407375782191977, 3.4749514605206433,  -2.3160688005082415],
+    player4: [1.6493022576347443,  3.4749514605206433, -3.704894706352383],
+    player5: [-0.17391148652813393, 3.4749514605206433, -4.3423994958588175],
+    player6: [-1.4384571787631077, 3.4749514605206433,  -3.4652850607946486]
+  }
   const [gameStarted, setGameStarted] = useState(false);
   const [holeCards, setHoleCards] = useState([[], [], [], [], [], []]);
   let _holeCards = [[], [], [], [], [], []];
@@ -1078,6 +1086,13 @@ const onCanvasCreated = ({ camera }) => {
             {Array.from({ length: 6 }, (_, i) => (
               <React.Fragment key={i}>
                 <Player id={i + 1} isVisible={visibility[`player${i + 1}`]} />
+                {visibility[`player${i + 1}`] ?
+                <Html position={namePositions[`player${i+1}`]} transform occlude>
+                  <div style={{ color: 'white', background: 'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
+                    {eval(`seatName${i + 1}`)} 
+                  </div>
+                </Html> : ""
+                }
                 <Chair id={i + 1} togglePlayerVisibility={togglePlayerVisibility} isVisible={true} setCurrentSeat={setCurrentSeat} seatNumber={i+1} user = {props.user} roomName ={props.roomName} socket={props.socket}/>
               </React.Fragment>
             ))}
