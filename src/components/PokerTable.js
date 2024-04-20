@@ -882,7 +882,10 @@ const dealHoleCards = () => {
       props.setHost("");
       props.socket.emit("leaveGame");
   }
-
+  const handleClickAvoidFPS = (event, buttonFunction) =>{
+    event.stopPropagation()
+    buttonFunction();
+  }
   const checkAction = () =>{
     
     seatsWithPlayers = [];
@@ -1150,7 +1153,7 @@ const onCanvasCreated = ({ camera }) => {
         </Suspense>
       </Canvas>
       <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
-        <button onClick={handleLeaveGame}>
+        <button onClick={(event) =>handleClickAvoidFPS(event,handleLeaveGame)}>
           Leave
         </button>
         <input
@@ -1172,14 +1175,14 @@ const onCanvasCreated = ({ camera }) => {
 
       <Box sx={{position: 'absolute',top: 20, right: 20}}>
       { props.host === props.user.userName ?
-            <Button variant="contained" color="success" onClick={dealHoleCards}>
+            <Button variant="contained" color="success" onClick={(event) =>handleClickAvoidFPS(event,dealHoleCards)}>
                 Deal
             </Button> : ""
       } 
       </Box>
       <Box sx={{position: 'absolute',top: 80, right: 20}}>
       { !gameStarted ? "" : playerTurnIndex === currentSeat ?
-                <Button variant='contained' color='success' onClick={checkAction}>Check</Button>
+                <Button variant='contained' color='success' onClick={(event) =>handleClickAvoidFPS(event, checkAction)}>Check</Button>
                 : ""
       }
        </Box>
