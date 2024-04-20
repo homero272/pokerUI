@@ -7,6 +7,9 @@ import {SpotLight, Stage, Html, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button, Box } from '@mui/material';
 import { Vector3 } from 'three';
+import { FirstPersonControls } from '@react-three/drei';
+import { PointerLockControls } from '@react-three/drei';
+
 const { Deck } = require('../poker_logic/Deck');
 const { PokerHand, numCardsInPokerHand } = require('../poker_logic/PokerHand');
 const texturePath = '/tabletextures/';
@@ -922,6 +925,7 @@ const dealHoleCards = () => {
     props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
 
 }
+const [enableControls, setEnableControls] = useState(false);
   const togglePlayerVisibility = (id) => {
     const key = `player${id}`;
     if (currentSeat) return;
@@ -929,6 +933,7 @@ const dealHoleCards = () => {
       return;
     }
     setCurrentSeat(id);
+    setEnableControls(true);
     props.socket.emit("selectSeat", { user: props.user, roomName: props.roomName, seatNumber: id });
    // const key = `player${id}`;
     setVisibility(prev => ({
@@ -1042,7 +1047,7 @@ const dealHoleCards = () => {
     const [cameraConfig, setCameraConfig] = useState({
       position: new THREE.Vector3(0.8914996876342017, 3.015910144726076, -1.4035605706911727), // Default position
       rotation: new THREE.Euler(-2.1212578348181106, 0.43804076394137353, 2.536853770348328), // Default rotation
-      fov: 75,
+      fov: 85,
       near: 0.1,
       far: 1000
   });
@@ -1088,7 +1093,11 @@ const onCanvasCreated = ({ camera }) => {
                 <Player id={i + 1} isVisible={visibility[`player${i + 1}`]} />
                 {visibility[`player${i + 1}`] ?
                 <Html position={namePositions[`player${i+1}`]} transform occlude>
+<<<<<<< Updated upstream
                   <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
+=======
+                  <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
+>>>>>>> Stashed changes
                     {eval(`seatName${i + 1}`)} 
                   </div>
                 </Html> : ""
@@ -1112,6 +1121,12 @@ const onCanvasCreated = ({ camera }) => {
 
           </Stage>
           {/* <OrbitControls setCameraData={setCameraData}/> */}
+          {enableControls && (
+            <PointerLockControls
+              camera={cameraRef.current}
+              domElement={document.body}
+            />
+          )}
 
         </Suspense>
       </Canvas>
