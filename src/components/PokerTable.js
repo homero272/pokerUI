@@ -1088,7 +1088,7 @@ const onCanvasCreated = ({ camera }) => {
                 <Player id={i + 1} isVisible={visibility[`player${i + 1}`]} />
                 {visibility[`player${i + 1}`] ?
                 <Html position={namePositions[`player${i+1}`]} transform occlude>
-                  <div style={{ color: 'white', background: 'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
+                  <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
                     {eval(`seatName${i + 1}`)} 
                   </div>
                 </Html> : ""
