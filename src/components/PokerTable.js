@@ -1093,11 +1093,7 @@ const onCanvasCreated = ({ camera }) => {
                 <Player id={i + 1} isVisible={visibility[`player${i + 1}`]} />
                 {visibility[`player${i + 1}`] ?
                 <Html position={namePositions[`player${i+1}`]} transform occlude>
-<<<<<<< Updated upstream
                   <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
-=======
-                  <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
->>>>>>> Stashed changes
                     {eval(`seatName${i + 1}`)} 
                   </div>
                 </Html> : ""
@@ -1111,11 +1107,11 @@ const onCanvasCreated = ({ camera }) => {
             <Card id{1} typeCard="player1" card={holeCrads[1]/> */}
             {gameStarted && communityCards.length > 0 && (
               <>
-                {/* <Cards id={0} typeCard={'community'} card={communityCards[0]} />
+                <Cards id={0} typeCard={'community'} card={communityCards[0]} />
                 <Cards id={1} typeCard={'community'} card={communityCards[1]} />
                 <Cards id={2} typeCard={'community'} card={communityCards[2]} />
                 <Cards id={3} typeCard={'community'} card={communityCards[3]} />
-                <Cards id={4} typeCard={'community'} card={communityCards[4]} /> */}
+                <Cards id={4} typeCard={'community'} card={communityCards[4]} />
               </>
             )}
 
