@@ -359,6 +359,9 @@ const PokerTableWithPlayers = (props) => {
   let _bestHands = [];
   const [playerTurn, setPlayerTurn] = useState(false);
   const [playerTurnIndex, setPlayerTurnIndex] = useState(null);
+  
+
+
 
 
     // returns all C(7, 5) combos of poker hands a player can have
@@ -881,6 +884,7 @@ const dealHoleCards = () => {
   }
 
   const checkAction = () =>{
+    
     seatsWithPlayers = [];
 
     if (visibility["player1"]) seatsWithPlayers.push(1);
@@ -1069,6 +1073,24 @@ const onCanvasCreated = ({ camera }) => {
       setCameraZoom(newZoom);
     };
   //[7, 4, -5], fov: 10
+
+  function disableClicks(duration = 1300) {
+    const preventClick = (event) => {
+      console.log("input disbaled")
+      event.stopPropagation();
+      event.preventDefault();
+    };
+  
+    // Add the event listener to disable clicks
+    document.addEventListener('click', preventClick, true);
+  
+    // Remove the listener after the specified duration
+    setTimeout(() => {
+      console.log("input enabled")
+      document.removeEventListener('click', preventClick, true);
+    }, duration);
+  }
+
   return (
     <>
   <Canvas
@@ -1121,6 +1143,7 @@ const onCanvasCreated = ({ camera }) => {
             <PointerLockControls
               camera={cameraRef.current}
               domElement={document.body}
+              onUnlock={() =>disableClicks()}
             />
           )}
 
