@@ -244,79 +244,6 @@ const PokerTable = props => {
     });
   } 
 
-  useEffect(() => {
-
-    const deductChips = (seat, amount) => {
-      switch(seat) {
-          case 1:
-              const newChipCount1 = props.seatChipCount1 - amount;
-              props.setSeatChipCount1(newChipCount1);
-              props.socket.emit("updateChipCount", {
-                room: props.roomName, 
-                seatNumber: 1,
-                chipCount: newChipCount1
-              });
-              break;
-          case 2:
-            const newChipCount2 = props.seatChipCount2 - amount;
-              props.setSeatChipCount2(newChipCount2);
-              props.socket.emit("updateChipCount", {
-                room: props.roomName, 
-                seatNumber: 2,
-                chipCount: newChipCount2
-              });
-              break;
-          case 3:
-              const newChipCount3 = props.seatChipCount3 - amount;
-              props.setSeatChipCount3(newChipCount3);
-              props.socket.emit("updateChipCount", {
-                room: props.roomName, 
-                seatNumber: 3,
-                chipCount: newChipCount3
-              });
-              break;
-          case 4:
-              const newChipCount4 = props.seatChipCount4 - amount;
-              props.setSeatChipCount4(newChipCount4);
-              props.socket.emit("updateChipCount", {
-                room: props.roomName, 
-                seatNumber: 4,
-                chipCount: newChipCount4
-              });
-              break;
-          case 5:
-              const newChipCount5 = props.seatChipCount5 - amount;
-              props.setSeatChipCount5(newChipCount5);
-              props.socket.emit("updateChipCount", {
-                room: props.roomName, 
-                seatNumber: 5,
-                chipCount: newChipCount5
-              });
-              break;
-          case 6:
-              const newChipCount6 = props.seatChipCount6 - amount;
-              props.setSeatChipCount6(newChipCount6);
-              props.socket.emit("updateChipCount", {
-                room: props.roomName, 
-                seatNumber: 6,
-                chipCount: newChipCount6
-              });
-              break;
-          default:
-        }
-      };
-
-      // Deduct big blind
-      if (props.bigBlind) {
-          deductChips(props.bigBlind, bigBlindAmount);
-      }
-
-      // Deduct small blind
-      if (props.smallBlind) {
-          deductChips(props.smallBlind, smallBlindAmount);
-      }
-    }, [props.bigBlind, props.smallBlind, bigBlindAmount, smallBlindAmount]);
-
     return (
         <Box sx={{ 
             height: tableHeight,
@@ -478,7 +405,65 @@ const PokerTableWithPlayers = props => {
     const [playerTurnIndex, setPlayerTurnIndex] = useState(null);
     const [totalPot, setTotalPot] = useState(0);
 
-    
+    const deductChips = (seat, amount) => {
+      switch(seat) {
+          case 1:
+              const newChipCount1 = seatChipCount1 - amount;
+              setSeatChipCount1(newChipCount1);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 1,
+                chipCount: newChipCount1
+              });
+              break;
+          case 2:
+            const newChipCount2 = seatChipCount2 - amount;
+              setSeatChipCount2(newChipCount2);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 2,
+                chipCount: newChipCount2
+              });
+              break;
+          case 3:
+              const newChipCount3 = seatChipCount3 - amount;
+              setSeatChipCount3(newChipCount3);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 3,
+                chipCount: newChipCount3
+              });
+              break;
+          case 4:
+              const newChipCount4 = seatChipCount4 - amount;
+              setSeatChipCount4(newChipCount4);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 4,
+                chipCount: newChipCount4
+              });
+              break;
+          case 5:
+              const newChipCount5 = seatChipCount5 - amount;
+              setSeatChipCount5(newChipCount5);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 5,
+                chipCount: newChipCount5
+              });
+              break;
+          case 6:
+              const newChipCount6 = seatChipCount6 - amount;
+              setSeatChipCount6(newChipCount6);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 6,
+                chipCount: newChipCount6
+              });
+              break;
+          default:
+        }
+    };
     
     // returns all C(7, 5) combos of poker hands a player can have
     // given their 2 hole cards and the 5 community cards
@@ -577,6 +562,9 @@ const PokerTableWithPlayers = props => {
         setDealerButton(_dealerButton);
         setSmallBlind(_smallBlind);
         setBigBlind(_bigBlind);
+
+        deductChips(_bigBlind, bigBlindAmount);
+        deductChips(_smallBlind, smallBlindAmount);
 
         let tempPlayerTurnIndex = newSmallBlindSeat;
         setPlayerTurnIndex(tempPlayerTurnIndex);
@@ -683,9 +671,10 @@ const PokerTableWithPlayers = props => {
         setSmallBlind(_smallBlind);
         setBigBlind(_bigBlind);
         
+        deductChips(_bigBlind, bigBlindAmount);
+        deductChips(_smallBlind, smallBlindAmount);
         
         console.log("current persons turn is seat :", _dealerButton);
-
 
         console.log(seatsWithPlayers);
         console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
@@ -930,6 +919,53 @@ const PokerTableWithPlayers = props => {
             setTotalPot(data.totalPot);
           });
 
+          props.socket.on("recievedUpdateChipCount", data => {
+            console.log("^&^&^&^&^&^%$%U&JNHY%")
+            data.forEach((obj,idx) =>{
+              switch (obj.seatNumber) {
+                  case 1:
+                    setSeat1(true);
+                    setSeatName1(obj.userName);
+                    setSeatChipCount1(obj.chipCount);
+                    console.log(`seat1 chip count: ${obj.chipCount}`);
+                    break;
+                  case 2:
+                    setSeat2(true);
+                    setSeatName2(obj.userName);
+                    setSeatChipCount2(obj.chipCount);
+                    console.log(`seat2 chip count: ${obj.chipCount}`);
+                    break;
+                  case 3:
+                    setSeat3(true);
+                    setSeatName3(obj.userName);
+                    setSeatChipCount3(obj.chipCount);
+                    console.log(`seat3 chip count: ${obj.chipCount}`);
+                    break;
+                  case 4:
+                    setSeat4(true);
+                    setSeatName4(obj.userName);
+                    setSeatChipCount4(obj.chipCount);
+                    console.log(`seat4 chip count: ${obj.chipCount}`);
+                    break;
+                  case 5:
+                    setSeat5(true);
+                    setSeatName5(obj.userName);
+                    setSeatChipCount5(obj.chipCount);
+                    console.log(`seat5 chip count: ${obj.chipCount}`);
+                    break;
+                  case 6:
+                    setSeat6(true);
+                    setSeatName6(obj.userName);
+                    setSeatChipCount6(obj.chipCount);
+                    console.log(`seat6 chip count: ${obj.chipCount}`);
+                    break;
+                  default:
+                    console.log("Number is not between 1 and 6");
+                    break;
+              }
+          })
+          });
+
           props.socket.on("recievedDealHoleCards", (data) => {
             console.log("&&&&&&& ",data.deck);
             console.log(data.holeCards);
@@ -961,19 +997,19 @@ const PokerTableWithPlayers = props => {
                   setPlayerTurn(seatName1)
                   break;
                 case 2:
-                    setPlayerTurn(seatName2)
+                  setPlayerTurn(seatName2)
                   break;
                 case 3:
-                    setPlayerTurn(seatName3)
+                  setPlayerTurn(seatName3)
                   break;
                 case 4:
-                    setPlayerTurn(seatName4)
+                  setPlayerTurn(seatName4)
                   break;
                 case 5:
-                    setPlayerTurn(seatName5)
+                  setPlayerTurn(seatName5)
                   break;
                 case 6:
-                    setPlayerTurn(seatName6)
+                  setPlayerTurn(seatName6)
                   break;
                 default:
                   console.log("Number is not between 1 and 6");
@@ -993,19 +1029,19 @@ const PokerTableWithPlayers = props => {
                   setPlayerTurn(seatName1)
                   break;
                 case 2:
-                    setPlayerTurn(seatName2)
+                  setPlayerTurn(seatName2)
                   break;
                 case 3:
-                    setPlayerTurn(seatName3)
+                  setPlayerTurn(seatName3)
                   break;
                 case 4:
-                    setPlayerTurn(seatName4)
+                  setPlayerTurn(seatName4)
                   break;
                 case 5:
-                    setPlayerTurn(seatName5)
+                  setPlayerTurn(seatName5)
                   break;
                 case 6:
-                    setPlayerTurn(seatName6)
+                  setPlayerTurn(seatName6)
                   break;
                 default:
                   console.log("Number is not between 1 and 6");
