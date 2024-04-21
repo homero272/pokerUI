@@ -960,8 +960,8 @@ const PokerTableWithPlayers = props => {
             newSeatNames[data.seatLeaving - 1] = props.user.userName;
             setSeatNames(newSeatNames);
 
-            const newSeatsOccupied = [...seatsOccupied];
-            newSeatsOccupied[data.seatNumber - 1] = false;
+            let newSeatsOccupied = [...seatsOccupied];
+            newSeatsOccupied[data.seatLeaving - 1] = false;
             setSeatsOccupied(newSeatsOccupied);
 
             /*
@@ -1353,12 +1353,6 @@ const PokerTableWithPlayers = props => {
                                 bigBlind={bigBlind} gameStarted={gameStarted} setGameStarted={setGameStarted} 
                                 host={props.host} user={props.user.userName} roomName={props.roomName}
                                 socket={props.socket} initBlinds={initBlinds} 
-                                seatChipCount1={seatChipCount1} seatChipCount2={seatChipCount2}
-                                seatChipCount3={seatChipCount3} seatChipCount4={seatChipCount4}
-                                seatChipCount5={seatChipCount5} seatChipCount6={seatChipCount6}
-                                setSeatChipCount1={setSeatChipCount1} setSeatChipCount2={setSeatChipCount2}
-                                setSeatChipCount3={setSeatChipCount3} setSeatChipCount4={setSeatChipCount4}
-                                setSeatChipCount5={setSeatChipCount5} setSeatChipCount6={setSeatChipCount6}
                                 totalPot={totalPot} setTotalPot={setTotalPot}
                                 >
                     </PokerTable>
