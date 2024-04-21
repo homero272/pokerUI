@@ -17,6 +17,13 @@ const playerBoxWidth = (cardBoxWidth * 2) + spaceBetweenCards;
 const tableHeight = 315;
 const tableWidth = 585;
 
+<<<<<<< Updated upstream
+=======
+const numberOfSeats = 6;
+const buyInAmount = 10000;
+const bigBlindAmount = 100;
+const smallBlindAmount = 50;
+>>>>>>> Stashed changes
 let deck = [];
 
 const CardBox = props => {  
@@ -106,47 +113,140 @@ const EmptySeat = props => {
         if (!props.socket)
             return;
 
+<<<<<<< Updated upstream
+=======
+        const newSeatsOccupied = props.seatsOccupied;
+        newSeatsOccupied[props.seatNumber - 1] = true;
+        props.setSeatsOccupied(newSeatsOccupied);
+
+        const newSeatChipCounts = [...props.seatChipCounts];
+        
+        newSeatChipCounts[props.seatNumber - 1] = buyInAmount;
+        console.log(":::: ", newSeatChipCounts);
+        props.setSeatChipCounts(newSeatChipCounts);
+
+        props.setCurrentSeat(props.seatNumber);
+
+        props.socket.emit("selectSeat", {
+          user: props.user, 
+          roomName: props.roomName, 
+          seatNumber: props.seatNumber,
+          chipCount: buyInAmount,
+          seatsOccupied: newSeatsOccupied,
+          seatChipCounts: newSeatChipCounts
+        });
+
+        /*
+        
+>>>>>>> Stashed changes
         switch (props.seatNumber) {
             case 1:
               console.log("One");
               props.setSeat1(true);
               props.setCurrentSeat(1);
+<<<<<<< Updated upstream
               props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 1 } );
+=======
+              //props.setSeatChipCount1(10000);
+              props.socket.emit("selectSeat", {
+                user: props.user, 
+                roomName: props.roomName, 
+                seatNumber: 1,
+                chipCount: buyInAmount,
+                seatsOccupied: newSeatsOccupied
+              });
+>>>>>>> Stashed changes
               break;
             case 2:
               console.log("Two");
               props.setSeat2(true);
               props.setCurrentSeat(2);
+<<<<<<< Updated upstream
               props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 2} );
+=======
+              //props.setSeatChipCount2(10000);
+              props.socket.emit("selectSeat", {
+                user: props.user, 
+                roomName: props.roomName, 
+                seatNumber: 2,
+                chipCount: buyInAmount,
+                seatsOccupied: newSeatsOccupied
+              });
+>>>>>>> Stashed changes
               break;
             case 3:
               console.log("Three");
               props.setSeat3(true);
               props.setCurrentSeat(3);
+<<<<<<< Updated upstream
               props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 3} );
+=======
+              //props.setSeatChipCount3(10000);
+              props.socket.emit("selectSeat", {
+                user: props.user, 
+                roomName: props.roomName, 
+                seatNumber: 3,
+                chipCount: buyInAmount,
+                seatsOccupied: newSeatsOccupied
+              });
+>>>>>>> Stashed changes
               break;
             case 4:
               console.log("Four");
               props.setSeat4(true);
               props.setCurrentSeat(4);
+<<<<<<< Updated upstream
               props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 4} );
+=======
+              //props.setSeatChipCount4(10000);
+              props.socket.emit("selectSeat", {
+                user: props.user, 
+                roomName: props.roomName, 
+                seatNumber: 4,
+                chipCount: buyInAmount,
+                seatsOccupied: newSeatsOccupied
+              });
+>>>>>>> Stashed changes
               break;
             case 5:
               console.log("Five");
               props.setSeat5(true);
               props.setCurrentSeat(5);
+<<<<<<< Updated upstream
               props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 5} );
+=======
+              //props.setSeatChipCount5(10000);
+              props.socket.emit("selectSeat", {
+                user: props.user, 
+                roomName: props.roomName, 
+                seatNumber: 5,
+                chipCount: buyInAmount,
+                seatsOccupied: newSeatsOccupied
+              });
+>>>>>>> Stashed changes
               break;
             case 6:
               console.log("Six");
               props.setSeat6(true);
               props.setCurrentSeat(6);
+<<<<<<< Updated upstream
               props.socket.emit("selectSeat", {user: props.user, roomName: props.roomName, seatNumber: 6} );
+=======
+              //props.setSeatChipCount6(10000);
+              props.socket.emit("selectSeat", {
+                user: props.user, 
+                roomName: props.roomName, 
+                seatNumber: 6,
+                chipCount: buyInAmount,
+                seatsOccupied: newSeatsOccupied
+              });
+>>>>>>> Stashed changes
               break;
             default:
               console.log("Number is not between 1 and 6");
               break;
         }
+        */
     }
 
     console.log(`$$$$$$${props.currentSeat}`);
@@ -302,13 +402,34 @@ const PokerTableWithPlayers = props => {
     const [seat4, setSeat4] = useState(false);
     const [seat5, setSeat5] = useState(false);
     const [seat6, setSeat6] = useState(false);
+<<<<<<< Updated upstream
 
+=======
+    */
+    const [seatsOccupied, setSeatsOccupied] = useState(Array(numberOfSeats).fill(false));
+    const [seatNames, setSeatNames] = useState(Array(numberOfSeats).fill(props.user.userName));
+    const [seatChipCounts, setSeatChipCounts] = useState(Array(numberOfSeats).fill(0));
+    /*
+>>>>>>> Stashed changes
     const [seatName1, setSeatName1] = useState(props.user.userName);
     const [seatName2, setSeatName2] = useState(props.user.userName);
     const [seatName3, setSeatName3] = useState(props.user.userName);
     const [seatName4, setSeatName4] = useState(props.user.userName);
     const [seatName5, setSeatName5] = useState(props.user.userName);
     const [seatName6, setSeatName6] = useState(props.user.userName);
+<<<<<<< Updated upstream
+=======
+    */
+
+    /*
+    const [seatChipCount1, setSeatChipCount1] = useState(0);
+    const [seatChipCount2, setSeatChipCount2] = useState(0);
+    const [seatChipCount3, setSeatChipCount3] = useState(0);
+    const [seatChipCount4, setSeatChipCount4] = useState(0);
+    const [seatChipCount5, setSeatChipCount5] = useState(0);
+    const [seatChipCount6, setSeatChipCount6] = useState(0);
+    */
+>>>>>>> Stashed changes
 
     const [currentSeat, setCurrentSeat] = useState(0);
     let mostRecentUser = props.user.userName;
@@ -328,6 +449,87 @@ const PokerTableWithPlayers = props => {
     const [bestHands, setBestHands] = useState([]);
     let _bestHands = [];
 
+<<<<<<< Updated upstream
+=======
+    const deductChips = (seat, amount) => {
+
+      const newSeatChipCounts = [...seatChipCounts];
+      const newChipCount = newSeatChipCounts[seat - 1] - amount;
+      newSeatChipCounts[seat - 1] = newChipCount;
+      setSeatChipCounts(newSeatChipCounts);
+
+      console.log("cc, ", seat, newChipCount)
+      console.log("..... ", newSeatChipCounts);
+
+      props.socket.emit("updateChipCount", {
+        room: props.roomName, 
+        seatNumber: seat,
+        chipCount: newChipCount,
+        seatChipCounts: newSeatChipCounts
+      });
+
+      /*
+      switch(seat) {
+          case 1:
+              const newChipCount1 = seatChipCount1 - amount;
+              //setSeatChipCount1(newChipCount1);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 1,
+                chipCount: newChipCount1
+              });
+              break;
+          case 2:
+            const newChipCount2 = seatChipCount2 - amount;
+              setSeatChipCount2(newChipCount2);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 2,
+                chipCount: newChipCount2
+              });
+              break;
+          case 3:
+              const newChipCount3 = seatChipCount3 - amount;
+              setSeatChipCount3(newChipCount3);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 3,
+                chipCount: newChipCount3
+              });
+              break;
+          case 4:
+              const newChipCount4 = seatChipCount4 - amount;
+              setSeatChipCount4(newChipCount4);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 4,
+                chipCount: newChipCount4
+              });
+              break;
+          case 5:
+              const newChipCount5 = seatChipCount5 - amount;
+              setSeatChipCount5(newChipCount5);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 5,
+                chipCount: newChipCount5
+              });
+              break;
+          case 6:
+              const newChipCount6 = seatChipCount6 - amount;
+              setSeatChipCount6(newChipCount6);
+              props.socket.emit("updateChipCount", {
+                room: props.roomName, 
+                seatNumber: 6,
+                chipCount: newChipCount6
+              });
+              break;
+          default:
+        }
+        */
+    };
+    
+>>>>>>> Stashed changes
     // returns all C(7, 5) combos of poker hands a player can have
     // given their 2 hole cards and the 5 community cards
     // 
@@ -425,6 +627,56 @@ const PokerTableWithPlayers = props => {
         setSmallBlind(_smallBlind);
         setBigBlind(_bigBlind);
 
+<<<<<<< Updated upstream
+=======
+        const newSeatChipCounts = [...seatChipCounts];
+        newSeatChipCounts[_bigBlind - 1] -= bigBlindAmount;
+        newSeatChipCounts[_smallBlind - 1] -= smallBlindAmount;
+        setSeatChipCounts(newSeatChipCounts);
+
+        props.socket.emit("updateChipCount", {
+          room: props.roomName, 
+          seatChipCounts: newSeatChipCounts
+        });
+
+        //deductChips(_bigBlind, bigBlindAmount);
+        //deductChips(_smallBlind, smallBlindAmount);
+
+        let tempPlayerTurnIndex = newSmallBlindSeat;
+        setPlayerTurnIndex(tempPlayerTurnIndex);
+
+        setPlayerTurn(seatNames[tempPlayerTurnIndex - 1]);
+
+        /*
+	      switch (tempPlayerTurnIndex) {
+            case 1:
+              setPlayerTurn(seatName1)
+              break;
+            case 2:
+              setPlayerTurn(seatName2)
+              break;
+            case 3:
+              setPlayerTurn(seatName3)
+              break;
+            case 4:
+              setPlayerTurn(seatName4)
+              break;
+            case 5:
+              setPlayerTurn(seatName5)
+              break;
+            case 6:
+              setPlayerTurn(seatName6)
+              break;
+            default:
+              console.log("Number is not between 1 and 6");
+              break;
+        }
+        */
+        console.log("current persons turn is seat :", _dealerButton)
+
+ 
+
+>>>>>>> Stashed changes
         console.log(seatsWithPlayers);
         console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
 
@@ -462,6 +714,24 @@ const PokerTableWithPlayers = props => {
         setDealerButton(_dealerButton);
         setSmallBlind(_smallBlind);
         setBigBlind(_bigBlind);
+<<<<<<< Updated upstream
+=======
+        
+        const newSeatChipCounts = [...seatChipCounts];
+        newSeatChipCounts[_bigBlind - 1] -= bigBlindAmount;
+        newSeatChipCounts[_smallBlind - 1] -= smallBlindAmount;
+        setSeatChipCounts(newSeatChipCounts);
+
+        props.socket.emit("updateChipCount", {
+          room: props.roomName, 
+          seatChipCounts: newSeatChipCounts
+        });
+
+        //deductChips(_bigBlind, bigBlindAmount);
+        //deductChips(_smallBlind, smallBlindAmount);
+        
+        console.log("current persons turn is seat :", _dealerButton);
+>>>>>>> Stashed changes
 
         console.log(seatsWithPlayers);
         console.log(`button: ${_dealerButton} sb: ${_smallBlind} bb: ${_bigBlind}`);
@@ -545,6 +815,22 @@ const PokerTableWithPlayers = props => {
             //we have seat number of what they chose and we have the username of the person who chose it
            // console.log("temp user:", tempuser, " most recent user: ", mostRecentUser );
 
+<<<<<<< Updated upstream
+=======
+            let newSeatsOccupied = [...seatsOccupied];
+            newSeatsOccupied[data.seatNumber - 1] = true;
+            setSeatsOccupied(data.seatsOccupied);
+
+            
+            const newSeatChipCounts = data.seatChipCounts;//[...seatChipCounts];
+            console.log("*** ", newSeatChipCounts);
+            //newSeatChipCounts[data.seatNumber - 1] = data.chipCount;
+            setSeatChipCounts(newSeatChipCounts);
+
+            console.log("$$^^, ", data.chipCount, newSeatChipCounts);
+            
+            /*
+>>>>>>> Stashed changes
             switch (data.seatNumber) {
                 case 1:
                   setSeat1(true);
@@ -574,12 +860,50 @@ const PokerTableWithPlayers = props => {
                   console.log("Number is not between 1 and 6");
                   break;
             }
+<<<<<<< Updated upstream
+=======
+            */
+            
+
+            let newSeatNames = [...seatNames];
+            newSeatNames[data.seatNumber - 1] = data.user.userName;
+            setSeatNames(newSeatNames);
+>>>>>>> Stashed changes
           });
 
           props.socket.on("update_room",(data) => {
 
             console.log("IT GOT CALLED IN UI UPDATE_ROOM, array is: ", data);
+<<<<<<< Updated upstream
                 data.forEach((obj,idx) =>{
+=======
+
+            const newSeatNames = [...seatNames];
+            data.forEach((obj, idk) => {
+              newSeatNames[obj.seatNumber - 1] = obj.userName;
+            });
+            setSeatNames(newSeatNames);
+
+            const newSeatsOccupied = [...seatsOccupied];
+            data.forEach((obj, idk) => {
+              newSeatsOccupied[obj.seatNumber - 1] = true;
+            });
+            setSeatsOccupied(newSeatsOccupied);
+
+            const newSeatChipCounts = [...seatChipCounts];
+            data.forEach((obj, idk) => {
+              newSeatChipCounts[obj.seatNumber - 1] = obj.chipCount;
+            });
+            console.log("&*&^&*,", newSeatChipCounts);
+            setSeatChipCounts(newSeatChipCounts);
+            //newSeatNames[obj.seatNumber - 1] = obj.userName;
+            console.log("666666", data);
+            
+            /*
+                data.forEach((obj,idx) => {
+                  
+
+>>>>>>> Stashed changes
                     switch (obj.seatNumber) {
                         case 1:
                           setSeat1(true);
@@ -610,6 +934,7 @@ const PokerTableWithPlayers = props => {
                           break;
                     }
                 })
+                */
 
           });
 
@@ -647,6 +972,68 @@ const PokerTableWithPlayers = props => {
 
           })
 
+<<<<<<< Updated upstream
+=======
+          props.socket.on("recievedUpdateTotalPot", data => {
+            setTotalPot(data.totalPot);
+          });
+
+          props.socket.on("recievedUpdateChipCount", data => {
+            console.log("^&^&^&^&^&^%$%U&JNHY%")
+            //setSeatChipCounts(data.seatChipCounts);
+            
+            const newSeatChipCounts = [...seatChipCounts];
+            data.forEach((obj,idx) => {
+              newSeatChipCounts[obj.seatNumber - 1] = obj.chipCount;
+            
+              switch (obj.seatNumber) {
+                  case 1:
+                    //setSeat1(true);
+                    //setSeatName1(obj.userName);
+                    //setSeatChipCount1(obj.chipCount);
+                    console.log(`seat1 chip count: ${obj.chipCount}`);
+                    break;
+                  case 2:
+                    //setSeat2(true);
+                    //setSeatName2(obj.userName);
+                    //setSeatChipCount2(obj.chipCount);
+                    console.log(`seat2 chip count: ${obj.chipCount}`);
+                    break;
+                  case 3:
+                    //setSeat3(true);
+                    //setSeatName3(obj.userName);
+                    //setSeatChipCount3(obj.chipCount);
+                    console.log(`seat3 chip count: ${obj.chipCount}`);
+                    break;
+                  case 4:
+                    //setSeat4(true);
+                    //setSeatName4(obj.userName);
+                    //setSeatChipCount4(obj.chipCount);
+                    console.log(`seat4 chip count: ${obj.chipCount}`);
+                    break;
+                  case 5:
+                    //setSeat5(true);
+                    //setSeatName5(obj.userName);
+                    //setSeatChipCount5(obj.chipCount);
+                    console.log(`seat5 chip count: ${obj.chipCount}`);
+                    break;
+                  case 6:
+                    //setSeat6(true);
+                    //setSeatName6(obj.userName);
+                    //setSeatChipCount6(obj.chipCount);
+                    console.log(`seat6 chip count: ${obj.chipCount}`);
+                    break;
+                  default:
+                    console.log("Number is not between 1 and 6");
+                    break;
+              }
+          
+          })
+          setSeatChipCounts(newSeatChipCounts);
+          
+          });
+
+>>>>>>> Stashed changes
           props.socket.on("recievedDealHoleCards", (data) => {
             console.log("&&&&&&& ",data.deck);
             console.log(data.holeCards);
@@ -738,10 +1125,31 @@ const PokerTableWithPlayers = props => {
                     justifyContent: 'center',
                     alignItems: 'center'
                 }}>
+<<<<<<< Updated upstream
                     {
                    !seat4 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat4={seat4} setSeat4={setSeat4} seatNumber={4}/> 
                    : <PlayerBox mostRecentUser={seatName4} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[3]} name={seatName4}/>
                 }
+=======
+                  {
+                    (currentSeat !== 0 && !seatsOccupied[3]) ? "" :
+                    !seatsOccupied[3] ? <EmptySeat mostRecentUser={mostRecentUser} 
+                             user={props.user} roomName={props.roomName} 
+                             socket={props.socket} currentSeat={currentSeat} 
+                             setCurrentSeat={setCurrentSeat} seatsOccupied={[...seatsOccupied]}
+                             setSeatsOccupied={setSeatsOccupied} seatNumber={4} 
+                             setSeatChipCounts={setSeatChipCounts}
+                             seatChipCounts={seatChipCounts}
+                             /> 
+                    : <PlayerBox isCurrentTurn={playerTurnIndex === 4} 
+                        mostRecentUser={seatNames[3]} roomName={props.roomName} 
+                        socket={props.socket} user={props.user} 
+                        holeCards={holeCards[3]} name={seatNames[3]}
+                        seatChipCount={seatChipCounts[3]}
+                        setSeatChipCounts={setSeatChipCounts}
+                      />
+                  }
+>>>>>>> Stashed changes
                 </Box>
 
                 <Box sx={{
@@ -763,9 +1171,29 @@ const PokerTableWithPlayers = props => {
                             justifyContent: 'flex-end'
                         }}>
                             {
+<<<<<<< Updated upstream
                    !seat3 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat3={seat3} setSeat3={setSeat3} seatNumber={3}/> 
                    : <PlayerBox mostRecentUser={seatName3} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[2]} name={seatName3}/>
                 }
+=======
+                              (currentSeat !== 0 && !seatsOccupied[2]) ? "" :
+                              !seatsOccupied[2] ? <EmptySeat mostRecentUser={mostRecentUser} 
+                                        user={props.user} roomName={props.roomName} 
+                                        socket={props.socket} currentSeat={currentSeat}
+                                        setCurrentSeat={setCurrentSeat} seatsOccupied={[...seatsOccupied]}
+                                        setSeatsOccupied={setSeatsOccupied} seatNumber={3}
+                                        setSeatChipCounts={setSeatChipCounts}
+                                        seatChipCounts={seatChipCounts}
+                                       /> 
+                              : <PlayerBox isCurrentTurn={playerTurnIndex === 3} 
+                                 mostRecentUser={seatNames[2]} roomName={props.roomName} 
+                                 socket={props.socket} user={props.user} 
+                                 holeCards={holeCards[2]} name={seatNames[2]}
+                                 seatChipCount={seatChipCounts[2]}
+                                 setSeatChipCounts={setSeatChipCounts}
+                                 />
+                            }
+>>>>>>> Stashed changes
                         </Box>
                         <Box sx={{
                             height: playerBoxHeight,
@@ -775,9 +1203,29 @@ const PokerTableWithPlayers = props => {
                             justifyContent: 'flex-end'
                         }}>
                             {
+<<<<<<< Updated upstream
                    !seat2 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat2={seat2} setSeat2={setSeat2} seatNumber={2}/> 
                    : <PlayerBox mostRecentUser={seatName2} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[1]} name={seatName2}/>
                 }
+=======
+                              (currentSeat !== 0 && !seatsOccupied[1]) ? "" :
+                              !seatsOccupied[1] ? <EmptySeat mostRecentUser={mostRecentUser} 
+                                        user={props.user} roomName={props.roomName}
+                                        socket={props.socket} currentSeat={currentSeat}
+                                        setCurrentSeat={setCurrentSeat} seatsOccupied={[...seatsOccupied]}
+                                        setSeatsOccupied={setSeatsOccupied} seatNumber={2}
+                                        setSeatChipCounts={setSeatChipCounts}
+                                        seatChipCounts={seatChipCounts}
+                                       /> 
+                              : <PlayerBox isCurrentTurn={playerTurnIndex === 2}
+                                 mostRecentUser={seatNames[1]} roomName={props.roomName} 
+                                 socket={props.socket} user={props.user} 
+                                 holeCards={holeCards[1]} name={seatNames[1]}
+                                 seatChipCount={seatChipCounts[1]}
+                                 setSeatChipCounts={setSeatChipCounts}
+                                />
+                            }
+>>>>>>> Stashed changes
                         </Box>
                     </Box>
                     
@@ -801,9 +1249,29 @@ const PokerTableWithPlayers = props => {
                             alignItems: 'center'
                         }}>
                             {
+<<<<<<< Updated upstream
                    !seat5 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat5={seat5} setSeat5={setSeat5} seatNumber={5}/> 
                    : <PlayerBox mostRecentUser={seatName5} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[4]} name={seatName5}/>
                 }
+=======
+                              (currentSeat !== 0 && !seatsOccupied[4]) ? "" :
+                              !seatsOccupied[4] ? <EmptySeat mostRecentUser={mostRecentUser} 
+                                        user={props.user} roomName={props.roomName} 
+                                        socket={props.socket} currentSeat={currentSeat} 
+                                        setCurrentSeat={setCurrentSeat} seatsOccupied={[...seatsOccupied]}
+                                        setSeatsOccupied={setSeatsOccupied} seatNumber={5}
+                                        setSeatChipCounts={setSeatChipCounts}
+                                        seatChipCounts={seatChipCounts}
+                                       /> 
+                              : <PlayerBox isCurrentTurn={playerTurnIndex === 5} 
+                                 mostRecentUser={seatNames[4]} roomName={props.roomName} 
+                                 socket={props.socket} user={props.user} 
+                                 holeCards={holeCards[4]} name={seatNames[4]}
+                                 seatChipCount={seatChipCounts[4]}
+                                 setSeatChipCounts={setSeatChipCounts}
+                                 />
+                            }
+>>>>>>> Stashed changes
                         </Box>
                         <Box sx={{
                             height: playerBoxHeight,
@@ -812,9 +1280,30 @@ const PokerTableWithPlayers = props => {
                             alignItems: 'center'
                         }}>
                             {
+<<<<<<< Updated upstream
                     !seat6 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat6={seat6} setSeat6={setSeat6} seatNumber={6}/> 
                     : <PlayerBox mostRecentUser={seatName6} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[5]} name={seatName6}/>
                     }
+=======
+                              (currentSeat !== 0 && !seatsOccupied[5]) ? "" :
+                              !seatsOccupied[5] ? <EmptySeat mostRecentUser={mostRecentUser} 
+                                        user={props.user} roomName={props.roomName} 
+                                        socket={props.socket} currentSeat={currentSeat} 
+                                        setCurrentSeat={setCurrentSeat} seatsOccupied={[...seatsOccupied]}
+                                        setSeatsOccupied={setSeatsOccupied}
+                                        seatNumber={6}
+                                        setSeatChipCounts={setSeatChipCounts}
+                                        seatChipCounts={seatChipCounts}
+                                       /> 
+                              : <PlayerBox isCurrentTurn={playerTurnIndex === 6} 
+                                 mostRecentUser={seatNames[5]} roomName={props.roomName} 
+                                 socket={props.socket} user={props.user} 
+                                 holeCards={holeCards[5]} name={seatNames[5]}
+                                 seatChipCount={seatChipCounts[5]}
+                                 setSeatChipCounts={setSeatChipCounts}
+                                 />
+                            }
+>>>>>>> Stashed changes
                         </Box>
                     </Box>
                 </Box>
@@ -825,10 +1314,32 @@ const PokerTableWithPlayers = props => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center'
+<<<<<<< Updated upstream
                 }}> {
                    !seat1 ? <EmptySeat mostRecentUser={mostRecentUser} user={props.user} roomName={props.roomName} socket={props.socket} currentSeat={currentSeat} setCurrentSeat={setCurrentSeat} seat1={seat1} setSeat1={setSeat1} seatNumber={1}/> 
                    : <PlayerBox mostRecentUser={seatName1} roomName={props.roomName} socket={props.socket} user={props.user} holeCards={holeCards[0]} name={seatName1}/>
                 }
+=======
+                }}> 
+                    {
+                      (currentSeat !== 0 && !seatsOccupied[0]) ? "" :
+                      !seatsOccupied[0] ? <EmptySeat mostRecentUser={mostRecentUser} 
+                                user={props.user} roomName={props.roomName} 
+                                socket={props.socket} currentSeat={currentSeat} 
+                                setCurrentSeat={setCurrentSeat} seatsOccupied={[...seatsOccupied]}
+                                setSeatsOccupied={setSeatsOccupied} seatNumber={1}
+                                setSeatChipCounts={setSeatChipCounts}
+                                seatChipCounts={seatChipCounts}
+                               /> 
+                      : <PlayerBox isCurrentTurn={playerTurnIndex === 1} 
+                         mostRecentUser={seatNames[0]} roomName={props.roomName} 
+                         socket={props.socket} user={props.user} 
+                         holeCards={holeCards[0]} name={seatNames[0]}
+                         seatChipCount={seatChipCounts[0]}
+                         setSeatChipCounts={setSeatChipCounts}
+                        />
+                    }
+>>>>>>> Stashed changes
                 </Box>
                 
             </Box>
