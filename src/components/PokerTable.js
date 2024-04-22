@@ -5,11 +5,13 @@ import { TextureLoader } from 'three';
 import { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls';
 import {SpotLight, Stage, Html, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import { Vector3 } from 'three';
 import { FirstPersonControls } from '@react-three/drei';
 import { PointerLockControls } from '@react-three/drei';
 
+
+extend({ Html, Box, Typography });
 const { Deck } = require('../poker_logic/Deck');
 const { PokerHand, numCardsInPokerHand } = require('../poker_logic/PokerHand');
 const texturePath = '/tabletextures/';
@@ -249,62 +251,62 @@ const Cards = ({ id, typeCard, card, cardPOS}) => {
   else if(typeCard==="player"){
     switch (id) {
       case 0:
-        if(cardPOS === 1){
+        if(cardPOS === 0){
           position = new THREE.Vector3(2.921, 1.912, 0.759);
-          rotation = new THREE.Euler(-117.87, -25.17, -139.78); // Using Euler angles here
+          rotation = new THREE.Euler(-30, .1, 30.7); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         }
-        else if (cardPOS === 2){
-          position = new THREE.Vector3(3.248, 1.912, 0.432);
-          rotation = new THREE.Euler(-117.87, -25.17, -139.78); // Using Euler angles here
+        else if (cardPOS === 1){
+          position = new THREE.Vector3(3.248, 1.912, .432);
+          rotation = new THREE.Euler(-30, .1, 30.7); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         }
         break;
       case 1:
         if(cardPOS === 0){
-          position = new THREE.Vector3(3.454, 1.912, -0.265);
-          rotation = new THREE.Euler(-89.59, -36.86, -87.91); // Using Euler angles here
+          position = new THREE.Vector3(3.454, 1.8, -0.265);
+          rotation = new THREE.Euler(-89.59, -41.3, -86.5); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         }
         else if (cardPOS === 1){
-          position = new THREE.Vector3(3.454, 1.912, -0.739);
-          rotation = new THREE.Euler(-89.59, -36.86, -87.91); // Using Euler angles here
+          position = new THREE.Vector3(3.454, 1.8, -0.739);
+          rotation = new THREE.Euler(-89.59, -41.3, -86.5); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         } // Scale down the card
         break;
       case 2:
         if(cardPOS === 0){
-          position = new THREE.Vector3(-2.874, 1.912, -1.303);
-          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          position = new THREE.Vector3(3.074, 1.8, -1.503);
+          rotation = new THREE.Euler(30,-.2, 5.5); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         }
         else if (cardPOS === 1){
-          position = new THREE.Vector3(2.486, 1.912, -1.645);
-          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          position = new THREE.Vector3(2.786, 1.8, -1.845);
+          rotation = new THREE.Euler(30,-.2, 5.5); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         } 
         break;
       case 3:
         if(cardPOS === 0){
-          position = new THREE.Vector3(1.319, 1.912, -2.818);
-          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          position = new THREE.Vector3(1.319, 1.8, -2.818);
+          rotation = new THREE.Euler(-155, -24.6, -121.94); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         }
         else if (cardPOS === 1){
-          position = new THREE.Vector3(0.979, 1.912, -3.136);
-          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          position = new THREE.Vector3(0.979, 1.8, -3.136);
+          rotation = new THREE.Euler(-155, -24.6, -121.94); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         } 
         break;
       case 4:
         if(cardPOS === 0){
           position = new THREE.Vector3(0.282, 1.912, -3.441);
-          rotation = new THREE.Euler(-53.14, 0.35, 1.87); // Using Euler angles here
+          rotation = new THREE.Euler(-54.14, -.1, 2.87); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         }
         else if (cardPOS === 1){
           position = new THREE.Vector3(-0.210, 1.912, -3.441);
-          rotation = new THREE.Euler(-53.14, 0.35, 1.87); // Using Euler angles here
+          rotation = new THREE.Euler(-54.14, -.1, 2.87); // Using Euler angles here
           scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
         } 
         break;
@@ -1155,6 +1157,7 @@ const onCanvasCreated = ({ camera }) => {
     }, duration);
   }
 
+
   return (
     <>
   <Canvas
@@ -1200,7 +1203,7 @@ const onCanvasCreated = ({ camera }) => {
                 <Cards id={4} typeCard={'community'} card={communityCards[4]} />
 
 
-
+                
                 <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][0]} cardPOS={0}/>
                 <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][1]} cardPOS={1}/>
 
@@ -1255,6 +1258,41 @@ const onCanvasCreated = ({ camera }) => {
                 : ""
       }
        </Box>
+       <Box
+      sx={{
+        position: 'absolute',
+        top: 10,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        padding: '10px',
+        borderRadius: '5px',
+        display: 'flex',
+        gap: '10px',
+      }}
+    >
+      {communityCards.map((card, index) => (
+        <Box
+          key={index}
+          sx={{
+            width: '70px',
+            height: '90px',
+            backgroundColor: 'black',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '5px',
+          }}
+        >
+          {/* Using dynamic import to get the image based on card value and suit */}
+          <img
+            src={`/tabletextures/cardpng/${card.value + card.suit}.png`}
+            alt={`${card.value} of ${card.suit}`}
+            style={{ width: '650%', height: '650%', objectFit: 'contain' }}
+          />
+        </Box>
+      ))}
+    </Box>
     </>
   );
 };
