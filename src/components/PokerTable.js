@@ -380,6 +380,10 @@ const OrbitControls = (props) => {
 
 
 let deck;
+const bigBlindAmount = 100;
+const smallBlindAmount = 50;
+
+
 
 const PokerTableWithPlayers = (props) => {
 
@@ -389,6 +393,15 @@ const PokerTableWithPlayers = (props) => {
   const [seatName4, setSeatName4] = useState(props.user.userName);
   const [seatName5, setSeatName5] = useState(props.user.userName);
   const [seatName6, setSeatName6] = useState(props.user.userName);
+  
+  const [seatChipCount1, setSeatChipCount1] = useState(0);
+  const [seatChipCount2, setSeatChipCount2] = useState(0);
+  const [seatChipCount3, setSeatChipCount3] = useState(0);
+  const [seatChipCount4, setSeatChipCount4] = useState(0);
+  const [seatChipCount5, setSeatChipCount5] = useState(0);
+  const [seatChipCount6, setSeatChipCount6] = useState(0);
+  const [totalPot, setTotalPot] = useState(0);
+
   const [currentSeat, setCurrentSeat] = useState(null);
   const [visibility, setVisibility] = useState({
     player1: false,
@@ -524,7 +537,10 @@ const PokerTableWithPlayers = (props) => {
           setDealerButton(_dealerButton);
           setSmallBlind(_smallBlind);
           setBigBlind(_bigBlind);
-  
+
+          deductChips(_bigBlind, bigBlindAmount);
+          deductChips(_smallBlind, smallBlindAmount);
+
           let tempPlayerTurnIndex = newSmallBlindSeat;
           setPlayerTurnIndex(tempPlayerTurnIndex);
   
@@ -565,6 +581,13 @@ const PokerTableWithPlayers = (props) => {
               bigBlind: _bigBlind,
               roomName: props.roomName,
               playerTurnIndex: tempPlayerTurnIndex
+          });
+          let newTotalPot = smallBlindAmount + bigBlindAmount;
+          console.log(`in UI pokerTable newTotatlPot: ${newTotalPot}`);
+          setTotalPot(newTotalPot);
+          props.socket.emit("updateTotalPot", {
+            roomName: props.roomName, 
+            totalPot: newTotalPot
           });
       }
       // used at start of game, picks a random seat with a player
@@ -620,6 +643,8 @@ const PokerTableWithPlayers = (props) => {
       setSmallBlind(_smallBlind);
       setBigBlind(_bigBlind);
       
+      deductChips(_bigBlind, bigBlindAmount);
+      deductChips(_smallBlind, smallBlindAmount);
       
       console.log("current persons turn is seat :", _dealerButton);
 
@@ -644,6 +669,13 @@ const PokerTableWithPlayers = (props) => {
         river: _communityCards,
         roomName: props.roomName
     });
+    let newTotalPot = smallBlindAmount + bigBlindAmount;
+    console.log(`in UI pokerTable newTotatlPot: ${newTotalPot}`);
+    setTotalPot(newTotalPot);
+    props.socket.emit("updateTotalPot", {
+      roomName: props.roomName, 
+      totalPot: newTotalPot
+    });
 }
 
 const dealTurn = () => {
@@ -666,8 +698,69 @@ const dealFlop = () => {
   });
 }
 
+const deductChips = (seat, amount) => {
+  switch(seat) {
+      case 1:
+          const newChipCount1 = seatChipCount1 - amount;
+          setSeatChipCount1(newChipCount1);
+          props.socket.emit("updateChipCount", {
+            room: props.roomName, 
+            seatNumber: 1,
+            chipCount: newChipCount1
+          });
+          break;
+      case 2:
+        const newChipCount2 = seatChipCount2 - amount;
+          setSeatChipCount2(newChipCount2);
+          props.socket.emit("updateChipCount", {
+            room: props.roomName, 
+            seatNumber: 2,
+            chipCount: newChipCount2
+          });
+          break;
+      case 3:
+          const newChipCount3 = seatChipCount3 - amount;
+          setSeatChipCount3(newChipCount3);
+          props.socket.emit("updateChipCount", {
+            room: props.roomName, 
+            seatNumber: 3,
+            chipCount: newChipCount3
+          });
+          break;
+      case 4:
+          const newChipCount4 = seatChipCount4 - amount;
+          setSeatChipCount4(newChipCount4);
+          props.socket.emit("updateChipCount", {
+            room: props.roomName, 
+            seatNumber: 4,
+            chipCount: newChipCount4
+          });
+          break;
+      case 5:
+          const newChipCount5 = seatChipCount5 - amount;
+          setSeatChipCount5(newChipCount5);
+          props.socket.emit("updateChipCount", {
+            room: props.roomName, 
+            seatNumber: 5,
+            chipCount: newChipCount5
+          });
+          break;
+      case 6:
+          const newChipCount6 = seatChipCount6 - amount;
+          setSeatChipCount6(newChipCount6);
+          props.socket.emit("updateChipCount", {
+            room: props.roomName, 
+            seatNumber: 6,
+            chipCount: newChipCount6
+          });
+          break;
+      default:
+    }
+};
+
 const dealHoleCards = () => {
   //console.log(deck);
+  if(!currentSeat){return;}
   rotateBlinds();
   deck = new Deck();
   deck.shuffle();
@@ -719,27 +812,27 @@ const dealHoleCards = () => {
        }));
         switch (data.seatNumber) {
             case 1:
-              
+              setSeatChipCount1(data.chipCount)
               setSeatName1(data.user.userName);
               break;
             case 2:
-              
+              setSeatChipCount2(data.chipCount)
               setSeatName2(data.user.userName);
               break;
             case 3:
-                
+              setSeatChipCount3(data.chipCount)
                 setSeatName3(data.user.userName);
               break;
             case 4:
-                
+              setSeatChipCount4(data.chipCount)
                 setSeatName4(data.user.userName);
               break;
             case 5:
-                
+              setSeatChipCount5(data.chipCount)
                 setSeatName5(data.user.userName);
               break;
             case 6:
-                
+              setSeatChipCount6(data.chipCount)
                 setSeatName6(data.user.userName);
               break;
             default:
@@ -759,27 +852,27 @@ const dealHoleCards = () => {
               }));
                 switch (obj.seatNumber) {
                     case 1:
-                      
+                      setSeatChipCount1(obj.chipCount)
                       setSeatName1(obj.userName);
                       break;
                     case 2:
-                      
+                      setSeatChipCount2(obj.chipCount)
                       setSeatName2(obj.userName);
                       break;
                     case 3:
-                        
-                        setSeatName3(obj.userName);
+                      setSeatChipCount3(obj.chipCount)
+                      setSeatName3(obj.userName);
                       break;
                     case 4:
-                        
-                        setSeatName4(obj.userName);
+                      setSeatChipCount4(obj.chipCount)  
+                      setSeatName4(obj.userName);
                       break;
                     case 5:
-                        
-                        setSeatName5(obj.userName);
+                      setSeatChipCount5(obj.chipCount)  
+                      setSeatName5(obj.userName);
                       break;
                     case 6:
-                        
+                        setSeatChipCount6(obj.chipCount)
                         setSeatName6(obj.userName);
                       break;
                     default:
@@ -829,6 +922,56 @@ const dealHoleCards = () => {
 
       })
 
+      props.socket.on("recievedUpdateTotalPot", data => {
+        setTotalPot(data.totalPot);
+      });
+
+      props.socket.on("recievedUpdateChipCount", data => {
+        console.log("^&^&^&^&^&^%$%U&JNHY%")
+        data.forEach((obj,idx) =>{
+          switch (obj.seatNumber) {
+              case 1:
+                //setSeat1(true);
+                //setSeatName1(obj.userName);
+                setSeatChipCount1(obj.chipCount);
+                console.log(`seat1 chip count: ${obj.chipCount}`);
+                break;
+              case 2:
+                //setSeat2(true);
+                //setSeatName2(obj.userName);
+                setSeatChipCount2(obj.chipCount);
+                console.log(`seat2 chip count: ${obj.chipCount}`);
+                break;
+              case 3:
+                //setSeat3(true);
+                //setSeatName3(obj.userName);
+                setSeatChipCount3(obj.chipCount);
+                console.log(`seat3 chip count: ${obj.chipCount}`);
+                break;
+              case 4:
+                //setSeat4(true);
+                //setSeatName4(obj.userName);
+                setSeatChipCount4(obj.chipCount);
+                console.log(`seat4 chip count: ${obj.chipCount}`);
+                break;
+              case 5:
+                //setSeat5(true);
+                //setSeatName5(obj.userName);
+                setSeatChipCount5(obj.chipCount);
+                console.log(`seat5 chip count: ${obj.chipCount}`);
+                break;
+              case 6:
+                //setSeat6(true);
+                //setSeatName6(obj.userName);
+                setSeatChipCount6(obj.chipCount);
+                console.log(`seat6 chip count: ${obj.chipCount}`);
+                break;
+              default:
+                console.log("Number is not between 1 and 6");
+                break;
+          }
+      })
+      });
       props.socket.on("recievedDealHoleCards", (data) => {
         console.log("&&&&&&& ",data.deck);
         console.log(data.holeCards);
@@ -998,21 +1141,23 @@ const dealHoleCards = () => {
 const [enableControls, setEnableControls] = useState(false);
   const togglePlayerVisibility = (id) => {
     const key = `player${id}`;
+    
     if (currentSeat) return;
     if(visibility[key] == true){
       return;
     }
     setCurrentSeat(id);
     setEnableControls(true);
-    props.socket.emit("selectSeat", { user: props.user, roomName: props.roomName, seatNumber: id });
+    props.socket.emit("selectSeat", { user: props.user, roomName: props.roomName, seatNumber: id, chipCount: 10000});
    // const key = `player${id}`;
     setVisibility(prev => ({
       ...prev,
       [key]: !prev[key]
     }));
+
     switch (id) {
       case 1:
-        
+        setSeatChipCount1(10000);
       if (cameraRef.current) {
         cameraRef.current.position.copy(new THREE.Vector3(0.8380562280321286, 0.6806835769896427, 4.218280283917921));
         cameraRef.current.rotation.copy(new THREE.Euler(-0.3007774255261268, 0.49802849238603664, 0.1471048406142235));
@@ -1020,7 +1165,7 @@ const [enableControls, setEnableControls] = useState(false);
     }
         break;
       case 2:
-        
+        setSeatChipCount2(10000);
       if (cameraRef.current) {
         cameraRef.current.position.copy(new THREE.Vector3(1.6710115161376544, 0.4364528681116143, 1.974999831526403));
         cameraRef.current.rotation.copy(new THREE.Euler(-1.3239257819428438, 1.2958940056050277, 1.3147029049612715));
@@ -1028,6 +1173,7 @@ const [enableControls, setEnableControls] = useState(false);
     }
         break;
       case 3:
+        setSeatChipCount3(10000);
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(0.83003736190289, 0.5609178299067229, 0.20790864120295688));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.4956862450862594, 0.8177242272838758, 2.6387951344603144));
@@ -1036,6 +1182,7 @@ const [enableControls, setEnableControls] = useState(false);
           
         break;
       case 4:
+        setSeatChipCount4(10000);
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(-0.94166520077328, 0.6978245972933373, -1.1792269063118446));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.552163561376754, 0.3634024154516776, 2.9082196515008523));
@@ -1044,6 +1191,7 @@ const [enableControls, setEnableControls] = useState(false);
           
         break;
       case 5:
+        setSeatChipCount5(10000);
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(-2.581770352521738, 0.8935528294076593, -1.628236846383945));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.5055065161550516, -0.07284732502723025, -3.0878957450863758));
@@ -1052,6 +1200,7 @@ const [enableControls, setEnableControls] = useState(false);
           
         break;
       case 6:
+        setSeatChipCount6(10000);
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(-4.366071316545736, 0.7095759121349478, -1.0057159037192394));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.3574436317654097, -0.7914534928891457, -2.524452382954885));
@@ -1181,11 +1330,19 @@ const onCanvasCreated = ({ camera }) => {
               <React.Fragment key={i}>
                 <Player id={i + 1} isVisible={visibility[`player${i + 1}`]} />
                 {visibility[`player${i + 1}`] ?
+                <>
                 <Html position={namePositions[`player${i+1}`]} transform occlude>
-                  <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
-                    {eval(`seatName${i + 1}`)} 
+                  <div style={{ color: 'white', background: 'green', padding: '2px 5px', borderRadius: '5px' }}>
+                    {eval(`seatChipCount${i + 1}`)} 
                   </div>
-                </Html> : ""
+                </Html> 
+                <Html position={[namePositions[`player${i+1}`][0],namePositions[`player${i+1}`][1] + 0.6, namePositions[`player${i+1}`][2]]} transform occlude>
+                <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
+                  {eval(`seatName${i + 1}`)} 
+                </div>
+                </Html>
+                </>
+                : ""
                 }
                 <Chair id={i + 1} togglePlayerVisibility={togglePlayerVisibility} isVisible={true} setCurrentSeat={setCurrentSeat} seatNumber={i+1} user = {props.user} roomName ={props.roomName} socket={props.socket}/>
               </React.Fragment>
@@ -1258,6 +1415,7 @@ const onCanvasCreated = ({ camera }) => {
                 : ""
       }
        </Box>
+       
        <Box
       sx={{
         position: 'absolute',
