@@ -6,6 +6,21 @@ import JoinMatchList from './JoinMatchList';
 import { IconButton } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home'
 
+// const heavy = createTheme({
+//     typography: {
+//       fontFamily: [
+//         'heavy',
+
+//       ].join(','),
+//     },
+//     palette: {
+//         primary: {
+//           main: '#9caab7', // replace with your desired hex color
+//         },
+//         // ... other color settings
+//       },
+//   });
+
 
 const JoinMatch = (props) =>{
     const handleSelectMatchCallBack =  props.handleSelectMatch;

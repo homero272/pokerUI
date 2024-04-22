@@ -8,7 +8,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Fragment } from 'react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { red } from '@mui/material/colors';
-import { TextField } from '@mui/material';
+import { TextField} from '@mui/material';
 import API from '../API-Interface/API-Interface';
 import SearchIcon from '@mui/icons-material/Search';
 import ListItemText from '@mui/material/ListItemText';
@@ -22,6 +22,21 @@ import AddIcon from '@mui/icons-material/Add';
 import ClockIcon from '@mui/icons-material/AccessTime';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+const heavy = createTheme({
+    typography: {
+      fontFamily: [
+        'heavy',
+
+      ].join(','),
+    },
+    palette: {
+        primary: {
+          main: '#9caab7', // replace with your desired hex color
+        },
+        // ... other color settings
+      },
+  });
 
 
 const PendingRequestsPage = (props) => {
@@ -59,18 +74,19 @@ const PendingRequestsPage = (props) => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 width: "100vw",
-                height: '100vh'
+                height: '100vh',
+                backgroundColor:'#00000b'
             }}>
                 <Box sx={{ position: 'absolute', top: 10, left: 0 }}>
                     <IconButton onClick={handleReturnToFriendsPage}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <ArrowBackIcon sx={{ color: red[900] }} fontSize='large' />
-                            <Typography variant="caption">Return to Friends</Typography>
+                            <Typography sx={{color:'white'}} variant="caption">Return to Friends</Typography>
                         </Box>
                     </IconButton>
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px' }}> {/* Display list vertically with padding */}
-                    <Typography variant="h6">Received Requests:</Typography>
+                    <Typography sx={{color:'white'}} variant="h6">Received Requests:</Typography>
                     {receivedRequests.map((friend) => {
                         // Get friend's user name (either userName1 or userName2)
                         const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
@@ -117,7 +133,7 @@ const PendingRequestsPage = (props) => {
                     })}
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px' }}> {/* Display list vertically with padding */}
-                    <Typography variant="h6">Outgoing Requests:</Typography>
+                    <Typography sx={{color:'white'}} variant="h6">Outgoing Requests:</Typography>
                     {outgoingRequests.map((friend) => {
                         // Get friend's user name (either userName1 or userName2)
                         const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
@@ -197,8 +213,10 @@ const AddFriendsPage = (props) => {
         setFilteredSearchResults(filteredResults);
     }
 
+
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
+        
     }
 
     const handleAddFriend = async (recieverUserName, recieverUserId, index) => {
@@ -221,24 +239,40 @@ const AddFriendsPage = (props) => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 width: "100vw",
-                height: '100vh'
+                height: '100vh',
+                backgroundColor:'#00000b'
             }}>
                 <Box sx={{ position: 'absolute', top: 10, left: 0 }}>
                     <IconButton onClick={handleReturnToFriendsPage}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <ArrowBackIcon sx={{ color: red[900] }} fontSize='large' />
-                            <Typography variant="caption">Return to Friends</Typography>
+                            <Typography sx={{color:'white'}} variant="caption">Return to Friends</Typography>
                         </Box>
                     </IconButton>
                 </Box>
-                <Box sx={{ position: 'absolute', top: 50 }}>
+                <Box sx={{ position: 'absolute', top: 50 ,display:'flex', flexDirection:'row'}}>
+                    <Box sx={{border:1, borderColor:'white'}}>
+
+                    
+                    
+
+                    
                     <TextField
+                        
                         label="Search For Users"
                         variant="outlined"
                         value={searchInput}
                         onChange={handleInputChange}
-                    />
-                    <IconButton onClick={handleSearch} sx={{}}>
+                        InputLabelProps={{
+                            style: { color: 'white' } // Style for the label
+                        }}
+                        InputProps={{
+                            style: { color: 'white' },
+                            // Style for the input field
+                        }}
+                    /></Box>
+                    
+                    <IconButton onClick={handleSearch}>
                         <SearchIcon color='success' fontSize='large' />
                     </IconButton>
                 </Box>
@@ -347,6 +381,7 @@ const FriendsPage = (props) => {
 
     return (
         <>
+        <ThemeProvider theme={heavy}>
             {addFriends ? (
                 <AddFriendsPage user={user}  setArrayOfRequests={setArrayOfRequests} arrayOfRequests={arrayOfRequests} arrayOfFriends={arrayOfFriends} arrayOfUsers={arrayOfUsers} setAddFriends={setAddFriends} />
             ) : pendingFriends ? (
@@ -357,13 +392,14 @@ const FriendsPage = (props) => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     width: "100vw",
-                    height: '100vh'
+                    height: '100vh',
+                    backgroundColor:'#00000b'
                 }}>
                     <Box sx={{position: 'absolute', top: 10, left: 0}}>
                         <IconButton  onClick={handleReturnToMenu}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <HomeIcon color='primary' fontSize='large'/>
-                                <Typography variant="caption">Return to Menu</Typography>
+                                <Typography sx={{color:'white'}} variant="caption">Return to Menu</Typography>
                             </Box>
                         </IconButton>
                     </Box> 
@@ -371,7 +407,7 @@ const FriendsPage = (props) => {
                         <IconButton  onClick={() => handleAddFriends(true)}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <GroupAddIcon color='primary' fontSize='large'/>
-                                <Typography variant="caption">Add Friends</Typography>
+                                <Typography sx={{color:'white'}} variant="caption">Add Friends</Typography>
                             </Box>
                         </IconButton>
                     </Box> 
@@ -379,13 +415,13 @@ const FriendsPage = (props) => {
                         <IconButton  onClick={() => handlePendingFriends(true)}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <AccessTimeIcon color='primary' fontSize='large'/>
-                                <Typography variant="caption">Pending Requests</Typography>
+                                <Typography sx={{color:'white'}} variant="caption">Pending Requests</Typography>
                             </Box>
                         </IconButton>
                     </Box> 
                     <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', padding: '100px' }}>
     {/* Display list vertically with padding */}
-    <Typography variant="h6">My Friends:</Typography>
+    <Typography sx={{color:'white'}} variant="h6">My Friends:</Typography>
     {arrayOfFriends.map((friend) => {
         // Get friend's user name (either userName1 or userName2)
         const friendUserName = friend.userName1 !== user.userName ? friend.userName1 : friend.userName2;
@@ -445,6 +481,7 @@ const FriendsPage = (props) => {
 
                 </Box>
             )}
+            </ThemeProvider>
         </>
     );
 };
