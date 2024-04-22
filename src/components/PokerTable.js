@@ -201,7 +201,7 @@ const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, r
 // };
 
 
-const Cards = ({ id, typeCard, card }) => {
+const Cards = ({ id, typeCard, card, cardPOS}) => {
   
   console.log(`LOOK THIS IS THE CARD ${card.value + card.suit}`)
   const gltf = useLoader(GLTFLoader, `/tabletextures/pokerdeck/${card.value + card.suit}.glb`);
@@ -211,38 +211,123 @@ const Cards = ({ id, typeCard, card }) => {
 
   //if comunity card we will do a switch from 0-4 (passing CC, index 0-4).... switch to determine the postion to set it to
   //if player card we will do a switch from 1-6 (passing pc, index1-6 )... switch to determine and if condition (0 or 1)for each to determine position
-  switch (id) {
-    case 0:
-      position = new THREE.Vector3(1.871, 1.5039156776787426, -0.626);
+  if(typeCard==="community"){
+    switch (id) {
+      case 0:
+        position = new THREE.Vector3(1.871, 1.5039156776787426, -0.626);
+        rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
+        scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        
+        break;
+      case 1:
+          
+      position = new THREE.Vector3(1.560, 1.504, -0.911);
       rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
       scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
-      
-      break;
-    case 1:
-        
-    position = new THREE.Vector3(1.560, 1.504, -0.911);
-    rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
-    scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
-      break;
-    case 2:
-      position = new THREE.Vector3(1.27, 1.504, -1.21);
-      rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
-      scale = new THREE.Vector3(0.25, 0.25, 0.25); 
-      break;
-    case 3:
-      position = new THREE.Vector3(0.938, 1.504, -1.481);
-      rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
-      scale = new THREE.Vector3(0.25, 0.25, 0.25); 
-      break;
-    case 4:
-      position = new THREE.Vector3(0.627, 1.504, -1.796);
-      rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
-      scale = new THREE.Vector3(0.25, 0.25, 0.25); 
-      break;
-    default:
-      console.log("Number is not between 1 and 6");
-      break;
-}
+        break;
+      case 2:
+        position = new THREE.Vector3(1.27, 1.504, -1.21);
+        rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
+        scale = new THREE.Vector3(0.25, 0.25, 0.25); 
+        break;
+      case 3:
+        position = new THREE.Vector3(0.938, 1.504, -1.481);
+        rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
+        scale = new THREE.Vector3(0.25, 0.25, 0.25); 
+        break;
+      case 4:
+        position = new THREE.Vector3(0.627, 1.504, -1.796);
+        rotation = new THREE.Euler(0, -0.7582964141897087, 0); // Using Euler angles here
+        scale = new THREE.Vector3(0.25, 0.25, 0.25); 
+        break;
+      default:
+        console.log("Number is not between 1 and 6");
+        break;
+    }
+   
+  }
+  else if(typeCard==="player"){
+    switch (id) {
+      case 0:
+        if(cardPOS === 1){
+          position = new THREE.Vector3(2.921, 1.912, 0.759);
+          rotation = new THREE.Euler(-117.87, -25.17, -139.78); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        }
+        else if (cardPOS === 2){
+          position = new THREE.Vector3(3.248, 1.912, 0.432);
+          rotation = new THREE.Euler(-117.87, -25.17, -139.78); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        }
+        break;
+      case 1:
+        if(cardPOS === 0){
+          position = new THREE.Vector3(3.454, 1.912, -0.265);
+          rotation = new THREE.Euler(-89.59, -36.86, -87.91); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        }
+        else if (cardPOS === 1){
+          position = new THREE.Vector3(3.454, 1.912, -0.739);
+          rotation = new THREE.Euler(-89.59, -36.86, -87.91); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        } // Scale down the card
+        break;
+      case 2:
+        if(cardPOS === 0){
+          position = new THREE.Vector3(-2.874, 1.912, -1.303);
+          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        }
+        else if (cardPOS === 1){
+          position = new THREE.Vector3(2.486, 1.912, -1.645);
+          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        } 
+        break;
+      case 3:
+        if(cardPOS === 0){
+          position = new THREE.Vector3(1.319, 1.912, -2.818);
+          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        }
+        else if (cardPOS === 1){
+          position = new THREE.Vector3(0.979, 1.912, -3.136);
+          rotation = new THREE.Euler(-61.52, -24.46, -35.94); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        } 
+        break;
+      case 4:
+        if(cardPOS === 0){
+          position = new THREE.Vector3(0.282, 1.912, -3.441);
+          rotation = new THREE.Euler(-53.14, 0.35, 1.87); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        }
+        else if (cardPOS === 1){
+          position = new THREE.Vector3(-0.210, 1.912, -3.441);
+          rotation = new THREE.Euler(-53.14, 0.35, 1.87); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        } 
+        break;
+      case 5:
+        if(cardPOS === 0){
+          position = new THREE.Vector3(-0.631, 1.908, -2.923);
+          rotation = new THREE.Euler(-42.03, 30.93, 40); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        }
+        else if (cardPOS === 1){
+          position = new THREE.Vector3(-0.983, 1.912, -2.570);
+          rotation = new THREE.Euler(-42.03, 30.93, 40); // Using Euler angles here
+          scale = new THREE.Vector3(0.25, 0.25, 0.25); // Scale down the card
+        } 
+          break;
+      default:
+        console.log("Number is not between 1 and 6");
+        break;
+    }
+
+
+  }
+
 
 
 
@@ -265,31 +350,7 @@ const Cards = ({ id, typeCard, card }) => {
   );
 };
 
-// extend({ OrbitControlsImpl });
 
-// const OrbitControls = () => {
-//   const { camera, gl } = useThree();
-//   const controls = useRef();
-
-//   useEffect(() => {
-//     // This sets the focus point of the controls which effectively is the point around which the camera will rotate
-//     controls.current.target.set(0,0, 0); // Adjust this target to where you want the head to be focused initially.
-//     controls.current.update();
-//   }, [camera]);
-
-//   useFrame(() => controls.current && controls.current.update());
-
-//   return (
-//     <orbitControlsImpl
-//       ref={controls}
-//       fov={1}
-//       args={[camera, gl.domElement]}
-      // enableZoom={true} // Disable zooming
-      // enablePan={false}  // Disable panning
-      // enableRotate={true} // Enable rotation
-//     />
-//   );
-// };
 
 extend({ OrbitControlsImpl });
 
@@ -1137,6 +1198,14 @@ const onCanvasCreated = ({ camera }) => {
                 <Cards id={2} typeCard={'community'} card={communityCards[2]} />
                 <Cards id={3} typeCard={'community'} card={communityCards[3]} />
                 <Cards id={4} typeCard={'community'} card={communityCards[4]} />
+
+
+
+                <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][0]} cardPOS={0}/>
+                <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][1]} cardPOS={1}/>
+
+                
+                
               </>
             )}
 
