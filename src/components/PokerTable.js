@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useEffect, useRef } from 'react';
+import React, { Suspense, useState, useEffect, useRef, Fragment } from 'react';
 import { Canvas, useLoader, useFrame ,extend, useThree} from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { TextureLoader } from 'three';
@@ -1138,6 +1138,22 @@ const dealHoleCards = () => {
     props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
 
 }
+
+  const foldAction = (props) =>{
+
+
+
+    checkAction();
+  }
+  const callAction = (props) =>{
+
+    checkAction();
+  }
+  const raiseAction = (props) =>{
+    
+    checkAction();
+  }
+
 const [enableControls, setEnableControls] = useState(false);
   const togglePlayerVisibility = (id) => {
     const key = `player${id}`;
@@ -1409,9 +1425,23 @@ const onCanvasCreated = ({ camera }) => {
             </Button> : ""
       } 
       </Box>
-      <Box sx={{position: 'absolute',top: 80, right: 20}}>
+      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', position: 'absolute',bottom: 20, gap: '50px'}}>
       { !gameStarted ? "" : playerTurnIndex === currentSeat ?
-                <Button variant='contained' color='success' onClick={(event) =>handleClickAvoidFPS(event, checkAction)}>Check</Button>
+              <Fragment>
+                <Button variant='contained' color='error' onClick={(event) =>handleClickAvoidFPS(event, foldAction)}>
+                    Fold
+                </Button> 
+                <Button variant='contained' color='success' onClick={(event) =>handleClickAvoidFPS(event, checkAction)}>
+                    Check
+                </Button>
+                <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, callAction)}>
+                    Call
+                </Button>
+                <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, raiseAction)}>
+                    Raise
+                </Button>
+
+                </Fragment>
                 : ""
       }
        </Box>
