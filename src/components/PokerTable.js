@@ -202,8 +202,9 @@ const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, r
 
 
 const Cards = ({ id, typeCard, card, cardPOS}) => {
-  
+
   //console.log(`LOOK THIS IS THE CARD ${card.value + card.suit}`)
+
   const gltf = useLoader(GLTFLoader, `/tabletextures/pokerdeck/${card.value + card.suit}.glb`);
   const cardRef = useRef();
   let position, rotation, scale;
@@ -443,7 +444,25 @@ const PokerTableWithPlayers = (props) => {
   let _bestHands = [];
   const [playerTurn, setPlayerTurn] = useState(false);
   const [playerTurnIndex, setPlayerTurnIndex] = useState(null);
-  
+  const [canCheck, setCanCheck] = useState(true);
+  const [minBet, setMinBet] = useState(bigBlindAmount); //the min bet should be set initially to big blind
+
+  const[playerMoney, setPlayerMoney]= useState({
+    player1: 0,
+    player2: 0,
+    player3: 0,
+    player4: 0,
+    player5: 0,
+    player6: 0,
+  }) // we need to set the big blind and small blind for these
+  const[lastRaise, setLastRaise] = useState(-1); // keeps track of the last seat that raised
+  //therewfore everyone must either call, reraise, or fold
+
+  const[flop,setFlop] = useState(false);
+  const[turn,setTurn] = useState(false);
+  const[river,setRiver] = useState(false);
+
+
 
 
   if(currentSeat){
@@ -674,7 +693,7 @@ const PokerTableWithPlayers = (props) => {
       });
   }
   const dealRiver = () => {
-    _communityCards = [..._communityCards, deck.deal()]; 
+    _communityCards = [...communityCards, deck.deal()]; 
     setCommunityCards(_communityCards);
 
     props.socket.emit("dealRiver", {
@@ -691,7 +710,9 @@ const PokerTableWithPlayers = (props) => {
 }
 
 const dealTurn = () => {
-  _communityCards = [..._communityCards, deck.deal()]; 
+
+  _communityCards = [...communityCards, deck.deal()]; 
+  console.log(_communityCards,"comCARDS");
   setCommunityCards(_communityCards);
 
   props.socket.emit("dealTurn", {
@@ -711,6 +732,10 @@ const dealFlop = () => {
 }
 
 const deductChips = (seat, amount) => {
+  setPlayerMoney({ // here is where we keep track of everyones money they put in the pot
+    ...playerMoney,
+    [`player${seat}`] : playerMoney[`player${seat}`] + amount
+  })
   switch(seat) {
       case 1:
           const newChipCount1 = seatChipCount1 - amount;
@@ -720,6 +745,7 @@ const deductChips = (seat, amount) => {
             seatNumber: 1,
             chipCount: newChipCount1
           });
+          
           break;
       case 2:
         const newChipCount2 = seatChipCount2 - amount;
@@ -793,12 +819,12 @@ const dealHoleCards = () => {
       roomName: props.roomName
   });
 
-  dealFlop();
-  dealTurn();
-  dealRiver();
-  console.log(`seaaaat: ${currentSeat}`)
-  console.log(`communnnnity cards: ${communityCards}`)
-  getPlayersBestHands();
+//   dealFlop();
+//   dealTurn();
+//   dealRiver();
+//   console.log(`seaaaat: ${currentSeat}`)
+//   console.log(`communnnnity cards: ${communityCards}`)
+//   getPlayersBestHands();
   setGameStarted(true);
   gameStarted2 = true;
   props.socket.emit("startGame", {
@@ -812,6 +838,9 @@ const dealHoleCards = () => {
 
   useEffect(() => {
     if(props.socket !== null) {
+      console.log("socket called last");
+      
+
       props.socket.on("receiveSeatNumber", (data) => {
         //alert(data);
         console.log("Seat number recieved is :", data);
@@ -1030,14 +1059,19 @@ const dealHoleCards = () => {
 
       props.socket.on("recievedDealFlop", (data) => {
         setCommunityCards(data.flop);
+        console.log("I got the call for flop in the use EFFECT!!! BEFORE THE SET", flop, "this is what we are setting it to", data.flop);
+        setFlop(true);
       });
 
       props.socket.on("recievedDealTurn", (data) => {
         setCommunityCards(data.turn);
+        console.log("I got the call for TURN in the use EFFECT!!! BEFORE THE SET", turn, "this is what we are setting it to", data.turn);
+        setTurn(true);
       });
 
       props.socket.on("recievedDealRiver", (data) => {
         setCommunityCards(data.river);
+        setRiver(true);
       });
 
       props.socket.on("recievedInitBlinds", (data) => {
@@ -1126,14 +1160,35 @@ const dealHoleCards = () => {
         playerTurnIndex2 = data.playerTurnIndex;
         setPlayerTurn(data.playerTurn);
 
+
         console.log("check action called from other user, new players turn is :", data.playerTurn);
+      
+      
       })
+
+
+      props.socket.on("recievedRaiseAction", (data)=>{
+
+        console.log(data, "use Effect Raise Data");
+          setMinBet(data.minBet);
+          setFirstRound(false);
+          setLastRaise(data.lastRaiseSeat);
+
+
+      })
+
+
+      
+
+      
 
       
 
 
     }
+
     }, [props.socket])
+
 
     console.log("host is: ", props.host);
     const handleLeaveGame = () => {
@@ -1147,8 +1202,8 @@ const dealHoleCards = () => {
 
 
   const handleClickAvoidFPS = (event, buttonFunction) =>{
-    event.stopPropagation()
-    buttonFunction();
+    event.stopPropagation(); //makes it so it does not turn on FPS controls
+    buttonFunction(); //this functoin calls whatever function was passed in the button
   }
   const checkAction = () =>{
     
@@ -1196,9 +1251,34 @@ const dealHoleCards = () => {
     }
     console.log("after check its player ", newPlayerActionSeat, " turn")
     props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
+    console.log(playerTurnIndex, dealerButton, "debug check");
+    if(playerTurnIndex === dealerButton){
+      console.log("checkAction last Player of round now going to new round");
+      console.log(flop, "this is what flop is");
+      if(flop == false){
+        dealFlop();
+        setFlop(true);
+
+        console.log("SETTING FLOP!!! in check");
+        
+
+      }
+      else if(!turn){
+        dealTurn();
+        setTurn(true);
+        console.log("SETTING TURN!!! in check");
+      }
+      else if(!river){
+        dealRiver();
+        setRiver(true);
+        console.log("SETTING RIVER!!! in check");
+      }
+    }
 
 }
 
+  const[firstRound,setFirstRound]= useState(true);
+  
   const foldAction = (props) =>{
 
 
@@ -1206,13 +1286,46 @@ const dealHoleCards = () => {
     checkAction();
   }
   const callAction = (props) =>{
-
+    setCanCheck(false); // not used yet
+    if(currentSeat === bigBlind && firstRound === true ){
+      //if any other seat didnt raise then skip the turn 
+      checkAction();
+      return;
+    }
+    else if(currentSeat ===smallBlind && firstRound=== true){
+      deductChips(currentSeat,minBet-smallBlindAmount);
+      checkAction();
+      return;
+    }
+    
+    deductChips(currentSeat,minBet);
     checkAction();
   }
-  const raiseAction = (props) =>{
+  const raiseAction = (obj) =>{ //called obj to avoid props confusion
+    setLastRaise(currentSeat);
 
+    setMinBet(minBet * 2);
+    setFirstRound(false);
+
+    if(currentSeat === bigBlind && firstRound === true){
+      deductChips(currentSeat, (minBet * 2)-bigBlindAmount);
+    }
+    if(currentSeat === smallBlind && firstRound === true){
+      deductChips(currentSeat, (minBet * 2)-smallBlindAmount);
+    }
+
+    
+    
+      props.socket.emit("raiseAction", {minBet:minBet * 2, roomName:props.roomName ,type:"raiseAction", lastRaiseSeat:currentSeat});
     checkAction();
   }
+
+
+  const startGame =(obj)=>{
+    dealHoleCards();
+  }
+
+
 
 const [enableControls, setEnableControls] = useState(false);
   const togglePlayerVisibility = (id) => {
@@ -1349,6 +1462,11 @@ const [enableControls, setEnableControls] = useState(false);
       far: 1000
   });
   
+
+
+
+
+
 // This function is called when the Canvas component has mounted
 // It will set the camera reference and apply initial configuration
 const onCanvasCreated = ({ camera }) => {
@@ -1429,21 +1547,33 @@ const onCanvasCreated = ({ camera }) => {
             {/* if(visible["player1"])
             <Card id{0} typeCard="player1" card={holeCrads[0]/>
             <Card id{1} typeCard="player1" card={holeCrads[1]/> */}
+            {gameStarted && (
+              <>
+              <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][0]} cardPOS={0}/>
+                <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][1]} cardPOS={1}/>
+                </>
+            )}
+            
             {gameStarted && communityCards.length > 0 && (
               <>
-                <Cards id={0} typeCard={'community'} card={communityCards[0]} />
-                <Cards id={1} typeCard={'community'} card={communityCards[1]} />
-                <Cards id={2} typeCard={'community'} card={communityCards[2]} />
-                <Cards id={3} typeCard={'community'} card={communityCards[3]} />
-                <Cards id={4} typeCard={'community'} card={communityCards[4]} />
-
-
-                
-                <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][0]} cardPOS={0}/>
-                <Cards id={currentSeat-1} typeCard={'player'} card={holeCards[currentSeat-1][1]} cardPOS={1}/>
-
-                
-                
+                {flop && (
+                  <>
+                  <Cards id={0} typeCard={'community'} card={communityCards[0]} />
+                  <Cards id={1} typeCard={'community'} card={communityCards[1]} />
+                  <Cards id={2} typeCard={'community'} card={communityCards[2]} />
+                  
+                  </>
+                )}
+                {turn && communityCards.length > 3 && (
+                  <>
+                  <Cards id={3} typeCard={'community'} card={communityCards[3]} />
+                  </>
+                )}
+                {river && communityCards.length > 4 && (
+                  <>
+                    <Cards id={4} typeCard={'community'} card={communityCards[4]} />
+                  </>
+                )}
               </>
             )}
 
@@ -1482,8 +1612,8 @@ const onCanvasCreated = ({ camera }) => {
 
       <Box sx={{position: 'absolute',top: 20, right: 20}}>
       { props.host === props.user.userName ?
-            <Button variant="contained" color="success" onClick={(event) =>handleClickAvoidFPS(event,dealHoleCards)}>
-                Deal
+            <Button variant="contained" color="success" onClick={(event) =>handleClickAvoidFPS(event,startGame)}>
+                Start Game
             </Button> : ""
       } 
       </Box>
@@ -1494,13 +1624,13 @@ const onCanvasCreated = ({ camera }) => {
                     Fold
                 </Button> 
                 <Button variant='contained' color='success' onClick={(event) =>handleClickAvoidFPS(event, checkAction)}>
-                    Check
+                    Check 
                 </Button>
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, callAction)}>
-                    Call
+                    Call ${currentSeat === bigBlind && firstRound === true ? minBet-bigBlindAmount : currentSeat === smallBlind && firstRound === true ? minBet-smallBlindAmount:minBet }
                 </Button>
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, raiseAction)}>
-                    Raise
+                    Raise ${minBet}
                 </Button>
 
                 </Fragment>
