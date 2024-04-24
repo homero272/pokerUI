@@ -1252,6 +1252,9 @@ const dealHoleCards = () => {
     console.log("after check its player ", newPlayerActionSeat, " turn")
     props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
     console.log(playerTurnIndex, dealerButton, "debug check");
+        // if(lastRaise != -1 && playerToLeft == playerTurnIndex){
+    //   //same logic
+    // }
     if(playerTurnIndex === dealerButton){
       console.log("checkAction last Player of round now going to new round");
       console.log(flop, "this is what flop is");
@@ -1303,7 +1306,9 @@ const dealHoleCards = () => {
   }
   const raiseAction = (obj) =>{ //called obj to avoid props confusion
     setLastRaise(currentSeat);
-
+    // if(lastRaise != -1 && playerToLeft == playerTurnIndex){
+    //   //same logic
+    // }
     setMinBet(minBet * 2);
     setFirstRound(false);
 
