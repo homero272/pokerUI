@@ -75,7 +75,6 @@ const AllChips = ({ position }) => {
 // };
 const Players = ({ visibility }) => {
   const gltf = useLoader(GLTFLoader, '/tabletextures/wholeroom3.gltf');
-  console.log(gltf, "LOOK HERE");
   return gltf.scene.children.filter(child => child.name.startsWith("player")).map(child => (
     <primitive
       key={child.name}
@@ -138,7 +137,6 @@ const SimpleRoom = ({ isVisible }) => {
 const Player = ({ id, isVisible }) => {
   const gltf = useLoader(GLTFLoader, `/tabletextures/player${id}.gltf`);
   const meshRef = useRef();
-  console.log(gltf,"gltf PLAYER");
   if (meshRef.current) {
     meshRef.current.visible = isVisible;
   }
@@ -205,7 +203,7 @@ const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, r
 
 const Cards = ({ id, typeCard, card, cardPOS}) => {
   
-  console.log(`LOOK THIS IS THE CARD ${card.value + card.suit}`)
+  //console.log(`LOOK THIS IS THE CARD ${card.value + card.suit}`)
   const gltf = useLoader(GLTFLoader, `/tabletextures/pokerdeck/${card.value + card.suit}.glb`);
   const cardRef = useRef();
   let position, rotation, scale;
@@ -361,7 +359,7 @@ const OrbitControls = (props) => {
   const controls = useRef();
 
   useFrame(() => {
-    console.log(camera,"cam");
+    //console.log(camera,"cam");
     if (controls.current) {
       controls.current.update();
       props.setCameraData({
@@ -383,7 +381,16 @@ let deck;
 const bigBlindAmount = 100;
 const smallBlindAmount = 50;
 
-
+let visibility2 = {
+  player1: false,
+  player2: false,
+  player3: false,
+  player4: false,
+  player5: false,
+  player6: false
+}
+let gameStarted2 = false;
+let playerTurnIndex2;
 
 const PokerTableWithPlayers = (props) => {
 
@@ -411,6 +418,7 @@ const PokerTableWithPlayers = (props) => {
     player5: false,
     player6: false
   });
+
   const namePositions = {
     player1: [3.923879107980736, 3.4749514605206433, 1.0414440423770173],
     player2: [4.399886094460785,3.4749514605206433, -0.8129757847962559],
@@ -438,7 +446,9 @@ const PokerTableWithPlayers = (props) => {
   
 
 
-
+  if(currentSeat){
+    visibility2[`player${currentSeat}`] = true;
+  }
 
     // returns all C(7, 5) combos of poker hands a player can have
     // given their 2 hole cards and the 5 community cards
@@ -528,7 +538,6 @@ const PokerTableWithPlayers = (props) => {
   
           //console.log(`%%%${newDealerButtonIndex} %%%${newDealerButtonSeat}`);
           //console.log(seatsWithPlayers.length, "#####");
-          console.log(`newBBindex: ${newBigBlindIndex} newSBindex: ${newSmallBlindIndex} newButtonIndex: ${newDealerButtonIndex}`)
   
           _dealerButton = newDealerButtonSeat;
           _smallBlind = newSmallBlindSeat;
@@ -543,7 +552,9 @@ const PokerTableWithPlayers = (props) => {
 
           let tempPlayerTurnIndex = newSmallBlindSeat;
           setPlayerTurnIndex(tempPlayerTurnIndex);
-  
+          playerTurnIndex2 = tempPlayerTurnIndex;
+          console.log(`newBBindex: ${newBigBlindIndex} newSBindex: ${newSmallBlindIndex} newButtonIndex: ${newDealerButtonIndex} playerTurn: ${tempPlayerTurnIndex}`)
+
         switch (tempPlayerTurnIndex) {
               case 1:
                 setPlayerTurn(seatName1)
@@ -568,7 +579,7 @@ const PokerTableWithPlayers = (props) => {
                 break;
           }
   
-          console.log("current persons turn is seat :", _dealerButton)
+          console.log("current persons turn is seat :", tempPlayerTurnIndex)
   
    
   
@@ -615,6 +626,7 @@ const PokerTableWithPlayers = (props) => {
 
       let tempPlayerTurnIndex = _smallBlind;
       setPlayerTurnIndex(tempPlayerTurnIndex);
+      playerTurnIndex2 = tempPlayerTurnIndex;
 
       switch (tempPlayerTurnIndex) {
           case 1:
@@ -788,6 +800,7 @@ const dealHoleCards = () => {
   console.log(`communnnnity cards: ${communityCards}`)
   getPlayersBestHands();
   setGameStarted(true);
+  gameStarted2 = true;
   props.socket.emit("startGame", {
     roomName: props.roomName
 });
@@ -810,6 +823,8 @@ const dealHoleCards = () => {
          ...prev,
          [key]: true
        }));
+       visibility2[key] = true;
+       console.log(visibility2, "player visibility");
         switch (data.seatNumber) {
             case 1:
               setSeatChipCount1(data.chipCount)
@@ -842,7 +857,9 @@ const dealHoleCards = () => {
       });
       props.socket.on("update_room",(data) => {
         //const key = `player${data.seatNumber}`;
-       
+        if(currentSeat){
+          visibility2[`player${currentSeat}`] = true;
+        }
         console.log("IT GOT CALLED IN UI UPDATE_ROOM, array is: ", data);
             data.forEach((obj,idx) =>{
               const key = `player${obj.seatNumber}`;
@@ -850,6 +867,7 @@ const dealHoleCards = () => {
                 ...prev,
                 [key]: true
               }));
+              visibility2[key] = true;
                 switch (obj.seatNumber) {
                     case 1:
                       setSeatChipCount1(obj.chipCount)
@@ -885,10 +903,41 @@ const dealHoleCards = () => {
 
       props.socket.on("groupUpdate_room", (data) => {
         const key = `player${data.seatLeaving}`;
+        let tempArr = {...visibility2};
+        tempArr[key] = false;
         setVisibility(prev => ({
           ...prev,
           [key]: false
         }));
+        visibility2[key] = false;
+        console.log(tempArr, "EMPTY FUCKING OBJECT");
+        // Start at 'seatLeaving' and loop through the next 6 seats
+
+        if(gameStarted2 && playerTurnIndex2 === data.seatLeaving){
+          for (let i = data.seatLeaving; i < data.seatLeaving + 6; i++) {
+            // Using modulo to ensure the index stays within 1 to 6
+            const adjustedIndex = (i - 1) % 6 + 1; // To maintain 1-based indexing
+            console.log("seat value is ", adjustedIndex)
+            // If 'tempArr' at the adjusted index is false, return the adjusted index
+            if (tempArr[`player${adjustedIndex}`]) {
+              console.log("new index is ", adjustedIndex)
+                setPlayerTurnIndex(adjustedIndex)
+                playerTurnIndex2 = adjustedIndex;
+                break;
+            }
+          }
+        }
+
+
+
+        // console.log("Loooooooook", gameStarted)
+        // if(gameStarted){
+        //   console.log("playerTurn index is: ", playerTurnIndex, "and person leaving is :", data.seatLeaving);
+        //   if(playerTurnIndex === data.seatLeaving){
+        //     checkAction();
+        //     console.log("player left should check here")
+        //   }
+        // }
         switch (data.seatLeaving) {
             case 1:
               
@@ -996,6 +1045,7 @@ const dealHoleCards = () => {
         setSmallBlind(data.smallBlind);
         setBigBlind(data.bigBlind);
         setPlayerTurnIndex(data.playerTurnIndex);
+        playerTurnIndex2 = data.playerTurnIndex;
         console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
         console.log(`ITS seats ${data.playerTurnIndex} TURN!! (calleeeeee)`);
         switch (data.playerTurnIndex) {
@@ -1028,6 +1078,7 @@ const dealHoleCards = () => {
         setSmallBlind(data.smallBlind);
         setBigBlind(data.bigBlind);
         setPlayerTurnIndex(data.playerTurnIndex)
+        playerTurnIndex2 = data.playerTurnIndex;
         console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
         console.log("current persons turn is seat: ", data.dealerButton);
         switch (data.playerTurnIndex) {
@@ -1058,6 +1109,7 @@ const dealHoleCards = () => {
 
       props.socket.on("recievedStartGame", (data) => {
         setGameStarted(true);
+        gameStarted2 = true;
       });
 
       props.socket.on("recievedPlayersBestHands", (data) => {
@@ -1071,12 +1123,13 @@ const dealHoleCards = () => {
       });
       props.socket.on("recievedCheckAction", (data)=>{
         setPlayerTurnIndex(data.playerTurnIndex)
+        playerTurnIndex2 = data.playerTurnIndex;
         setPlayerTurn(data.playerTurn);
 
         console.log("check action called from other user, new players turn is :", data.playerTurn);
       })
 
-
+      
 
 
     }
@@ -1084,10 +1137,15 @@ const dealHoleCards = () => {
 
     console.log("host is: ", props.host);
     const handleLeaveGame = () => {
+ 
       props.setActionForMatch(null);
       props.setHost("");
       props.socket.emit("leaveGame");
   }
+
+
+
+
   const handleClickAvoidFPS = (event, buttonFunction) =>{
     event.stopPropagation()
     buttonFunction();
@@ -1105,6 +1163,7 @@ const dealHoleCards = () => {
     const newPlayerActionIndex = (seatsWithPlayers.indexOf(playerTurnIndex) + 1) % seatsWithPlayers.length;
     const newPlayerActionSeat = seatsWithPlayers[newPlayerActionIndex];
     setPlayerTurnIndex(newPlayerActionSeat);
+    playerTurnIndex2 = newPlayerActionSeat;
     let _playerTurn;
     switch (newPlayerActionSeat) {
         case 1:
@@ -1135,6 +1194,7 @@ const dealHoleCards = () => {
           console.log("Number is not between 1 and 6");
           break;
     }
+    console.log("after check its player ", newPlayerActionSeat, " turn")
     props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
 
 }
@@ -1150,14 +1210,14 @@ const dealHoleCards = () => {
     checkAction();
   }
   const raiseAction = (props) =>{
-    
+
     checkAction();
   }
 
 const [enableControls, setEnableControls] = useState(false);
   const togglePlayerVisibility = (id) => {
     const key = `player${id}`;
-    
+    console.log("key is :", key)
     if (currentSeat) return;
     if(visibility[key] == true){
       return;
@@ -1170,6 +1230,8 @@ const [enableControls, setEnableControls] = useState(false);
       ...prev,
       [key]: !prev[key]
     }));
+    visibility2[key] = true;
+    console.log(visibility2, "look here");
 
     switch (id) {
       case 1:
