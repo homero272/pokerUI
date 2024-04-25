@@ -2,15 +2,26 @@ const { suits, values, Card } = require('./Card');
 
 class Deck {
     // creates 52 card deck
-    constructor() {
+    constructor(cardData = null) {
         this.cards = [];
-
-        for (let suit of suits) {
+    
+        if ((cardData)) {
+            console.log("parameter deck")
+          // If card data is provided, create a deck from it
+          cardData.forEach(({ suit, value }) => {
+            this.cards.push(new Card(value, suit));
+          });
+        } else {
+          // If no card data is provided, create a standard 52-card deck
+          console.log("normal deck")
+          for (let suit of suits) {
             for (let value of values) {
-                this.cards.push(new Card(value, suit));
+              this.cards.push(new Card(value, suit));
             }
+          }
         }
-    }
+      }
+    
 
     // shuffles deck using Fischer-Yates method
     shuffle() {

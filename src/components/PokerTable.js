@@ -812,6 +812,7 @@ const dealHoleCards = () => {
   
   setHoleCards(_holeCards);
   console.log(_holeCards);
+  console.log(deck, "Look for deck")
 
   props.socket.emit("dealHoleCards", {
       deck: deck, 
@@ -1054,7 +1055,9 @@ const dealHoleCards = () => {
         console.log("&&&&&&& ",data.deck);
         console.log(data.holeCards);
         setHoleCards(data.holeCards);
-        deck = data.deck;
+      
+        deck = new Deck(data.deck['cards']);
+        console.log(deck, "conversion using new constructor");
       });
 
       props.socket.on("recievedDealFlop", (data) => {
