@@ -381,7 +381,7 @@ const OrbitControls = (props) => {
 let deck;
 const bigBlindAmount = 100;
 const smallBlindAmount = 50;
-
+let currentSeat2;
 let visibility2 = {
   player1: false,
   player2: false,
@@ -390,6 +390,14 @@ let visibility2 = {
   player5: false,
   player6: false
 }
+let playerStatus2 = {
+  player1: 'playing',
+  player2: 'playing',
+  player3: 'playing',
+  player4: 'playing',
+  player5: 'playing',
+  player6: 'playing',
+};
 let gameStarted2 = false;
 let playerTurnIndex2;
 
@@ -447,6 +455,15 @@ const PokerTableWithPlayers = (props) => {
   const [canCheck, setCanCheck] = useState(true);
   const [minBet, setMinBet] = useState(bigBlindAmount); //the min bet should be set initially to big blind
 
+  const[playerStatus, setPlayerStatus]= useState({
+    player1: 'playing',
+    player2: 'playing',
+    player3: 'playing',
+    player4: 'playing',
+    player5: 'playing',
+    player6: 'playing',
+  })
+  const [skipTurn, setSkipTurn] = useState(false);
   const[playerMoney, setPlayerMoney]= useState({
     player1: 0,
     player2: 0,
@@ -468,6 +485,7 @@ const PokerTableWithPlayers = (props) => {
   if(currentSeat){
     visibility2[`player${currentSeat}`] = true;
   }
+
 
     // returns all C(7, 5) combos of poker hands a player can have
     // given their 2 hole cards and the 5 community cards
@@ -691,6 +709,13 @@ const PokerTableWithPlayers = (props) => {
           roomName: props.roomName,
           playerTurnIndex: tempPlayerTurnIndex
       });
+      let newTotalPot = smallBlindAmount + bigBlindAmount;
+      console.log(`in UI pokerTable newTotatlPot: ${newTotalPot}`);
+      setTotalPot(newTotalPot);
+      props.socket.emit("updateTotalPot", {
+        roomName: props.roomName, 
+        totalPot: newTotalPot
+      });
   }
   const dealRiver = () => {
     _communityCards = [...communityCards, deck.deal()]; 
@@ -799,6 +824,7 @@ const deductChips = (seat, amount) => {
 const dealHoleCards = () => {
   //console.log(deck);
   if(!currentSeat){return;}
+  //initBlinds();
   rotateBlinds();
   deck = new Deck();
   deck.shuffle();
@@ -1179,6 +1205,20 @@ const dealHoleCards = () => {
 
 
       })
+      props.socket.on("recievedFoldAction", (data)=>{
+        setPlayerStatus({
+          ...playerStatus,
+          [`player${data}`]: "folded"
+        })
+        playerStatus2[`player${data}`] = 'folded';
+        console.log(`player${data} folded receieved from use effect`)
+      })
+      props.socket.on("recievedSkipTurn", (data)=>{
+        console.log("skip turn recieved : ", data, " and current seat is ", currentSeat2);
+        if(currentSeat2 === data){
+          setSkipTurn(true)
+        }
+      })
 
 
       
@@ -1212,12 +1252,12 @@ const dealHoleCards = () => {
     
     seatsWithPlayers = [];
 
-    if (visibility["player1"]) seatsWithPlayers.push(1);
-    if (visibility["player2"]) seatsWithPlayers.push(2);
-    if (visibility["player3"]) seatsWithPlayers.push(3);
-    if (visibility["player4"]) seatsWithPlayers.push(4);
-    if (visibility["player5"]) seatsWithPlayers.push(5);
-    if (visibility["player6"]) seatsWithPlayers.push(6);
+    if (visibility["player1"] ) seatsWithPlayers.push(1);
+    if (visibility["player2"] ) seatsWithPlayers.push(2);
+    if (visibility["player3"] ) seatsWithPlayers.push(3);
+    if (visibility["player4"] ) seatsWithPlayers.push(4);
+    if (visibility["player5"] ) seatsWithPlayers.push(5);
+    if (visibility["player6"] ) seatsWithPlayers.push(6);
     const newPlayerActionIndex = (seatsWithPlayers.indexOf(playerTurnIndex) + 1) % seatsWithPlayers.length;
     const newPlayerActionSeat = seatsWithPlayers[newPlayerActionIndex];
     setPlayerTurnIndex(newPlayerActionSeat);
@@ -1253,7 +1293,6 @@ const dealHoleCards = () => {
           break;
     }
     console.log("after check its player ", newPlayerActionSeat, " turn")
-    props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
     console.log(playerTurnIndex, dealerButton, "debug check");
         // if(lastRaise != -1 && playerToLeft == playerTurnIndex){
     //   //same logic
@@ -1280,18 +1319,33 @@ const dealHoleCards = () => {
         console.log("SETTING RIVER!!! in check");
       }
     }
+    props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
 
-}
+    if(playerStatus2[`player${playerTurnIndex2}`] === 'folded'){
+      console.log("the next player has folded so skip his turn");
+      props.socket.emit("skipTurn", {roomName: props.roomName, skipTurn: playerTurnIndex2});
+    }
+
+
+  }
+  if(skipTurn && (currentSeat2 === playerTurnIndex2)){
+    checkAction();
+  }
 
   const[firstRound,setFirstRound]= useState(true);
   
-  const foldAction = (props) =>{
-
+  const foldAction = (obj) =>{
+      setPlayerStatus({
+        ...playerStatus,
+        [`player${currentSeat2}`]: 'folded'
+      })
+      playerStatus2[`player${currentSeat2}`] = 'folded';
+      props.socket.emit("foldAction",{roomName: props.roomName, playerFolding: currentSeat});
 
 
     checkAction();
   }
-  const callAction = (props) =>{
+  const callAction = (obj) =>{
     setCanCheck(false); // not used yet
     if(currentSeat === bigBlind && firstRound === true ){
       //if any other seat didnt raise then skip the turn 
@@ -1344,6 +1398,7 @@ const [enableControls, setEnableControls] = useState(false);
       return;
     }
     setCurrentSeat(id);
+    currentSeat2 = id;
     setEnableControls(true);
     props.socket.emit("selectSeat", { user: props.user, roomName: props.roomName, seatNumber: id, chipCount: 10000});
    // const key = `player${id}`;
@@ -1541,7 +1596,7 @@ const onCanvasCreated = ({ camera }) => {
                   </div>
                 </Html> 
                 <Html position={[namePositions[`player${i+1}`][0],namePositions[`player${i+1}`][1] + 0.6, namePositions[`player${i+1}`][2]]} transform occlude>
-                <div style={{ color: 'white', background: playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
+                <div style={{ color: 'white', background: playerStatus2[`player${i+1}`] === 'folded' ? 'red' : playerTurnIndex === (i+1) ? 'yellow' :'rgba(0, 0, 0, 0.5)', padding: '2px 5px', borderRadius: '5px' }}>
                   {eval(`seatName${i + 1}`)} 
                 </div>
                 </Html>
