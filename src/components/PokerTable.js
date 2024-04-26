@@ -392,6 +392,9 @@ let visibility2 = {
   player5: false,
   player6: false
 }
+let newEndingCycle;
+let savedFirstPlayerTurn;
+let lastRaise2 = -1;
 let playerStatus2 = {
   player1: 'playing',
   player2: 'playing',
@@ -673,6 +676,8 @@ const PokerTableWithPlayers = (props) => {
 
       let tempPlayerTurnIndex = _smallBlind;
       setPlayerTurnIndex(tempPlayerTurnIndex);
+      savedFirstPlayerTurn = tempPlayerTurnIndex;
+      console.log("FIRST PERSON TURN:", savedFirstPlayerTurn);
       playerTurnIndex2 = tempPlayerTurnIndex;
 
       switch (tempPlayerTurnIndex) {
@@ -739,11 +744,15 @@ const PokerTableWithPlayers = (props) => {
     setAmmountToCall(0);
     props.socket.emit("dealRiver", {
         river: _communityCards,
-        roomName: props.roomName
+        roomName: props.roomName,
+        savedFirstPlayerTurn: savedFirstPlayerTurn,
+        deck: deck
     });
     let newTotalPot = smallBlindAmount + bigBlindAmount;
     console.log(`in UI pokerTable newTotatlPot: ${newTotalPot}`);
     setTotalPot(newTotalPot);
+    setPlayerTurnIndex(savedFirstPlayerTurn);
+    playerTurnIndex2 = savedFirstPlayerTurn;
     props.socket.emit("updateTotalPot", {
       roomName: props.roomName, 
       totalPot: newTotalPot
@@ -756,20 +765,30 @@ const dealTurn = () => {
   console.log(_communityCards,"comCARDS");
   setCommunityCards(_communityCards);
   setAmmountToCall(0);
+
   props.socket.emit("dealTurn", {
       turn: _communityCards,
-      roomName: props.roomName
+      roomName: props.roomName,
+      savedFirstPlayerTurn: savedFirstPlayerTurn,
+      deck: deck
   });
+  setPlayerTurnIndex(savedFirstPlayerTurn);
+  playerTurnIndex2 = savedFirstPlayerTurn;
 }
 
 const dealFlop = () => {
   _communityCards = [deck.deal(), deck.deal(), deck.deal()];
   setCommunityCards(_communityCards);
   setAmmountToCall(0);
+
   props.socket.emit("dealFlop", {
       flop: _communityCards,
-      roomName: props.roomName
+      roomName: props.roomName,
+      savedFirstPlayerTurn: savedFirstPlayerTurn,
+      deck: deck
   });
+  setPlayerTurnIndex(savedFirstPlayerTurn);
+  playerTurnIndex2 = savedFirstPlayerTurn;
 }
 
 const deductChips = (seat, amount) => {
@@ -1002,7 +1021,7 @@ const dealHoleCards = () => {
         // Start at 'seatLeaving' and loop through the next 6 seats
 
         if(gameStarted2 && playerTurnIndex2 === data.seatLeaving){
-          for (let i = data.seatLeaving; i < data.seatLeaving + 6; i++) {
+          for (let i = data.seatLeaving + 6; i >= data.seatLeaving; i--) {
             // Using modulo to ensure the index stays within 1 to 6
             const adjustedIndex = (i - 1) % 6 + 1; // To maintain 1-based indexing
             console.log("seat value is ", adjustedIndex)
@@ -1129,23 +1148,39 @@ const dealHoleCards = () => {
 
       props.socket.on("recievedDealFlop", (data) => {
         setCommunityCards(data.flop);
+        setLastRaise(-1);
+        lastRaise2 = -1;
         console.log("I got the call for flop in the use EFFECT!!! BEFORE THE SET", flop, "this is what we are setting it to", data.flop);
         setFlop(true);
         setAmmountToCall(0);
+        deck = new Deck(data.deck['cards']);
+        setPlayerTurnIndex(data.savedFirstPlayerTurn);
+        playerTurnIndex2 = data.savedFirstPlayerTurn;
+
+
       });
 
       props.socket.on("recievedDealTurn", (data) => {
         setCommunityCards(data.turn);
+        setLastRaise(-1);
+        lastRaise2 = -1;
         console.log("I got the call for TURN in the use EFFECT!!! BEFORE THE SET", turn, "this is what we are setting it to", data.turn);
         setTurn(true);
         setAmmountToCall(0);
-        
+        deck = new Deck(data.deck['cards']);
+        setPlayerTurnIndex(data.savedFirstPlayerTurn);
+        playerTurnIndex2 = data.savedFirstPlayerTurn;
       });
 
       props.socket.on("recievedDealRiver", (data) => {
         setCommunityCards(data.river);
+        setLastRaise(-1);
+        lastRaise2 = -1;
         setRiver(true);
         setAmmountToCall(0);
+        deck = new Deck(data.deck['cards']);
+        setPlayerTurnIndex(data.savedFirstPlayerTurn);
+        playerTurnIndex2 = data.savedFirstPlayerTurn;
       });
 
 
@@ -1155,6 +1190,8 @@ const dealHoleCards = () => {
         setBigBlind(data.bigBlind);
         setPlayerTurnIndex(data.playerTurnIndex);
         playerTurnIndex2 = data.playerTurnIndex;
+        savedFirstPlayerTurn = data.playerTurnIndex;
+        console.log("FIRST PERSON TURN USE EFFECT:", savedFirstPlayerTurn);
         console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
         let tempPlayerMoney = {...playerMoney};
         tempPlayerMoney[`player${data.bigBlind}`] += bigBlindAmount;
@@ -1253,6 +1290,8 @@ const dealHoleCards = () => {
           setMinBet(data.minBet);
           setFirstRound(false);
           setLastRaise(data.lastRaiseSeat);
+          lastRaise2 = data.lastRaiseSeat;
+          newEndingCycle = data.newEndingCycle;
 
 
       })
@@ -1312,6 +1351,7 @@ const dealHoleCards = () => {
     const newPlayerActionIndex = (seatsWithPlayers.indexOf(playerTurnIndex)+seatsWithPlayers.length - 1) % seatsWithPlayers.length;
     const newPlayerActionSeat = seatsWithPlayers[newPlayerActionIndex];
     setPlayerTurnIndex(newPlayerActionSeat);
+    let tempPrevPlayer = playerTurnIndex2;
     playerTurnIndex2 = newPlayerActionSeat;
     let _playerTurn;
     switch (newPlayerActionSeat) {
@@ -1348,26 +1388,67 @@ const dealHoleCards = () => {
         // if(lastRaise != -1 && playerToLeft == playerTurnIndex){
     //   //same logic
     // }
-    if(playerTurnIndex === dealerButton){
-      console.log("checkAction last Player of round now going to new round");
-      console.log(flop, "this is what flop is");
+    console.log(newEndingCycle, " new ending cycle and last raise is ", lastRaise);
+    if(lastRaise2 != -1) {
+      console.log("passed first condition")
+      if(newEndingCycle === tempPrevPlayer){
+      console.log("checkAction NEW CYCLE ENDING PLAYER");
+      
       if(flop == false){
         dealFlop();
         setFlop(true);
-
+        setLastRaise(-1);
+        lastRaise2 = -1;
         console.log("SETTING FLOP!!! in check");
-        
+        return;
 
       }
       else if(!turn){
         dealTurn();
         setTurn(true);
+        setLastRaise(-1);
+        lastRaise2 = -1;
         console.log("SETTING TURN!!! in check");
+        return;
       }
       else if(!river){
         dealRiver();
         setRiver(true);
+        setLastRaise(-1);
+        lastRaise2 = -1;
         console.log("SETTING RIVER!!! in check");
+        return;
+      }
+    }
+  }
+    else if(playerTurnIndex === dealerButton){
+      console.log("checkAction last Player of round now going to new round");
+      console.log(flop, "this is what flop is");
+      if(flop == false){
+        dealFlop();
+        setFlop(true);
+        setLastRaise(-1);
+        lastRaise2 = -1;
+        console.log("SETTING FLOP!!! in check");
+        return;
+
+      }
+      else if(!turn){
+        dealTurn();
+        setTurn(true);
+        setLastRaise(-1);
+        lastRaise2 = -1;
+        console.log("SETTING TURN!!! in check");
+        return;
+      }
+      else if(!river){
+        dealRiver();
+        setRiver(true);
+        setLastRaise(-1);
+        lastRaise2 = -1;
+        console.log("SETTING RIVER!!! in check");
+        return;
+
       }
     }
     props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
@@ -1379,6 +1460,9 @@ const dealHoleCards = () => {
 
 
   }
+
+
+
   if(skipTurn && (currentSeat2 === playerTurnIndex2)){
     checkAction();
   }
@@ -1399,7 +1483,8 @@ const dealHoleCards = () => {
   const callAction = (obj) =>{
     setCanCheck(false); // not used yet
     if(currentSeat === bigBlind && firstRound === true ){
-      //if any other seat didnt raise then skip the turn 
+      //if any other seat didnt raise then skip the turn
+      
       checkAction();
       return;
     }
@@ -1415,6 +1500,18 @@ const dealHoleCards = () => {
   }
   const raiseAction = (obj) =>{ //called obj to avoid props confusion
     setLastRaise(currentSeat);
+    lastRaise2 = currentSeat;
+    for(let i = currentSeat + 1; i < currentSeat + 6; ++i){
+      const adjustedIndex = (i - 1) % 6 + 1; // To maintain 1-based indexing
+      console.log("seat value is ", adjustedIndex)
+      // If 'tempArr' at the adjusted index is false, return the adjusted index
+      if (visibility2[`player${adjustedIndex}`]) {
+        console.log("new seat is ", adjustedIndex)
+          
+          newEndingCycle = adjustedIndex;
+          break;
+      }
+    }
     // if(lastRaise != -1 && playerToLeft == playerTurnIndex){
     //   //same logic
     // }
@@ -1433,7 +1530,7 @@ const dealHoleCards = () => {
 
     
     
-      props.socket.emit("raiseAction", {minBet:minBet * 2, roomName:props.roomName ,type:"raiseAction", lastRaiseSeat:currentSeat});
+      props.socket.emit("raiseAction", {minBet:minBet * 2, roomName:props.roomName ,type:"raiseAction", lastRaiseSeat:currentSeat, newEndingCycle: newEndingCycle});
     checkAction();
   }
 
