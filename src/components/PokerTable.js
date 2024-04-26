@@ -16,6 +16,8 @@ const { Deck } = require('../poker_logic/Deck');
 const { PokerHand, numCardsInPokerHand } = require('../poker_logic/PokerHand');
 const texturePath = '/tabletextures/';
 const manager = new THREE.LoadingManager();
+
+
 manager.setURLModifier((url) => {
   const newUrl = new URL(url, window.location.href);
   newUrl.pathname = `${texturePath}${newUrl.pathname.split('/').pop()}`;
@@ -400,7 +402,14 @@ let playerStatus2 = {
 };
 let gameStarted2 = false;
 let playerTurnIndex2;
-
+// let playerMoney = {
+//   player1: 0,
+//   player2: 0,
+//   player3: 0,
+//   player4: 0,
+//   player5: 0,
+//   player6: 0,
+// };
 const PokerTableWithPlayers = (props) => {
 
   const [seatName1, setSeatName1] = useState(props.user.userName);
@@ -480,7 +489,7 @@ const PokerTableWithPlayers = (props) => {
   const[river,setRiver] = useState(false);
 
 
-
+  const [ammountToCall, setAmmountToCall] = useState(0);
 
   if(currentSeat){
     visibility2[`player${currentSeat}`] = true;
@@ -561,15 +570,15 @@ const PokerTableWithPlayers = (props) => {
           if (seatsWithPlayers.length < 2) return;
   
           // Move the big blind to the next position
-          const newBigBlindIndex = (seatsWithPlayers.indexOf(bigBlind) + 1) % seatsWithPlayers.length;
+          const newBigBlindIndex = (seatsWithPlayers.indexOf(bigBlind) + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
           const newBigBlindSeat = seatsWithPlayers[newBigBlindIndex];
   
           // Set the small blind to the right of the big blind
-          const newSmallBlindIndex = (newBigBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
+          const newSmallBlindIndex = (newBigBlindIndex + 1) % seatsWithPlayers.length;
           const newSmallBlindSeat = seatsWithPlayers[newSmallBlindIndex];
   
           // Set the dealer button to the right of the small blind
-          const newDealerButtonIndex = (newSmallBlindIndex + seatsWithPlayers.length - 1) % seatsWithPlayers.length;
+          const newDealerButtonIndex = (newSmallBlindIndex + 1) % seatsWithPlayers.length;
           const newDealerButtonSeat = seatsWithPlayers[newDealerButtonIndex];
   
   
@@ -651,6 +660,7 @@ const PokerTableWithPlayers = (props) => {
       if (visibility["player5"]) seatsWithPlayers.push(5);
       if (visibility["player6"]) seatsWithPlayers.push(6);
 
+      console.log(seatsWithPlayers, "initBlinds SWP");
       // not enough players
       if (seatsWithPlayers.length < 2) return;
 
@@ -658,8 +668,8 @@ const PokerTableWithPlayers = (props) => {
       const randomSeat = seatsWithPlayers[randomIndex];
 
       _dealerButton = randomSeat;
-      _smallBlind = seatsWithPlayers[(randomIndex + 1) % seatsWithPlayers.length];
-      _bigBlind = seatsWithPlayers[(randomIndex + 2) % seatsWithPlayers.length];
+      _smallBlind = seatsWithPlayers[(randomIndex + seatsWithPlayers.length -1) % seatsWithPlayers.length];
+      _bigBlind = seatsWithPlayers[(randomIndex + seatsWithPlayers.length-2) % seatsWithPlayers.length];
 
       let tempPlayerTurnIndex = _smallBlind;
       setPlayerTurnIndex(tempPlayerTurnIndex);
@@ -692,6 +702,12 @@ const PokerTableWithPlayers = (props) => {
       setSmallBlind(_smallBlind);
       setBigBlind(_bigBlind);
       
+      let tempPlayerMoney = {...playerMoney};
+      tempPlayerMoney[`player${_bigBlind}`] += bigBlindAmount;
+      tempPlayerMoney[`player${_smallBlind}`] += smallBlindAmount;
+      console.log("initial playermoney: ", tempPlayerMoney);
+
+      setPlayerMoney(tempPlayerMoney);
       deductChips(_bigBlind, bigBlindAmount);
       deductChips(_smallBlind, smallBlindAmount);
       
@@ -720,7 +736,7 @@ const PokerTableWithPlayers = (props) => {
   const dealRiver = () => {
     _communityCards = [...communityCards, deck.deal()]; 
     setCommunityCards(_communityCards);
-
+    setAmmountToCall(0);
     props.socket.emit("dealRiver", {
         river: _communityCards,
         roomName: props.roomName
@@ -739,7 +755,7 @@ const dealTurn = () => {
   _communityCards = [...communityCards, deck.deal()]; 
   console.log(_communityCards,"comCARDS");
   setCommunityCards(_communityCards);
-
+  setAmmountToCall(0);
   props.socket.emit("dealTurn", {
       turn: _communityCards,
       roomName: props.roomName
@@ -749,7 +765,7 @@ const dealTurn = () => {
 const dealFlop = () => {
   _communityCards = [deck.deal(), deck.deal(), deck.deal()];
   setCommunityCards(_communityCards);
-
+  setAmmountToCall(0);
   props.socket.emit("dealFlop", {
       flop: _communityCards,
       roomName: props.roomName
@@ -757,10 +773,19 @@ const dealFlop = () => {
 }
 
 const deductChips = (seat, amount) => {
-  setPlayerMoney({ // here is where we keep track of everyones money they put in the pot
-    ...playerMoney,
-    [`player${seat}`] : playerMoney[`player${seat}`] + amount
-  })
+
+  //playerMoney[`player${seat}`] +=  amount;
+  // setPlayerMoney(
+  //   {
+  //     ...playerMoney,
+  //     [`player${seat}`]: playerMoney[`player${seat}`] + amount
+  //   }
+  // )
+
+  if(amount > ammountToCall) {
+    setAmmountToCall(amount);
+    
+  }
   switch(seat) {
       case 1:
           const newChipCount1 = seatChipCount1 - amount;
@@ -768,7 +793,9 @@ const deductChips = (seat, amount) => {
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 1,
-            chipCount: newChipCount1
+            chipCount: newChipCount1,
+            amount:amount,
+
           });
           
           break;
@@ -778,7 +805,8 @@ const deductChips = (seat, amount) => {
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 2,
-            chipCount: newChipCount2
+            chipCount: newChipCount2,
+            amount:amount,
           });
           break;
       case 3:
@@ -787,7 +815,8 @@ const deductChips = (seat, amount) => {
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 3,
-            chipCount: newChipCount3
+            chipCount: newChipCount3,
+            amount:amount,
           });
           break;
       case 4:
@@ -796,7 +825,8 @@ const deductChips = (seat, amount) => {
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 4,
-            chipCount: newChipCount4
+            chipCount: newChipCount4,
+            amount:amount,
           });
           break;
       case 5:
@@ -805,7 +835,8 @@ const deductChips = (seat, amount) => {
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 5,
-            chipCount: newChipCount5
+            chipCount: newChipCount5,
+            amount:amount,
           });
           break;
       case 6:
@@ -814,7 +845,8 @@ const deductChips = (seat, amount) => {
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 6,
-            chipCount: newChipCount6
+            chipCount: newChipCount6,
+            amount:amount,
           });
           break;
       default:
@@ -824,11 +856,11 @@ const deductChips = (seat, amount) => {
 const dealHoleCards = () => {
   //console.log(deck);
   if(!currentSeat){return;}
-  //initBlinds();
-  rotateBlinds();
+  initBlinds();
+  //rotateBlinds();
   deck = new Deck();
   deck.shuffle();
-
+  setAmmountToCall(bigBlindAmount);
   if (visibility["player1"]) _holeCards[0] = [deck.deal(), deck.deal()];
   if (visibility["player2"]) _holeCards[1] = [deck.deal(), deck.deal()];
   if (visibility["player3"]) _holeCards[2] = [deck.deal(), deck.deal()];
@@ -1032,8 +1064,15 @@ const dealHoleCards = () => {
       });
 
       props.socket.on("recievedUpdateChipCount", data => {
-        console.log("^&^&^&^&^&^%$%U&JNHY%")
-        data.forEach((obj,idx) =>{
+        console.log("^&^&^&^&^&^%$%U&JNHY%", data)
+        setAmmountToCall(data.data.amount);
+        // console.log(data.data.amount, "socked use effect updatachipcount");
+        // let tempPlayerMoney = {...playerMoney};
+        // tempPlayerMoney[`player${data.data.seatNumber}`] += data.data.amount;
+
+        // setPlayerMoney(tempPlayerMoney);
+        // playerMoney[`player${data.seatNumber}`] += data.amount;
+        data.roomSeatLayout.forEach((obj,idx) =>{
           switch (obj.seatNumber) {
               case 1:
                 //setSeat1(true);
@@ -1080,8 +1119,10 @@ const dealHoleCards = () => {
       props.socket.on("recievedDealHoleCards", (data) => {
         console.log("&&&&&&& ",data.deck);
         console.log(data.holeCards);
+
         setHoleCards(data.holeCards);
-      
+        setAmmountToCall(bigBlindAmount);
+        
         deck = new Deck(data.deck['cards']);
         console.log(deck, "conversion using new constructor");
       });
@@ -1090,18 +1131,23 @@ const dealHoleCards = () => {
         setCommunityCards(data.flop);
         console.log("I got the call for flop in the use EFFECT!!! BEFORE THE SET", flop, "this is what we are setting it to", data.flop);
         setFlop(true);
+        setAmmountToCall(0);
       });
 
       props.socket.on("recievedDealTurn", (data) => {
         setCommunityCards(data.turn);
         console.log("I got the call for TURN in the use EFFECT!!! BEFORE THE SET", turn, "this is what we are setting it to", data.turn);
         setTurn(true);
+        setAmmountToCall(0);
+        
       });
 
       props.socket.on("recievedDealRiver", (data) => {
         setCommunityCards(data.river);
         setRiver(true);
+        setAmmountToCall(0);
       });
+
 
       props.socket.on("recievedInitBlinds", (data) => {
         setDealerButton(data.dealerButton);
@@ -1110,6 +1156,11 @@ const dealHoleCards = () => {
         setPlayerTurnIndex(data.playerTurnIndex);
         playerTurnIndex2 = data.playerTurnIndex;
         console.log(`button: ${data.dealerButton} sb: ${data.smallBlind} bb: ${data.bigBlind}`);
+        let tempPlayerMoney = {...playerMoney};
+        tempPlayerMoney[`player${data.bigBlind}`] += bigBlindAmount;
+        tempPlayerMoney[`player${data.smallBlind}`] += smallBlindAmount;
+        console.log("initial playermoney: ", tempPlayerMoney);
+        setPlayerMoney(tempPlayerMoney);
         console.log(`ITS seats ${data.playerTurnIndex} TURN!! (calleeeeee)`);
         switch (data.playerTurnIndex) {
             case 1:
@@ -1251,14 +1302,14 @@ const dealHoleCards = () => {
   const checkAction = () =>{
     
     seatsWithPlayers = [];
-
+    console.log("PLAYER MONEY BRUH!, checkaction: ", playerMoney);
     if (visibility["player1"] ) seatsWithPlayers.push(1);
     if (visibility["player2"] ) seatsWithPlayers.push(2);
     if (visibility["player3"] ) seatsWithPlayers.push(3);
     if (visibility["player4"] ) seatsWithPlayers.push(4);
     if (visibility["player5"] ) seatsWithPlayers.push(5);
     if (visibility["player6"] ) seatsWithPlayers.push(6);
-    const newPlayerActionIndex = (seatsWithPlayers.indexOf(playerTurnIndex) + 1) % seatsWithPlayers.length;
+    const newPlayerActionIndex = (seatsWithPlayers.indexOf(playerTurnIndex)+seatsWithPlayers.length - 1) % seatsWithPlayers.length;
     const newPlayerActionSeat = seatsWithPlayers[newPlayerActionIndex];
     setPlayerTurnIndex(newPlayerActionSeat);
     playerTurnIndex2 = newPlayerActionSeat;
@@ -1357,6 +1408,7 @@ const dealHoleCards = () => {
       checkAction();
       return;
     }
+
     
     deductChips(currentSeat,minBet);
     checkAction();
@@ -1372,8 +1424,11 @@ const dealHoleCards = () => {
     if(currentSeat === bigBlind && firstRound === true){
       deductChips(currentSeat, (minBet * 2)-bigBlindAmount);
     }
-    if(currentSeat === smallBlind && firstRound === true){
+    else if(currentSeat === smallBlind && firstRound === true){
       deductChips(currentSeat, (minBet * 2)-smallBlindAmount);
+    }
+    else {
+      deductChips(currentSeat,(minBet*2) );
     }
 
     
@@ -1686,14 +1741,23 @@ const onCanvasCreated = ({ camera }) => {
                 <Button variant='contained' color='error' onClick={(event) =>handleClickAvoidFPS(event, foldAction)}>
                     Fold
                 </Button> 
-                <Button variant='contained' color='success' onClick={(event) =>handleClickAvoidFPS(event, checkAction)}>
-                    Check 
-                </Button>
+                {console.log(minBet - playerMoney[`player${currentSeat2}`] <=0, "min bet", minBet, " playerMoney: ", playerMoney )}
+                {ammountToCall - playerMoney[`player${currentSeat2}`] <=0 ? 
+                  <Button variant='contained' color='success' onClick={(event) =>handleClickAvoidFPS(event, checkAction)}>
+                  Check 
+                  </Button> : ""
+                }
+                {console.log(playerMoney[`player${currentSeat2}`])}
+                {/* minBet - playerMoney[`player${currentSeat2}`] */}
+
+                {ammountToCall - playerMoney[`player${currentSeat2}`] <=0 ? "":
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, callAction)}>
                     Call ${currentSeat === bigBlind && firstRound === true ? minBet-bigBlindAmount : currentSeat === smallBlind && firstRound === true ? minBet-smallBlindAmount:minBet }
                 </Button>
+                }
+
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, raiseAction)}>
-                    Raise ${minBet}
+                    Raise ${minBet*2}
                 </Button>
 
                 </Fragment>
