@@ -744,6 +744,16 @@ const PokerTableWithPlayers = (props) => {
     _communityCards = [...communityCards, deck.deal()]; 
     setCommunityCards(_communityCards);
     setAmmountToCall(0);
+    setMinBet(50);
+    setPlayerMoney((prev) => {
+  const keys = Object.keys(prev);
+  const updatedMoney = keys.reduce((obj, key) => {
+    obj[key] = 0;
+    return obj;
+  }, {});
+
+  return updatedMoney;
+});
     props.socket.emit("dealRiver", {
         river: _communityCards,
         roomName: props.roomName,
@@ -768,7 +778,16 @@ const dealTurn = () => {
   console.log(_communityCards,"comCARDS");
   setCommunityCards(_communityCards);
   setAmmountToCall(0);
-
+  setMinBet(50);
+  setPlayerMoney((prev) => {
+    const keys = Object.keys(prev);
+    const updatedMoney = keys.reduce((obj, key) => {
+      obj[key] = 0;
+      return obj;
+    }, {});
+  
+    return updatedMoney;
+  });
   props.socket.emit("dealTurn", {
       turn: _communityCards,
       roomName: props.roomName,
@@ -783,7 +802,16 @@ const dealFlop = () => {
   _communityCards = [deck.deal(), deck.deal(), deck.deal()];
   setCommunityCards(_communityCards);
   setAmmountToCall(0);
-
+  setMinBet(50);
+  setPlayerMoney((prev) => {
+    const keys = Object.keys(prev);
+    const updatedMoney = keys.reduce((obj, key) => {
+      obj[key] = 0;
+      return obj;
+    }, {});
+  
+    return updatedMoney;
+  });
   props.socket.emit("dealFlop", {
       flop: _communityCards,
       roomName: props.roomName,
@@ -1156,6 +1184,16 @@ const dealHoleCards = () => {
         console.log("I got the call for flop in the use EFFECT!!! BEFORE THE SET", flop, "this is what we are setting it to", data.flop);
         setFlop(true);
         setAmmountToCall(0);
+        setMinBet(50);
+        setPlayerMoney((prev) => {
+          const keys = Object.keys(prev);
+          const updatedMoney = keys.reduce((obj, key) => {
+            obj[key] = 0;
+            return obj;
+          }, {});
+        
+          return updatedMoney;
+        });
         deck = new Deck(data.deck['cards']);
         setPlayerTurnIndex(data.savedFirstPlayerTurn);
         playerTurnIndex2 = data.savedFirstPlayerTurn;
@@ -1170,6 +1208,16 @@ const dealHoleCards = () => {
         console.log("I got the call for TURN in the use EFFECT!!! BEFORE THE SET", turn, "this is what we are setting it to", data.turn);
         setTurn(true);
         setAmmountToCall(0);
+        setMinBet(50);
+        setPlayerMoney((prev) => {
+          const keys = Object.keys(prev);
+          const updatedMoney = keys.reduce((obj, key) => {
+            obj[key] = 0;
+            return obj;
+          }, {});
+        
+          return updatedMoney;
+        });
         deck = new Deck(data.deck['cards']);
         setPlayerTurnIndex(data.savedFirstPlayerTurn);
         playerTurnIndex2 = data.savedFirstPlayerTurn;
@@ -1181,6 +1229,16 @@ const dealHoleCards = () => {
         lastRaise2 = -1;
         setRiver(true);
         setAmmountToCall(0);
+        setMinBet(50);
+        setPlayerMoney((prev) => {
+          const keys = Object.keys(prev);
+          const updatedMoney = keys.reduce((obj, key) => {
+            obj[key] = 0;
+            return obj;
+          }, {});
+        
+          return updatedMoney;
+        });
         deck = new Deck(data.deck['cards']);
         setPlayerTurnIndex(data.savedFirstPlayerTurn);
         playerTurnIndex2 = data.savedFirstPlayerTurn;
