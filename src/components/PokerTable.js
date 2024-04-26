@@ -490,6 +490,7 @@ const PokerTableWithPlayers = (props) => {
   const[flop,setFlop] = useState(false);
   const[turn,setTurn] = useState(false);
   const[river,setRiver] = useState(false);
+  const[showdown, setShowdown] = useState(false);
 
 
   const [ammountToCall, setAmmountToCall] = useState(0);
@@ -525,10 +526,11 @@ const PokerTableWithPlayers = (props) => {
       // returns all the players best poker hand
       const getPlayersBestHands = () => {
         // maps players hole cards to the 5 community cards
-        const holeCardsAndCommunityCards = _holeCards.map(cards => {
-            return cards.length !== 0 ? [...cards, ..._communityCards] : [];
+        console.log(holeCards, "hole cards here");
+        const holeCardsAndCommunityCards = holeCards.map(cards => {
+            return cards.length !== 0 ? [...cards, ...communityCards] : [];
         });
-        console.log(holeCardsAndCommunityCards);
+        console.log(holeCardsAndCommunityCards, " look here in best hands");
 
         // combos is 3d array where the outter array is an array of size
         // 6 and the inner array is an array of arrays representing each
@@ -538,7 +540,7 @@ const PokerTableWithPlayers = (props) => {
         for (let i = 0; i < holeCardsAndCommunityCards.length; i++) {        
             combos.push(generateCombos(holeCardsAndCommunityCards[i]));
         }
-        console.log(combos);
+        console.log(combos, "combos");
 
         combos.forEach(playerCombos => {
             let bestHand = null;
@@ -551,7 +553,7 @@ const PokerTableWithPlayers = (props) => {
             _bestHands.push(bestHand);
         });
         setBestHands(_bestHands);
-        console.log(_bestHands);
+        console.log(_bestHands, "best hands UI");
 
         props.socket.emit("playersBestHands", {
             bestHands: _bestHands,
@@ -757,6 +759,7 @@ const PokerTableWithPlayers = (props) => {
       roomName: props.roomName, 
       totalPot: newTotalPot
     });
+    
 }
 
 const dealTurn = () => {
@@ -897,12 +900,12 @@ const dealHoleCards = () => {
       roomName: props.roomName
   });
 
-//   dealFlop();
-//   dealTurn();
-//   dealRiver();
-//   console.log(`seaaaat: ${currentSeat}`)
-//   console.log(`communnnnity cards: ${communityCards}`)
-//   getPlayersBestHands();
+  // dealFlop();
+  // dealTurn();
+  // dealRiver();
+  // console.log(`seaaaat: ${currentSeat}`)
+  // console.log(`communnnnity cards: ${communityCards}`)
+  // getPlayersBestHands();
   setGameStarted(true);
   gameStarted2 = true;
   props.socket.emit("startGame", {
@@ -1138,7 +1141,7 @@ const dealHoleCards = () => {
       props.socket.on("recievedDealHoleCards", (data) => {
         console.log("&&&&&&& ",data.deck);
         console.log(data.holeCards);
-
+        _holeCards = data.holeCards;
         setHoleCards(data.holeCards);
         setAmmountToCall(bigBlindAmount);
         
@@ -1266,11 +1269,14 @@ const dealHoleCards = () => {
       props.socket.on("recievedPlayersBestHands", (data) => {
         let pokerHands = [];
         data.bestHands.forEach(hand => {
+            console.log(hand);
             const newPokerHand = !hand ? null : new PokerHand(hand.cards);
+            console.log(newPokerHand, "use effect ")
             pokerHands.push(newPokerHand);
         });
         setBestHands(pokerHands);
-        console.log(pokerHands);
+        console.log(pokerHands, "use effect best hands");
+        setShowdown(true);
       });
       props.socket.on("recievedCheckAction", (data)=>{
         setPlayerTurnIndex(data.playerTurnIndex)
@@ -1419,6 +1425,12 @@ const dealHoleCards = () => {
         console.log("SETTING RIVER!!! in check");
         return;
       }
+      else if(!showdown){
+        getPlayersBestHands();
+        setShowdown(true);
+        console.log("showdown!!!")
+        
+      }
     }
   }
     else if(playerTurnIndex === dealerButton){
@@ -1449,6 +1461,11 @@ const dealHoleCards = () => {
         console.log("SETTING RIVER!!! in check");
         return;
 
+      }
+      else if(!showdown){
+        getPlayersBestHands();
+        setShowdown(true);
+        console.log("showdown!!!")
       }
     }
     props.socket.emit("playerCheckAction", {roomName: props.roomName, playerTurn: _playerTurn, playerTurnIndex: newPlayerActionSeat});
