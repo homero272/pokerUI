@@ -973,3 +973,54 @@ assert.strictEqual(pokerHand80.compareWith(pokerHand78), -1);
 assert.strictEqual(pokerHand81.compareWith(pokerHand74), -1);
 assert.strictEqual(pokerHand76.compareWith(pokerHand81), 1);
 
+const pokerHands = [null, pokerHand18, null, pokerHand1, pokerHand2, null];
+
+/**
+ * Determines who has the best poker hand, or hands if multiple players 
+ * have the best hand
+ * @param {*} pokerHands - An array of size 6, where each element is a 
+ *                          PokerHand object, or null if seat is empty
+ */
+const getWinners = (pokerHands) => {
+    //console.log(pokerHands);
+
+    let winnersHands = [];
+    let winnersSeats = [];
+
+    pokerHands.forEach( (hand, idx) => {
+        if (!hand) return;
+        if (winnersHands.length === 0 || hand.compareWith(winnersHands[0]) === 1) {
+            winnersHands = [hand];
+            winnersSeats = [idx + 1];
+        } else if (hand.compareWith(winnersHands[0]) === 0) {
+            winnersHands.push(hand);
+            winnersSeats.push(idx + 1);
+        }
+            
+    });
+
+    //console.log(winnersHands);
+    //console.log(winnersSeats);
+    let winnersString = '';
+
+    winnersHands.forEach((hand, idx) => {
+        winnersString += `Seat ${winnersSeats[idx]} wins with a ${winnersHands[idx].print()}, `;
+        winnersHands[idx].cards.forEach(card => {
+            winnersString += `${card.value}${card.suit}`;
+        });
+        winnersString += '\n';
+    });
+
+    console.log(winnersString);
+
+    const result = [];
+
+    for (let i = 0; i < winnersHands.length; i++) {
+    result.push({...winnersHands[i], seatNumber: winnersSeats[i]});
+    }
+
+    console.log("___", result);
+}
+
+getWinners(pokerHands);
+

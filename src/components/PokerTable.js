@@ -9,6 +9,7 @@ import { Button, Box, Typography } from '@mui/material';
 import { Vector3 } from 'three';
 import { FirstPersonControls } from '@react-three/drei';
 import { PointerLockControls } from '@react-three/drei';
+import { Card } from '../poker_logic/Card';
 
 
 extend({ Html, Box, Typography });
@@ -559,7 +560,56 @@ const PokerTableWithPlayers = (props) => {
             bestHands: _bestHands,
             roomName: props.roomName
         });
+
+        return _bestHands;
     }
+
+        /**
+         * Determines who has the best poker hand, or hands if multiple players 
+         * have the best hand
+         * @param {*} pokerHands - An array of size 6, where each element is a 
+         *                          PokerHand object, or null if seat is empty
+         */
+        const getWinners = (pokerHands) => {
+          //console.log(pokerHands);
+
+          let winnersHands = [];
+          let winnersSeats = [];
+
+          pokerHands.forEach( (hand, idx) => {
+              if (!hand) return;
+              if (winnersHands.length === 0 || hand.compareWith(winnersHands[0]) === 1) {
+                  winnersHands = [hand];
+                  winnersSeats = [idx + 1];
+              } else if (hand.compareWith(winnersHands[0]) === 0) {
+                  winnersHands.push(hand);
+                  winnersSeats.push(idx + 1);
+              }
+                  
+          });
+
+          //console.log(winnersHands);
+          //console.log(winnersSeats);
+          let winnersString = '';
+
+          winnersHands.forEach((hand, idx) => {
+              winnersString += `Seat ${winnersSeats[0]} wins with a ${winnersHands[0].print()}, `;
+              winnersHands[0].cards.forEach(card => {
+                  winnersString += `${card.value}${card.suit}`;
+              });
+              winnersString += '\n';
+          });
+
+          console.log(winnersString);
+          const result = [];
+
+          for (let i = 0; i < winnersHands.length; i++) {
+            result.push({...winnersHands[i], seatNumber: winnersSeats[i]});
+          }
+
+          console.log(result);
+          return result;
+        };
 
         // shifts the dealer button, sb, and bb 1 spot to the left
         const rotateBlinds = () => {
@@ -1484,8 +1534,9 @@ const dealHoleCards = () => {
         return;
       }
       else if(!showdown){
-        getPlayersBestHands();
+        const hands = getPlayersBestHands();
         setShowdown(true);
+        getWinners(hands);
         console.log("showdown!!!")
         
       }
@@ -1521,8 +1572,9 @@ const dealHoleCards = () => {
 
       }
       else if(!showdown){
-        getPlayersBestHands();
+        const hands = getPlayersBestHands();
         setShowdown(true);
+        getWinners(hands);
         console.log("showdown!!!")
       }
     }
