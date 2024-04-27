@@ -882,10 +882,7 @@ const deductChips = (seat, amount) => {
   //   }
   // )
 
-  if(amount > ammountToCall) {
-    setAmmountToCall(amount);
-    
-  }
+
   switch(seat) {
       case 1:
           const newChipCount1 = seatChipCount1 - amount;
@@ -1406,6 +1403,7 @@ const dealHoleCards = () => {
           setLastRaise(data.lastRaiseSeat);
           lastRaise2 = data.lastRaiseSeat;
           newEndingCycle = data.newEndingCycle;
+          setAmmountToCall(data.minBet);
 
 
       })
@@ -1611,18 +1609,25 @@ const dealHoleCards = () => {
     setCanCheck(false); // not used yet
     if(currentSeat === bigBlind && firstRound === true ){
       //if any other seat didnt raise then skip the turn
-      
+      let tempPlayerMoney = {...playerMoney};
+      tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`]);
+      setPlayerMoney(tempPlayerMoney);
       checkAction();
       return;
     }
     else if(currentSeat ===smallBlind && firstRound=== true){
-      deductChips(currentSeat,minBet-smallBlindAmount);
+      let tempPlayerMoney = {...playerMoney};
+      tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`]);
+      setPlayerMoney(tempPlayerMoney);
+      deductChips(currentSeat,minBet-playerMoney[`player${currentSeat}`]);
       checkAction();
       return;
     }
 
-    
-    deductChips(currentSeat,minBet);
+    let tempPlayerMoney = {...playerMoney};
+    tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`])
+    setPlayerMoney(tempPlayerMoney);
+    deductChips(currentSeat,minBet - playerMoney[`player${currentSeat}`]);
     checkAction();
   }
   const raiseAction = (obj) =>{ //called obj to avoid props confusion
@@ -1642,18 +1647,25 @@ const dealHoleCards = () => {
     // if(lastRaise != -1 && playerToLeft == playerTurnIndex){
     //   //same logic
     // }
+    setAmmountToCall(minBet * 2);
     setMinBet(minBet * 2);
     setFirstRound(false);
 
-    if(currentSeat === bigBlind && firstRound === true){
-      deductChips(currentSeat, (minBet * 2)-bigBlindAmount);
-    }
-    else if(currentSeat === smallBlind && firstRound === true){
-      deductChips(currentSeat, (minBet * 2)-smallBlindAmount);
-    }
-    else {
-      deductChips(currentSeat,(minBet*2) );
-    }
+    // if(currentSeat === bigBlind && firstRound === true){
+    //   deductChips(currentSeat, (minBet * 2)-bigBlindAmount);
+    // }
+    // else if(currentSeat === smallBlind && firstRound === true){
+    //   deductChips(currentSeat, (minBet * 2)-smallBlindAmount);
+    // }
+    // else {
+    //   deductChips(currentSeat,(minBet*2) );
+    // }
+    let amountToDeduct = (minBet * 2) - playerMoney[`player${currentSeat}`];
+    deductChips(currentSeat, amountToDeduct);
+    let tempPlayerMoney = {...playerMoney};
+    tempPlayerMoney[`player${currentSeat}`] += amountToDeduct;
+    setPlayerMoney(tempPlayerMoney);
+    console.log("new Player Money is : ", tempPlayerMoney);
 
     
     
@@ -1971,17 +1983,18 @@ const onCanvasCreated = ({ camera }) => {
                   Check 
                   </Button> : ""
                 }
-                {console.log(playerMoney[`player${currentSeat2}`])}
+                {console.log("Amount put in for current player",playerMoney[`player${currentSeat2}`], " and amount to call is:", ammountToCall)}
                 {/* minBet - playerMoney[`player${currentSeat2}`] */}
 
                 {ammountToCall - playerMoney[`player${currentSeat2}`] <=0 ? "":
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, callAction)}>
-                    Call ${currentSeat === bigBlind && firstRound === true ? minBet-bigBlindAmount : currentSeat === smallBlind && firstRound === true ? minBet-smallBlindAmount:minBet }
+                    {/* Call ${currentSeat === bigBlind && firstRound === true ? minBet-bigBlindAmount : currentSeat === smallBlind && firstRound === true ? minBet-smallBlindAmount:minBet } */}
+                    Call ${minBet - playerMoney[`player${currentSeat}`]}
                 </Button>
                 }
 
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, raiseAction)}>
-                    Raise ${minBet*2}
+                    {ammountToCall === 0 ? "Bet" : "Raise" } ${minBet*2}
                 </Button>
 
                 </Fragment>
