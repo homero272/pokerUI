@@ -71,6 +71,16 @@ export default class APIInterface{
             throw error;            
         }
     }
+    async updateGameMoney(money, userName) {
+        try{
+            await axiosAgent.get(`/money/update/game/money/${money}/${userName}`);
+            console.log("money game updated successfully");
+        }
+        catch (error){
+            console.error('Error UPDATING Gamemoney:', error);
+            throw error;            
+        }
+    }
 
     async getAllUsers() {
         try {

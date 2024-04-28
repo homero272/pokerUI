@@ -34,10 +34,10 @@ const heavy = createTheme({
 const Home = (props) => {
     const {socket, user, handleMatchAction, setActionForMatch, handleSelectMatch, setRoomName} = props;
     const userName = user.userName;
-
+    
     const [avatar,setAvatar] = useState(freeAvatars[user.avatar] || buyableAvatars[user.avatar]);
     const [selectedAvatar, setSelectedAvatar] = useState(null);
-    const [money, setMoney] = useState(user.money);
+    const [money, setMoney] = useState(props.playerMoney);
     const [shoppingMenu, setShoppingMenu] = useState(false);
     const [avatarPrice, setAvatarPrice] = useState(0);
     const [message, setMessage] = useState("");
@@ -95,6 +95,7 @@ const Home = (props) => {
         else{
             console.log("Purchased Successfully!!")
             setMoney(money - avatarPrice);
+            props.setPlayerMoney(money-avatarPrice);
             const api = new API();
             setAvatar(freeAvatars[selectedAvatar] || buyableAvatars[selectedAvatar]);
             props.setUser({...user,  avatar:selectedAvatar, money:money-avatarPrice});

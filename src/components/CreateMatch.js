@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { TextField,IconButton } from '@mui/material';
+import API from '../API-Interface/API-Interface';
 import HomeIcon from '@mui/icons-material/Home';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 const heavy = createTheme({
@@ -22,7 +23,7 @@ const heavy = createTheme({
 
 
 const CreateMatch = (props) =>{
-    const {handleCreateRoom} = props;
+    const {handleCreateRoom, set} = props;
 
     const [roomName, setRoomName] = useState('');
     const [error, setError] = useState('');
@@ -33,9 +34,18 @@ const CreateMatch = (props) =>{
         setError("");
     };
 
-    const createRoom = (props) =>{
+    const createRoom = async (obj) =>{
         console.log(roomName);
         handleCreateRoom(roomName);
+        props.setPlayerMoney(props.playerMoney - 10000);
+        const api = new API();
+        try {
+            const userInfo = await api.updateGameMoney(props.playerMoney-10000,props.user.userName);
+
+        }catch (error) {
+            console.error("Error during updating money:", error);
+            //setError("An error occurred during updating money.");
+        }
     }
     
     const handleReturnToMenu = () => {

@@ -11,6 +11,7 @@ import { FirstPersonControls } from '@react-three/drei';
 import { PointerLockControls } from '@react-three/drei';
 import { Card } from '../poker_logic/Card';
 import PlayerNamesAndCards from './PlayerNamesAndCards';
+import API from '../API-Interface/API-Interface';
 
 extend({ Html, Box, Typography });
 const { Deck } = require('../poker_logic/Deck');
@@ -406,14 +407,17 @@ let playerStatus2 = {
 };
 let gameStarted2 = false;
 let playerTurnIndex2;
-// let playerMoney = {
-//   player1: 0,
-//   player2: 0,
-//   player3: 0,
-//   player4: 0,
-//   player5: 0,
-//   player6: 0,
-// };
+
+let _totalPot = 0;
+let _seatChipCount1 = 0;
+let _seatChipCount2 = 0;
+let _seatChipCount3 = 0;
+let _seatChipCount4 = 0;
+let _seatChipCount5 = 0;
+let _seatChipCount6 = 0;
+
+
+
 const PokerTableWithPlayers = (props) => {
 
   const [seatName1, setSeatName1] = useState(props.user.userName);
@@ -435,7 +439,10 @@ const PokerTableWithPlayers = (props) => {
   const [seatChipCount4, setSeatChipCount4] = useState(0);
   const [seatChipCount5, setSeatChipCount5] = useState(0);
   const [seatChipCount6, setSeatChipCount6] = useState(0);
+
+  
   const [totalPot, setTotalPot] = useState(0);
+  
 
   const [currentSeat, setCurrentSeat] = useState(null);
   const [visibility, setVisibility] = useState({
@@ -580,7 +587,7 @@ const PokerTableWithPlayers = (props) => {
          */
         //emmit done to all players so we can disable the buttons and do what we want with winner/loser
 
-        const getWinners = (pokerHands) => {
+        const getWinners = async (pokerHands) => {
           //console.log(pokerHands);
 
           let winnersHands = [];
@@ -621,6 +628,26 @@ const PokerTableWithPlayers = (props) => {
           console.log("winner should be", result[0].seatNumber)
           setWinnerName(result[0].seatNumber);
           props.socket.emit("gameResult",{...result, roomName:props.roomName});
+          //props.setPlayerMoney(props.playerMoney + 10000);
+          const api = new API();
+          console.log("currentChipcount for player UI",  eval(`_seatChipCount${currentSeat2}`));
+          console.log("UI gamemoney total pot, ", _totalPot, "playermoney ",  props.playerMoney);
+          console.log("getwinners stuff", result[0].seatNumber, "current Seat", currentSeat2);
+          try {
+              if(result[0].seatNumber === currentSeat){
+                const userInfo = await api.updateGameMoney(props.playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+                props.setPlayerMoney(props.playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`));
+              }
+              else{
+
+                const userInfo = await api.updateGameMoney(props.playerMoney+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+                props.setPlayerMoney(props.playerMoney + eval(`_seatChipCount${currentSeat2}`));
+              }
+  
+          }catch (error) {
+              console.error("Error during updating money:", error);
+              //setError("An error occurred during updating money.");
+          }
           return result;
         };
 
@@ -710,6 +737,7 @@ const PokerTableWithPlayers = (props) => {
           let newTotalPot = smallBlindAmount + bigBlindAmount;
           console.log(`in UI pokerTable newTotatlPot: ${newTotalPot}`);
           setTotalPot(newTotalPot);
+          _totalPot = newTotalPot;
           props.socket.emit("updateTotalPot", {
             roomName: props.roomName, 
             totalPot: newTotalPot
@@ -798,6 +826,7 @@ const PokerTableWithPlayers = (props) => {
       let newTotalPot = smallBlindAmount + bigBlindAmount;
       console.log(`in UI pokerTable newTotatlPot: ${newTotalPot}`);
       setTotalPot(newTotalPot);
+      _totalPot= newTotalPot;
       props.socket.emit("updateTotalPot", {
         roomName: props.roomName, 
         totalPot: newTotalPot
@@ -823,15 +852,10 @@ const PokerTableWithPlayers = (props) => {
         savedFirstPlayerTurn: savedFirstPlayerTurn,
         deck: deck
     });
-    let newTotalPot = smallBlindAmount + bigBlindAmount;
-    console.log(`in UI pokerTable newTotatlPot: ${newTotalPot}`);
-    setTotalPot(newTotalPot);
+
     setPlayerTurnIndex(savedFirstPlayerTurn);
     playerTurnIndex2 = savedFirstPlayerTurn;
-    props.socket.emit("updateTotalPot", {
-      roomName: props.roomName, 
-      totalPot: newTotalPot
-    });
+
     
 }
 
@@ -900,6 +924,7 @@ const deductChips = (seat, amount) => {
       case 1:
           const newChipCount1 = seatChipCount1 - amount;
           setSeatChipCount1(newChipCount1);
+          _seatChipCount1 = newChipCount1;
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 1,
@@ -912,6 +937,7 @@ const deductChips = (seat, amount) => {
       case 2:
         const newChipCount2 = seatChipCount2 - amount;
           setSeatChipCount2(newChipCount2);
+          _seatChipCount2 = newChipCount2;
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 2,
@@ -922,6 +948,7 @@ const deductChips = (seat, amount) => {
       case 3:
           const newChipCount3 = seatChipCount3 - amount;
           setSeatChipCount3(newChipCount3);
+          _seatChipCount3 = newChipCount3;
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 3,
@@ -932,6 +959,7 @@ const deductChips = (seat, amount) => {
       case 4:
           const newChipCount4 = seatChipCount4 - amount;
           setSeatChipCount4(newChipCount4);
+          _seatChipCount4 = newChipCount4;
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 4,
@@ -942,6 +970,7 @@ const deductChips = (seat, amount) => {
       case 5:
           const newChipCount5 = seatChipCount5 - amount;
           setSeatChipCount5(newChipCount5);
+          _seatChipCount5 = newChipCount5;
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 5,
@@ -952,6 +981,7 @@ const deductChips = (seat, amount) => {
       case 6:
           const newChipCount6 = seatChipCount6 - amount;
           setSeatChipCount6(newChipCount6);
+          _seatChipCount6 = newChipCount6;
           props.socket.emit("updateChipCount", {
             room: props.roomName, 
             seatNumber: 6,
@@ -1026,31 +1056,37 @@ const dealHoleCards = () => {
         switch (data.seatNumber) {
             case 1:
               setSeatChipCount1(data.chipCount)
+              _seatChipCount1 = data.chipCount;
               setSeatName1(data.user.userName);
               _seatName1=data.user.userName;
               break;
             case 2:
               setSeatChipCount2(data.chipCount)
+              _seatChipCount2 = data.chipCount;
               setSeatName2(data.user.userName);
               _seatName2=data.user.userName;
               break;
             case 3:
               setSeatChipCount3(data.chipCount)
+              _seatChipCount3 = data.chipCount;
                 setSeatName3(data.user.userName);
                 _seatName3=data.user.userName;
               break;
             case 4:
               setSeatChipCount4(data.chipCount)
+              _seatChipCount4 = data.chipCount;
                 setSeatName4(data.user.userName);
                 _seatName4=data.user.userName;
               break;
             case 5:
               setSeatChipCount5(data.chipCount)
+              _seatChipCount5 = data.chipCount;
                 setSeatName5(data.user.userName);
                 _seatName5=data.user.userName;
               break;
             case 6:
               setSeatChipCount6(data.chipCount)
+              _seatChipCount6 = data.chipCount;
                 setSeatName6(data.user.userName);
                 _seatName6=data.user.userName;
               break;
@@ -1075,27 +1111,40 @@ const dealHoleCards = () => {
                 switch (obj.seatNumber) {
                     case 1:
                       setSeatChipCount1(obj.chipCount)
+                      _seatChipCount1 = obj.chipCount;
                       setSeatName1(obj.userName);
+                      _seatName1 = obj.userName;
+
                       break;
                     case 2:
                       setSeatChipCount2(obj.chipCount)
+                      _seatChipCount2 = obj.chipCount;
                       setSeatName2(obj.userName);
+                      _seatName2 = obj.userName;
                       break;
                     case 3:
                       setSeatChipCount3(obj.chipCount)
+                      _seatChipCount3 = obj.chipCount;
                       setSeatName3(obj.userName);
+                      _seatName3 = obj.userName;
                       break;
                     case 4:
                       setSeatChipCount4(obj.chipCount)  
+                      _seatChipCount4 = obj.chipCount;
                       setSeatName4(obj.userName);
+                      _seatName4 = obj.userName;
                       break;
                     case 5:
                       setSeatChipCount5(obj.chipCount)  
+                      _seatChipCount5 = obj.chipCount;
                       setSeatName5(obj.userName);
+                      _seatName5 = obj.userName;
                       break;
                     case 6:
                         setSeatChipCount6(obj.chipCount)
+                        _seatChipCount6 = obj.chipCount;
                         setSeatName6(obj.userName);
+                        _seatName6 = obj.userName;
                       break;
                     default:
                       console.log("Number is not between 1 and 6");
@@ -1177,6 +1226,7 @@ const dealHoleCards = () => {
 
       props.socket.on("recievedUpdateTotalPot", data => {
         setTotalPot(data.totalPot);
+        _totalPot = data.totalPot;
       });
 
       props.socket.on("recievedUpdateChipCount", data => {
@@ -1194,36 +1244,42 @@ const dealHoleCards = () => {
                 //setSeat1(true);
                 //setSeatName1(obj.userName);
                 setSeatChipCount1(obj.chipCount);
+                _seatChipCount1 = obj.chipCount;
                 console.log(`seat1 chip count: ${obj.chipCount}`);
                 break;
               case 2:
                 //setSeat2(true);
                 //setSeatName2(obj.userName);
                 setSeatChipCount2(obj.chipCount);
+                _seatChipCount2 = obj.chipCount;
                 console.log(`seat2 chip count: ${obj.chipCount}`);
                 break;
               case 3:
                 //setSeat3(true);
                 //setSeatName3(obj.userName);
                 setSeatChipCount3(obj.chipCount);
+                _seatChipCount3 = obj.chipCount;
                 console.log(`seat3 chip count: ${obj.chipCount}`);
                 break;
               case 4:
                 //setSeat4(true);
                 //setSeatName4(obj.userName);
                 setSeatChipCount4(obj.chipCount);
+                _seatChipCount4 = obj.chipCount;
                 console.log(`seat4 chip count: ${obj.chipCount}`);
                 break;
               case 5:
                 //setSeat5(true);
                 //setSeatName5(obj.userName);
                 setSeatChipCount5(obj.chipCount);
+                _seatChipCount5 = obj.chipCount;
                 console.log(`seat5 chip count: ${obj.chipCount}`);
                 break;
               case 6:
                 //setSeat6(true);
                 //setSeatName6(obj.userName);
                 setSeatChipCount6(obj.chipCount);
+                _seatChipCount6 = obj.chipCount;
                 console.log(`seat6 chip count: ${obj.chipCount}`);
                 break;
               default:
@@ -1446,9 +1502,12 @@ const dealHoleCards = () => {
           lastRaise2 = data.lastRaiseSeat;
           newEndingCycle = data.newEndingCycle;
           setAmmountToCall(data.minBet);
+          setTotalPot(totalPot + data.deduct)
+          _totalPot = _totalPot + data.deduct;
 
 
       })
+      
       props.socket.on("recievedFoldAction", (data)=>{
         setPlayerStatus({
           ...playerStatus,
@@ -1465,10 +1524,29 @@ const dealHoleCards = () => {
       })
 
 
-      props.socket.on("recieveGameResult",(data)=>{
+      props.socket.on("recieveGameResult", async (data)=>{
         console.log("we got the data for everyone, Winner: ", data, "seatnumber:", data[0].seatNumber);
         console.log(data[0].seatNumber, "Heres the winner name")
         setWinnerName(data[0].seatNumber);
+        const api = new API();
+        console.log("currentChipcount for player UE",  eval(`_seatChipCount${currentSeat2}`));
+        console.log("useEffect gamemoney total pot, ", _totalPot, "playermoney ",  props.playerMoney);
+        console.log("getwinners stuff UE", data[0].seatNumber, "current Seat", currentSeat2);
+        try {
+            if(data[0].seatNumber === currentSeat){
+              const userInfo = await api.updateGameMoney(props.playerMoney+ _totalPot+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+              props.setPlayerMoney(props.playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`));
+            }
+            else{
+              const userInfo = await api.updateGameMoney(props.playerMoney+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+              props.setPlayerMoney(props.playerMoney + eval(`_seatChipCount${currentSeat2}`));
+
+            }
+
+        }catch (error) {
+            console.error("Error during updating money:", error);
+            //setError("An error occurred during updating money.");
+        }
         
       })
 
@@ -1660,21 +1738,46 @@ const dealHoleCards = () => {
     if(currentSeat === bigBlind && firstRound === true ){
       //if any other seat didnt raise then skip the turn
       let tempPlayerMoney = {...playerMoney};
-      tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`]);
+      
       setPlayerMoney(tempPlayerMoney);
       checkAction();
+      setTotalPot(totalPot +  (minBet - tempPlayerMoney[`player${currentSeat}`]))
+      console.log((minBet - tempPlayerMoney[`player${currentSeat}`]), "callAction total pot");
+      _totalPot +=(minBet - tempPlayerMoney[`player${currentSeat}`]);
+      props.socket.emit("updateTotalPot", {
+        roomName: props.roomName, 
+        totalPot: _totalPot 
+      });
+      tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`]);
       return;
     }
     else if(currentSeat ===smallBlind && firstRound=== true){
       let tempPlayerMoney = {...playerMoney};
-      tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`]);
+      
       setPlayerMoney(tempPlayerMoney);
       deductChips(currentSeat,minBet-playerMoney[`player${currentSeat}`]);
+      setTotalPot(totalPot +  (minBet - tempPlayerMoney[`player${currentSeat}`]))
+      console.log((minBet - tempPlayerMoney[`player${currentSeat}`]), "callAction total pot");
+      _totalPot +=(minBet - tempPlayerMoney[`player${currentSeat}`]);
+      props.socket.emit("updateTotalPot", {
+        roomName: props.roomName, 
+        totalPot: _totalPot
+      });
+      tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`]);
       checkAction();
       return;
     }
 
     let tempPlayerMoney = {...playerMoney};
+    setTotalPot(totalPot +  (minBet - tempPlayerMoney[`player${currentSeat}`]));
+    
+    
+    console.log((minBet - tempPlayerMoney[`player${currentSeat}`]), "callAction total pot");
+    _totalPot +=(minBet - tempPlayerMoney[`player${currentSeat}`]);
+    props.socket.emit("updateTotalPot", {
+      roomName: props.roomName, 
+      totalPot: _totalPot
+    });
     tempPlayerMoney[`player${currentSeat}`] += (minBet - tempPlayerMoney[`player${currentSeat}`])
     setPlayerMoney(tempPlayerMoney);
     deductChips(currentSeat,minBet - playerMoney[`player${currentSeat}`]);
@@ -1716,10 +1819,12 @@ const dealHoleCards = () => {
     tempPlayerMoney[`player${currentSeat}`] += amountToDeduct;
     setPlayerMoney(tempPlayerMoney);
     console.log("new Player Money is : ", tempPlayerMoney);
+    setTotalPot(totalPot +  (minBet * 2) - playerMoney[`player${currentSeat}`])
+    _totalPot +=(minBet - tempPlayerMoney[`player${currentSeat}`]);
 
     
     
-      props.socket.emit("raiseAction", {minBet:minBet * 2, roomName:props.roomName ,type:"raiseAction", lastRaiseSeat:currentSeat, newEndingCycle: newEndingCycle});
+      props.socket.emit("raiseAction", {minBet:minBet * 2, roomName:props.roomName ,type:"raiseAction", lastRaiseSeat:currentSeat, newEndingCycle: newEndingCycle, deduct: amountToDeduct});
     checkAction();
   }
 
@@ -1773,6 +1878,7 @@ const [enableControls, setEnableControls] = useState(false);
     switch (id) {
       case 1:
         setSeatChipCount1(10000);
+        _seatChipCount1 = 10000;
       if (cameraRef.current) {
         cameraRef.current.position.copy(new THREE.Vector3(0.8380562280321286, 0.6806835769896427, 4.218280283917921));
         cameraRef.current.rotation.copy(new THREE.Euler(-0.3007774255261268, 0.49802849238603664, 0.1471048406142235));
@@ -1781,6 +1887,7 @@ const [enableControls, setEnableControls] = useState(false);
         break;
       case 2:
         setSeatChipCount2(10000);
+        _seatChipCount2 = 10000;
       if (cameraRef.current) {
         cameraRef.current.position.copy(new THREE.Vector3(1.6710115161376544, 0.4364528681116143, 1.974999831526403));
         cameraRef.current.rotation.copy(new THREE.Euler(-1.3239257819428438, 1.2958940056050277, 1.3147029049612715));
@@ -1789,6 +1896,7 @@ const [enableControls, setEnableControls] = useState(false);
         break;
       case 3:
         setSeatChipCount3(10000);
+        _seatChipCount3 = 10000;
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(0.83003736190289, 0.5609178299067229, 0.20790864120295688));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.4956862450862594, 0.8177242272838758, 2.6387951344603144));
@@ -1798,6 +1906,7 @@ const [enableControls, setEnableControls] = useState(false);
         break;
       case 4:
         setSeatChipCount4(10000);
+        _seatChipCount4 = 10000;
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(-0.94166520077328, 0.6978245972933373, -1.1792269063118446));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.552163561376754, 0.3634024154516776, 2.9082196515008523));
@@ -1807,6 +1916,7 @@ const [enableControls, setEnableControls] = useState(false);
         break;
       case 5:
         setSeatChipCount5(10000);
+        _seatChipCount5 = 10000;
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(-2.581770352521738, 0.8935528294076593, -1.628236846383945));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.5055065161550516, -0.07284732502723025, -3.0878957450863758));
@@ -1816,6 +1926,7 @@ const [enableControls, setEnableControls] = useState(false);
         break;
       case 6:
         setSeatChipCount6(10000);
+        _seatChipCount6 = 10000;
         if (cameraRef.current) {
           cameraRef.current.position.copy(new THREE.Vector3(-4.366071316545736, 0.7095759121349478, -1.0057159037192394));
           cameraRef.current.rotation.copy(new THREE.Euler(-2.3574436317654097, -0.7914534928891457, -2.524452382954885));
@@ -2042,7 +2153,7 @@ const onCanvasCreated = ({ camera }) => {
       } 
       </Box>
       <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', position: 'absolute',bottom: 20, gap: '50px'}}>
-      { !gameStarted ? "" : playerTurnIndex === currentSeat ?
+      {showdown? "": !gameStarted ? "" : playerTurnIndex === currentSeat ?
               <Fragment>
                 <Button variant='contained' color='error' onClick={(event) =>handleClickAvoidFPS(event, foldAction)}>
                     Fold

@@ -6,7 +6,7 @@ import JoinMatchList from './JoinMatchList';
 import { IconButton } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import API from '../API-Interface/API-Interface';
 const heavy = createTheme({
     typography: {
       fontFamily: [
@@ -32,9 +32,19 @@ const JoinMatch = (props) =>{
         selectedMatch = props;
     }
 
-    const handleSelectMatch =  props =>{
+    const handleSelectMatch =  async obj =>{
         console.log("JoinMatch Callback", selectedMatch);
         handleSelectMatchCallBack(selectedMatch);
+        props.setPlayerMoney(props.playerMoney - 10000);
+        const api = new API();
+        try {
+            const userInfo = await api.updateGameMoney(props.playerMoney-10000,props.user.userName);
+
+        }catch (error) {
+            console.error("Error during updating money:", error);
+            //setError("An error occurred during updating money.");
+        }
+        
     }
 
     const handleReturnToMenu = () => {

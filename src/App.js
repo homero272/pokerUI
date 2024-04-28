@@ -22,6 +22,7 @@ function App() {
   const [arrayOfRooms, setArrayOfRooms] = useState([]);
   const [host, setHost] = useState("");
   const [landingPage, setLandingPage] = useState(true);
+  const [playerMoney, setPlayerMoney] = useState(0);
   
   useEffect(() =>{
     if(socket !== null){
@@ -70,7 +71,8 @@ function App() {
     setSocket(io.connect("https://pokerwebsocket.onrender.com"));
     
 
-    
+    setPlayerMoney(props.user.money);
+    console.log("playerMoney set in app", props.user.money);
     console.log("called from app, user is: ", props.user);
 
     //so props.user is probably what we will add onto the db when logging in
@@ -114,11 +116,13 @@ const handleCreateRoom =  (props) =>{
   setArrayOfRooms(prevRooms => [...prevRooms, props]);
 }
 
-const handleJoinMatch = props =>{
+const handleJoinMatch = async props =>{
+  
   if(props ===""){
     console.log("SELECT A MATCH!!")
     return;
   }
+  
   setActionForMatch("done");
   console.log("selected Room from APP.js", props);
   setRoomName(props);
@@ -139,16 +143,16 @@ return (
       <LandingPage setLandingPage={setLandingPage} />
     ) : (
       !user ? (
-        <LoginPage onSubmitInfo={handleSignIn} />
+        <LoginPage  onSubmitInfo={handleSignIn} />
       ) : !actionForMatch ? (
-        <Home setUser={setUser} user={user} socket={socket} handleSignOut={handleSignOut} handleMatchAction={handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleJoinMatch} setRoomName={setRoomName} />
+        <Home playerMoney = {playerMoney} setPlayerMoney={setPlayerMoney} setUser={setUser} user={user} socket={socket} handleSignOut={handleSignOut} handleMatchAction={handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleJoinMatch} setRoomName={setRoomName} />
       ) : actionForMatch === "create" ? (
-        <CreateMatch setActionForMatch={setActionForMatch} handleCreateRoom={handleCreateRoom} />
+        <CreateMatch user = {user} playerMoney = {playerMoney} setPlayerMoney={setPlayerMoney} setActionForMatch={setActionForMatch} handleCreateRoom={handleCreateRoom} />
       ) : actionForMatch === "join" ? (
-        <JoinMatch setActionForMatch={setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch={handleJoinMatch} />
+        <JoinMatch user={user} playerMoney = {playerMoney}  setPlayerMoney={setPlayerMoney} setActionForMatch={setActionForMatch} arrayOfRooms={arrayOfRooms} handleSelectMatch={handleJoinMatch} />
       ) : (
         <Fragment>
-          <PokerTable host = {host} setHost={setHost} roomName={roomName} user={user} socket={socket} setActionForMatch={setActionForMatch} />
+          <PokerTable playerMoney = {playerMoney} setPlayerMoney={setPlayerMoney} host = {host} setHost={setHost} roomName={roomName} user={user} socket={socket} setActionForMatch={setActionForMatch} />
           {/* <Box sx={{ backgroundColor: color % 2 === 0 ? 'red' : 'blue', border: 1, width: '200px', height: '200px' }}>
             <Button variant="contained" color="primary" onClick={handleTestUpdateClick}>
               Click me
