@@ -10,7 +10,7 @@ import { Vector3 } from 'three';
 import { FirstPersonControls } from '@react-three/drei';
 import { PointerLockControls } from '@react-three/drei';
 import { Card } from '../poker_logic/Card';
-
+import PlayerNamesAndCards from './PlayerNamesAndCards';
 
 extend({ Html, Box, Typography });
 const { Deck } = require('../poker_logic/Deck');
@@ -422,7 +422,13 @@ const PokerTableWithPlayers = (props) => {
   const [seatName4, setSeatName4] = useState(props.user.userName);
   const [seatName5, setSeatName5] = useState(props.user.userName);
   const [seatName6, setSeatName6] = useState(props.user.userName);
-  
+  let _seatName1 =props.user.userName;
+  let _seatName2 =props.user.userName;
+  let _seatName3 =props.user.userName;
+  let _seatName4 =props.user.userName;
+  let _seatName5 =props.user.userName;
+  let _seatName6 =props.user.userName;
+
   const [seatChipCount1, setSeatChipCount1] = useState(0);
   const [seatChipCount2, setSeatChipCount2] = useState(0);
   const [seatChipCount3, setSeatChipCount3] = useState(0);
@@ -449,6 +455,8 @@ const PokerTableWithPlayers = (props) => {
     player5: [-0.17391148652813393, 3.4749514605206433, -4.3423994958588175],
     player6: [-1.4384571787631077, 3.4749514605206433,  -3.4652850607946486]
   }
+  let players2;
+  const [players,setPlayers] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [holeCards, setHoleCards] = useState([[], [], [], [], [], []]);
   let _holeCards = [[], [], [], [], [], []];
@@ -467,7 +475,7 @@ const PokerTableWithPlayers = (props) => {
   const [playerTurnIndex, setPlayerTurnIndex] = useState(null);
   const [canCheck, setCanCheck] = useState(true);
   const [minBet, setMinBet] = useState(bigBlindAmount); //the min bet should be set initially to big blind
-
+  const [winnerName, setWinnerName] = useState("");
   const[playerStatus, setPlayerStatus]= useState({
     player1: 'playing',
     player2: 'playing',
@@ -570,6 +578,8 @@ const PokerTableWithPlayers = (props) => {
          * @param {*} pokerHands - An array of size 6, where each element is a 
          *                          PokerHand object, or null if seat is empty
          */
+        //emmit done to all players so we can disable the buttons and do what we want with winner/loser
+
         const getWinners = (pokerHands) => {
           //console.log(pokerHands);
 
@@ -600,14 +610,17 @@ const PokerTableWithPlayers = (props) => {
               winnersString += '\n';
           });
 
-          console.log(winnersString);
+          console.log(winnersString, "WinnersString");
           const result = [];
 
           for (let i = 0; i < winnersHands.length; i++) {
             result.push({...winnersHands[i], seatNumber: winnersSeats[i]});
           }
 
-          console.log(result);
+          console.log(result, "Result");//emit here
+          console.log("winner should be", result[0].seatNumber)
+          setWinnerName(result[0].seatNumber);
+          props.socket.emit("gameResult",{...result, roomName:props.roomName});
           return result;
         };
 
@@ -1014,26 +1027,32 @@ const dealHoleCards = () => {
             case 1:
               setSeatChipCount1(data.chipCount)
               setSeatName1(data.user.userName);
+              _seatName1=data.user.userName;
               break;
             case 2:
               setSeatChipCount2(data.chipCount)
               setSeatName2(data.user.userName);
+              _seatName2=data.user.userName;
               break;
             case 3:
               setSeatChipCount3(data.chipCount)
                 setSeatName3(data.user.userName);
+                _seatName3=data.user.userName;
               break;
             case 4:
               setSeatChipCount4(data.chipCount)
                 setSeatName4(data.user.userName);
+                _seatName4=data.user.userName;
               break;
             case 5:
               setSeatChipCount5(data.chipCount)
                 setSeatName5(data.user.userName);
+                _seatName5=data.user.userName;
               break;
             case 6:
               setSeatChipCount6(data.chipCount)
                 setSeatName6(data.user.userName);
+                _seatName6=data.user.userName;
               break;
             default:
               console.log("Number is not between 1 and 6");
@@ -1222,6 +1241,27 @@ const dealHoleCards = () => {
         
         deck = new Deck(data.deck['cards']);
         console.log(deck, "conversion using new constructor");
+        
+        players2 = [
+          { name: _seatName1, cards: _holeCards[0], seatNumber: 1},
+          { name: _seatName2, cards: _holeCards[1], seatNumber: 2 },
+          { name: _seatName3, cards: _holeCards[2], seatNumber: 3 },
+          { name: _seatName4, cards: _holeCards[3], seatNumber: 4 },
+          { name: _seatName5, cards: _holeCards[4], seatNumber: 5 },
+          { name: _seatName6, cards: _holeCards[5],seatNumber: 6  },
+        ];
+        console.log("players2",players2);
+        const uniqueNames = new Set(); // Track unique player names
+        players2 = players2.filter((player) => {
+          if (player.cards.length <= 0) {
+            return false; // Filter out if name is already in the Set
+          } else {
+            // uniqueNames.add(player.name); // Add new name to the Set
+            return true; // Keep the player in the list
+          }
+        });
+        console.log("players2 After", players2);
+        setPlayers(players2);
       });
 
       props.socket.on("recievedDealFlop", (data) => {
@@ -1369,6 +1409,8 @@ const dealHoleCards = () => {
       props.socket.on("recievedStartGame", (data) => {
         setGameStarted(true);
         gameStarted2 = true;
+
+
       });
 
       props.socket.on("recievedPlayersBestHands", (data) => {
@@ -1420,6 +1462,14 @@ const dealHoleCards = () => {
         if(currentSeat2 === data){
           setSkipTurn(true)
         }
+      })
+
+
+      props.socket.on("recieveGameResult",(data)=>{
+        console.log("we got the data for everyone, Winner: ", data, "seatnumber:", data[0].seatNumber);
+        console.log(data[0].seatNumber, "Heres the winner name")
+        setWinnerName(data[0].seatNumber);
+        
       })
 
 
@@ -1676,6 +1726,26 @@ const dealHoleCards = () => {
 
   const startGame =(obj)=>{
     dealHoleCards();
+    players2 = [
+      { name: seatName1, cards: _holeCards[0], seatNumber: 1},
+      { name: seatName2, cards: _holeCards[1], seatNumber: 2 },
+      { name: seatName3, cards: _holeCards[2], seatNumber: 3 },
+      { name: seatName4, cards: _holeCards[3], seatNumber: 4 },
+      { name: seatName5, cards: _holeCards[4], seatNumber: 5 },
+      { name: seatName6, cards: _holeCards[5],seatNumber: 6  },
+    ];
+    const uniqueNames = new Set(); // Track unique player names
+    players2 = players2.filter((player) => {
+      if (player.cards.length <= 0) {
+        return false; // Filter out if name is already in the Set
+      } else {
+        // uniqueNames.add(player.name); // Add new name to the Set
+        return true; // Keep the player in the list
+      }
+    });
+    setPlayers(players2);
+
+    console.log(players,"heres what players looks like", players2)
   }
 
 
@@ -2000,6 +2070,7 @@ const onCanvasCreated = ({ camera }) => {
                 </Fragment>
                 : ""
       }
+      
        </Box>
        
        <Box
@@ -2036,7 +2107,9 @@ const onCanvasCreated = ({ camera }) => {
           />
         </Box>
       ))}
+  
     </Box>
+    <PlayerNamesAndCards players={players} username ={props.user.userName} showdown={showdown} winner = {winnerName} bestHands = {bestHands}/>
     </>
   );
 };

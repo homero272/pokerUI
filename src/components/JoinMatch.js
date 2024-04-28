@@ -5,21 +5,22 @@ import Button from '@mui/material/Button';
 import JoinMatchList from './JoinMatchList';
 import { IconButton } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// const heavy = createTheme({
-//     typography: {
-//       fontFamily: [
-//         'heavy',
+const heavy = createTheme({
+    typography: {
+      fontFamily: [
+        'heavy',
 
-//       ].join(','),
-//     },
-//     palette: {
-//         primary: {
-//           main: '#9caab7', // replace with your desired hex color
-//         },
-//         // ... other color settings
-//       },
-//   });
+      ].join(','),
+    },
+    palette: {
+        primary: {
+          main: '#9caab7', // replace with your desired hex color
+        },
+        // ... other color settings
+      },
+  });
 
 
 const JoinMatch = (props) =>{
@@ -44,6 +45,7 @@ const JoinMatch = (props) =>{
 
     return (
         <Fragment>
+            <ThemeProvider theme={heavy}>
 
             <Box sx={{
                 display: 'flex',
@@ -52,14 +54,15 @@ const JoinMatch = (props) =>{
                 alignItems: 'center',
                 width: '100vw',
                 height: '100vh',
-                border: 1
+                border: 1,
+                backgroundColor:"#00000b"
             }}>
 
             <Box sx={{position: 'absolute', top: 10, left: 10}}>
                 <IconButton  onClick={handleReturnToMenu}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <HomeIcon color='primary' fontSize='large'/> {/* Home icon */}
-                        <Typography variant="caption">Return to Menu</Typography> {/* Subtext */}
+                        <Typography sx={{color:'white'}} variant="caption">Return to Menu</Typography> {/* Subtext */}
                     </Box>
                 </IconButton>
             </Box> 
@@ -80,6 +83,7 @@ const JoinMatch = (props) =>{
                     </Button>
                 </Box>
             </Box>
+            </ThemeProvider>
         </Fragment>
     );
 }

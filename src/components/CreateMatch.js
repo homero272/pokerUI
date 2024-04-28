@@ -4,20 +4,21 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { TextField,IconButton } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
-// const heavy = createTheme({
-//     typography: {
-//       fontFamily: [
-//         'heavy',
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+const heavy = createTheme({
+    typography: {
+      fontFamily: [
+        'heavy',
 
-//       ].join(','),
-//     },
-//     palette: {
-//         primary: {
-//           main: '#9caab7', // replace with your desired hex color
-//         },
-//         // ... other color settings
-//       },
-//   });
+      ].join(','),
+    },
+    palette: {
+        primary: {
+          main: '#9caab7', // replace with your desired hex color
+        },
+        // ... other color settings
+      },
+  });
 
 
 const CreateMatch = (props) =>{
@@ -43,20 +44,22 @@ const CreateMatch = (props) =>{
         console.log("Returning to menu...");
     }
     return (
+
         <Fragment>
+            <ThemeProvider theme={heavy}>
             <Box sx={{
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 width: '100vw',
                 height: '100vh',
-                backgroundColor: 'lightgray'
+                backgroundColor: '#00000b'
             }}>
             <Box sx={{position: 'absolute', top: 10, left: 10}}>
                 <IconButton  onClick={handleReturnToMenu}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <HomeIcon color='primary' fontSize='large'/> {/* Home icon */}
-                        <Typography variant="caption">Return to Menu</Typography> {/* Subtext */}
+                        <Typography sx={{color:'white'}} variant="caption">Return to Menu</Typography> {/* Subtext */}
                     </Box>
                 </IconButton>
             </Box>                
@@ -68,28 +71,41 @@ const CreateMatch = (props) =>{
                 height: '50vh',
                 border: 1,
                 flexDirection: 'column',
-                backgroundColor: 'lightskyblue'
+                backgroundColor: '#00000b'
             }}>
-                <Typography> Creating Room</Typography>
+                <Typography sx={{color:'white'}}> Creating Room</Typography>
+                
+                <Box sx={{border:1, borderColor:'white',}}>
                 <TextField
                         label="Room Name"
                         value={roomName}
                         onChange={handleRoomName}
                         margin="normal"
-                        
+                        sx={{color:'white'}}
+                        InputLabelProps={{
+                            style: { color: 'white' } // Style for the label
+                        }}
+
+
                         // this sets max length of input
                         inputProps={
-                            {maxLength: 15}
+                        
+                            {
+                                style: { color: 'white'} ,
+                                maxLength: 15
+                            }
                         }
                     />
+                    </Box>
 
-                    <Button variant='contained' color='primary' onClick={() =>createRoom()} >
+                    <Button  variant='contained' color='primary' onClick={() =>createRoom()} >
                         Create Match
                     </Button>
             </Box>
             
 
             </Box>
+            </ThemeProvider>
         </Fragment>
     );
 }

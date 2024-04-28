@@ -5,6 +5,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { FixedSizeList } from 'react-window';
 
+
 const JoinMatchList = (props) => {
   const { arrayOfRooms, handleSelectMatch } = props;
   const [selectedRoom, setSelectedRoom] = useState("");
@@ -23,8 +24,8 @@ const JoinMatchList = (props) => {
           <ListItemText
             primary={room}
             sx={{
-              backgroundColor: selectedRoom === room ? 'lightblue' : "",
-              border: selectedRoom === room ? '1px solid blue' : "1px solid transparent",
+              backgroundColor: selectedRoom === room ? '#9caab7' : "",
+              border: selectedRoom === room ? "1px solid white" : "1px solid white",
             }}
           />
         </ListItemButton>
@@ -33,7 +34,7 @@ const JoinMatchList = (props) => {
   };
 
   return (
-    <Box sx={{ width: '100%', height: 400, maxWidth: 360, bgcolor: 'background.paper' }}>
+    <Box sx={{ width: '100%', height: 400, maxWidth: 360, bgcolor: '#0000b' ,border:1,borderColor:'white',color:'white'}}>
       <FixedSizeList
         height={400}
         width={360}
@@ -41,6 +42,7 @@ const JoinMatchList = (props) => {
         itemCount={arrayOfRooms.length}
         overscanCount={5}
         itemData={{ arrayOfRooms }}
+
       >
         {RenderRow}
       </FixedSizeList>
