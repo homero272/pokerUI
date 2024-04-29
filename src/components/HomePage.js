@@ -163,7 +163,7 @@ const Home = (props) => {
     return (
 
         
-        !shoppingMenu ? friendsPage ? <ThemeProvider theme={heavy}><FriendsPage setRoomName={setRoomName} handleMatchAction = {handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleSelectMatch} friendsRooms ={friendsRooms} onlineUsers= {onlineUsers} socket = {socket} user={user} setFriendsPage={setFriendsPage} /></ThemeProvider> :
+        !shoppingMenu ? friendsPage ? <ThemeProvider theme={heavy}><FriendsPage playerMoney = {props.playerMoney} setPlayerMoney = {props.setPlayerMoney}setRoomName={setRoomName} handleMatchAction = {handleMatchAction} setActionForMatch={setActionForMatch} handleSelectMatch={handleSelectMatch} friendsRooms ={friendsRooms} onlineUsers= {onlineUsers} socket = {socket} user={user} setFriendsPage={setFriendsPage} /></ThemeProvider> :
         <ThemeProvider theme={heavy}>
             <Box sx={{
                 display: 'flex',

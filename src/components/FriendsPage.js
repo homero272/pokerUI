@@ -371,12 +371,20 @@ const FriendsPage = (props) => {
     const handlePendingFriends = (boolean) => {
         setPendingFriends(boolean);
     };
-    const handleJoinGame = (room) =>{
+    const handleJoinGame = async (room) =>{
         console.log("room passed is: ", room);
         setActionForMatch("done");
         setRoomName(room);
         socket.emit("playerJoined", {userName: user.userName, room: room});
-        
+        props.setPlayerMoney(props.playerMoney - 10000);
+        const api = new API();
+        try {
+            const userInfo = await api.updateGameMoney(props.playerMoney-10000,props.user.userName);
+
+        }catch (error) {
+            console.error("Error during updating money:", error);
+            //setError("An error occurred during updating money.");
+        }
     }
 
     return (
