@@ -33,14 +33,7 @@ const PokerTable = ({ position }) => {
     loader.manager = manager;
   });
 
-  // Updating textures if needed
-  // gltf.scene.traverse((child) => {
-  //   if (child.isMesh && child.name === "Poker_Table") {
-  //     const textureLoader = new TextureLoader();
-  //     child.material.map = textureLoader.load(`${texturePath}pokerfelt.png`);
-  //     child.material.needsUpdate = true;
-  //   }
-  // });
+
 
   return <primitive object={gltf.scene} position={position} scale={[0.005, 0.005, 0.005]} />;
 };
@@ -51,32 +44,11 @@ const AllChips = ({ position }) => {
     loader.manager = manager;
   });
 
-  // Updating textures if needed
-  // gltf.scene.traverse((child) => {
-  //   if (child.isMesh && child.name === "Poker_Table") {
-  //     const textureLoader = new TextureLoader();
-  //     child.material.map = textureLoader.load(`${texturePath}pokerfelt.png`);
-  //     child.material.needsUpdate = true;
-  //   }
-  // });
+
 
   return <primitive object={gltf.scene} position={position} scale={[0.05, 0.05, 0.05]} />;
 };
-// const Room = ({ position }) => {
-//   const gltf = useLoader(GLTFLoader, '/tabletextures/roomtablechair.gltf', (loader) => {
-//     loader.setPath('/models/');
-//     loader.setResourcePath(texturePath);
-//     loader.manager = manager;
-//   });
 
-
-//   gltf.scene.traverse((child) => {
-//     console.log(child.name, "here");
-
-//   });
-
-//   return <primitive object={gltf.scene} position={position} scale={[0.05, 0.05, 0.05]} />;
-// };
 const Players = ({ visibility }) => {
   const gltf = useLoader(GLTFLoader, '/tabletextures/wholeroom3.gltf');
   return gltf.scene.children.filter(child => child.name.startsWith("player")).map(child => (
@@ -171,38 +143,6 @@ const Chair = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, r
   );
 };
 
-// const Cards = ({ id, togglePlayerVisibility, setCurrentSeat, seatNumber, user, roomName, socket }) => {
-//   const gltf = useLoader(GLTFLoader, `/tabletextures/pokerdeck/2h.glb`);
-//   const meshRef = useRef();
-//   console.log(gltf,"gltf card");
-//   //first card POS x: 1.7257951269120029, y: 1.5039156776787426, z: -0.8002722586972699
-// //Rotation EULER 
-// /**_order
-// : 
-// "XYZ"
-// _x
-// : 
-// 0
-// _y
-// : 
-// -0.7582964141897087
-// _z
-// : 
-// 0 */
-//   if (meshRef.current) {
-//     meshRef.current.visible = true;
-//   }
-//   return (
-//     <primitive
-//       ref={meshRef}
-//       object={gltf.scene}
-//       geometry={gltf.scene.children[0].geometry}
-//       material={gltf.scene.children[0].material}
-//       scale={[1, 1, 1]}
-      
-//     />
-//   );
-// };
 
 
 const Cards = ({ id, typeCard, card, cardPOS}) => {
@@ -334,15 +274,6 @@ const Cards = ({ id, typeCard, card, cardPOS}) => {
   }
 
 
-
-
-  // UseFrame to animate or react to changes (optional)
-  // useFrame(() => {
-  //     if (cardRef.current) {
-  //         // Example: Rotate the card slowly around its y-axis
-  //         cardRef.current.rotation.y += 0.01;
-  //     }
-  // });
 
   return (
       <primitive
@@ -483,6 +414,7 @@ const PokerTableWithPlayers = (props) => {
   const [canCheck, setCanCheck] = useState(true);
   const [minBet, setMinBet] = useState(bigBlindAmount); //the min bet should be set initially to big blind
   const [winnerName, setWinnerName] = useState("");
+  let _winnerName;
   const[playerStatus, setPlayerStatus]= useState({
     player1: 'playing',
     player2: 'playing',
@@ -507,7 +439,8 @@ const PokerTableWithPlayers = (props) => {
   const[turn,setTurn] = useState(false);
   const[river,setRiver] = useState(false);
   const[showdown, setShowdown] = useState(false);
-
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [overlayColor, setOverlayColor] = useState('green');
 
   const [ammountToCall, setAmmountToCall] = useState(0);
 
@@ -627,6 +560,8 @@ const PokerTableWithPlayers = (props) => {
           console.log(result, "Result");//emit here
           console.log("winner should be", result[0].seatNumber)
           setWinnerName(result[0].seatNumber);
+          _winnerName= result[0].seatNumber;
+          
           props.socket.emit("gameResult",{...result, roomName:props.roomName});
           //props.setPlayerMoney(props.playerMoney + 10000);
           const api = new API();
@@ -1480,6 +1415,7 @@ const dealHoleCards = () => {
         setBestHands(pokerHands);
         console.log(pokerHands, "use effect best hands");
         setShowdown(true);
+        //
       });
       props.socket.on("recievedCheckAction", (data)=>{
         setPlayerTurnIndex(data.playerTurnIndex)
@@ -1529,6 +1465,7 @@ const dealHoleCards = () => {
         console.log("we got the data for everyone, Winner: ", data, "seatnumber:", data[0].seatNumber);
         console.log(data[0].seatNumber, "Heres the winner name")
         setWinnerName(data[0].seatNumber);
+        _winnerName= data[0].seatNumber;
         const api = new API();
         console.log("currentChipcount for player UE",  eval(`_seatChipCount${currentSeat2}`));
         console.log("useEffect gamemoney total pot, ", _totalPot, "playermoney ",  _playerMoney);
@@ -1551,12 +1488,6 @@ const dealHoleCards = () => {
         
       })
 
-
-      
-
-      
-
-      
 
 
     }
@@ -1665,6 +1596,7 @@ const dealHoleCards = () => {
         setShowdown(true);
         getWinners(hands);
         console.log("showdown!!!")
+        //
         
       }
     }
@@ -1805,15 +1737,7 @@ const dealHoleCards = () => {
     setMinBet(minBet * 2);
     setFirstRound(false);
 
-    // if(currentSeat === bigBlind && firstRound === true){
-    //   deductChips(currentSeat, (minBet * 2)-bigBlindAmount);
-    // }
-    // else if(currentSeat === smallBlind && firstRound === true){
-    //   deductChips(currentSeat, (minBet * 2)-smallBlindAmount);
-    // }
-    // else {
-    //   deductChips(currentSeat,(minBet*2) );
-    // }
+
     let amountToDeduct = (minBet * 2) - playerMoney[`player${currentSeat}`];
     deductChips(currentSeat, amountToDeduct);
     let tempPlayerMoney = {...playerMoney};
@@ -2041,6 +1965,131 @@ const onCanvasCreated = ({ camera }) => {
   }
 
 
+  useEffect(() => {
+    if (showOverlay) {
+      setTimeout(() => {
+        setShowOverlay(false);
+        // Proceed to reset the game or handle next game logic here
+        //startNewGame(); // A function to reset the game state
+      }, 15000); // 10 seconds delay
+    }
+  }, [showOverlay]);
+  
+  const displayOverlay = (isWinner) => {
+    setOverlayColor(isWinner ? 'green' : 'red');
+
+    setShowOverlay(true);
+  };
+
+  useEffect(()=>{
+    console.log("showdown overlay winnerName,", winnerName, "currentSeat", currentSeat2);
+      if(currentSeat2 == winnerName){
+        displayOverlay(true);
+        console.log("IWON!!!!");
+      }
+      else{
+        displayOverlay(false);
+        console.log("ILOST!!!!");
+      }
+    
+  },[winnerName])
+
+
+  const startNewGame = () => {
+    // Reset all state variables related to the game progress, scores, and player statuses
+    // For example:
+
+
+  
+    
+    setTotalPot(0);
+    
+  
+
+
+ 
+    setGameStarted(false);
+    setHoleCards([[], [], [], [], [], []]);
+    _holeCards = [[], [], [], [], [], []];
+    setCommunityCards([]);
+    _communityCards = [];
+    //const [dealerButton, setDealerButton] = useState(0);
+    //let _dealerButton = 0;
+    //const [smallBlind, setSmallBlind] = useState(0);
+    //let _smallBlind = 0;
+   //const [bigBlind, setBigBlind] = useState(0);
+    //let _bigBlind = 0;
+    //let seatsWithPlayers = [];
+    setBestHands([]);
+    _bestHands = [];
+    setPlayerTurn(false);
+    setPlayerTurnIndex(null);
+    setCanCheck(true);
+    setMinBet(bigBlindAmount); //the min bet should be set initially to big blind
+    setWinnerName("");
+    _winnerName = "";
+
+    setSkipTurn(false);
+    // const[playerMoney, setPlayerMoney]= useState({
+    //   player1: 0,
+    //   player2: 0,
+    //   player3: 0,
+    //   player4: 0,
+    //   player5: 0,
+    //   player6: 0,
+    // }) // we need to set the big blind and small blind for these
+    setLastRaise(-1); // keeps track of the last seat that raised
+    //therewfore everyone must either call, reraise, or fold
+  
+    setFlop(false);
+    setTurn(false);
+    setRiver(false);
+    setShowdown(false);
+    setShowOverlay(false);
+    setOverlayColor('green');
+  
+    setAmmountToCall(0);
+    // setPlayerHands([]);
+    // setCommunityCards([]);
+    // setCurrentPlayer(null);
+    // More resets based on your state design
+    startGame();
+  };
+  
+  const GameOverlay = ({ show, color, timer }) => {
+    if (!show) return null;
+  
+    return (
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: color,
+        opacity: 0.5, // Adjust transparency here
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: 'white',
+        fontSize: '24px',
+        zIndex: 0 // Ensure this is below your top UI layer
+      }}>
+        <div style={{zIndex:3}}>
+          {color === 'green' ? 'Winner!' : 'Better luck next time!'}
+          <br />
+          <Typography>Next round in {timer} seconds...</Typography>
+        </div>
+      </div>
+    );
+  };
+  
+
+
+
+
+
+
   return (
     <>
   <Canvas
@@ -2148,14 +2197,14 @@ const onCanvasCreated = ({ camera }) => {
         </div>
       </div>
 
-      <Box sx={{position: 'absolute',top: 20, right: 20}}>
+      <Box sx={{position: 'absolute',top: 20, right: 20, zIndex:2}}>
       { props.host === props.user.userName ?
             <Button variant="contained" color="success" onClick={(event) =>handleClickAvoidFPS(event,startGame)}>
                 Start Game
             </Button> : ""
       } 
       </Box>
-      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', position: 'absolute',bottom: 20, gap: '50px'}}>
+      <Box sx={{zIndex:2, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', position: 'absolute',bottom: 20, gap: '50px'}}>
       {showdown? "": !gameStarted ? "" : playerTurnIndex === currentSeat ?
               <Fragment>
                 <Button variant='contained' color='error' onClick={(event) =>handleClickAvoidFPS(event, foldAction)}>
@@ -2198,6 +2247,7 @@ const onCanvasCreated = ({ camera }) => {
         borderRadius: '5px',
         display: 'flex',
         gap: '10px',
+        zIndex:2,
       }}
     >
       {communityCards.map((card, index) => (
@@ -2211,6 +2261,7 @@ const onCanvasCreated = ({ camera }) => {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: '5px',
+            
           }}
         >
           {/* Using dynamic import to get the image based on card value and suit */}
@@ -2223,7 +2274,13 @@ const onCanvasCreated = ({ camera }) => {
       ))}
   
     </Box>
-    <PlayerNamesAndCards players={players} username ={props.user.userName} showdown={showdown} winner = {winnerName} bestHands = {bestHands} playerTurnIndex={playerTurnIndex}/>
+    <PlayerNamesAndCards displayOverlay={displayOverlay}players={players} username ={props.user.userName} showdown={showdown} winner = {winnerName} bestHands = {bestHands} playerTurnIndex={playerTurnIndex}/>
+    
+    {showdown? <GameOverlay show={showOverlay} color={overlayColor} timer={10} />: ""}
+    {/* <Button variant ='contained' onClick={() => displayOverlay(true)} >Test Winner Overlay</Button>
+<Button variant ='contained' onClick={() => displayOverlay(false)}>Test Loser Overlay</Button> */}
+
+
     </>
   );
 };

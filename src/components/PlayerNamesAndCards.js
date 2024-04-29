@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 
-const PlayerNamesAndCards = ({ players , username, showdown, winner, bestHands, playerTurnIndex}) => {
+const PlayerNamesAndCards = ({ displayOverlay,players , username, showdown, winner, bestHands, playerTurnIndex}) => {
 
     if (!players || !Array.isArray(players)) {
         // This check ensures 'players' is not undefined and is an array
@@ -31,6 +31,7 @@ const PlayerNamesAndCards = ({ players , username, showdown, winner, bestHands, 
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
+        zIndex:2,
       }}
     >
       {players.map((player, index) => (
@@ -97,7 +98,7 @@ const PlayerNamesAndCards = ({ players , username, showdown, winner, bestHands, 
             
           </Box>
           <Box
-            key={0}
+            key={1}
             sx={{
               width: '50px',
               height: '70px',
