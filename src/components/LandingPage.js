@@ -8,6 +8,9 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import banner from '../pokerbanner.png';
 import logo from '../circleLogo.png';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 import logo2 from '../croppedLogo.png';
 import GlobalStyle from './GlobalStyle';
 import { keyframes } from '@emotion/react';
@@ -218,8 +221,52 @@ const LandingPage = (props) => {
                                 About Us
                             </Typography>
                             <Typography variant="body1" gutterBottom>
-                                This is the about section of our landing page.
+                                
+                                This project was created by Diego Rivera, Homero Arellano, and Zach Gassner. 
+                                We created this game for our CS470 Senior Research Project Spring 2024. 
+                                We specifically decided to do a poker game because we all liked the idea of 
+                                creating a multiplayer online game. We thought it would be a nice challenge
+                                to utilize new tools such as websockets in order to distribute the state of
+                                the game to everyone.
                             </Typography>
+                            <Box sx={{ pl: 2 }}>
+                                <Typography variant="h4" gutterBottom>
+                                    Some Areas of Research
+                                </Typography>
+                                <Box component="ul" sx={{ listStyleType: 'disc', marginLeft: '20px', padding: 0 }}>
+                                    <Typography component="li" variant="body1">
+                                    Web Sockets
+                                    </Typography>
+                                    <Typography component="li" variant="body1">
+                                    Poker Rules
+                                    </Typography>
+                                    <Typography component="li" variant="body1">
+                                    API
+                                    </Typography>
+                                    <Typography component="li" variant="body1">
+                                    Database Queries
+                                    </Typography>
+                            </Box>
+                        </Box>
+                        <Box sx={{ pl: 2 }}>
+                                <Typography variant="h4" gutterBottom>
+                                    Hosting Everything
+                                </Typography>
+                                <Box component="ul" sx={{ listStyleType: 'disc', marginLeft: '20px', padding: 0 }}>
+                                    <Typography component="li" variant="body1">
+                                    Web Sockets (render.com)
+                                    </Typography>
+                                    <Typography component="li" variant="body1">
+                                    UI - (front-end) - (render.com)
+                                    </Typography>
+                                    <Typography component="li" variant="body1">
+                                    API (render.com)
+                                    </Typography>
+                                    <Typography component="li" variant="body1">
+                                    Database (AWS)
+                                    </Typography>
+                            </Box>
+                        </Box>
                             {/* Add more content for the about section as needed */}
                         </Box>
                     )}
