@@ -353,16 +353,22 @@ let _seatChipCount6 = 0;
 
 
 const PokerTableWithPlayers = (props) => {
-
+  const[isMuted, setIsMuted] = useState(false);
   const { load } = useGlobalAudioPlayer();
-
+  const audioRef = useRef(new Audio(lobbyMusic));
   useEffect(() => {
-    // This will only run once when the component mounts
-    load(lobbyMusic, {
-      autoplay: true,
-      
-    });
-  }, [load]);
+    audioRef.current.play();
+    return () => {
+      audioRef.current.pause(); // Cleanup audio on component unmount
+    };
+  }, []);
+  
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !audioRef.current.muted;
+      setIsMuted(audioRef.current.muted);
+    }
+  };
   
 
   const [seatName1, setSeatName1] = useState(props.user.userName);
@@ -2236,6 +2242,9 @@ const onCanvasCreated = ({ camera }) => {
       <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
         <button onClick={(event) =>handleClickAvoidFPS(event,handleLeaveGame)}>
           Leave
+        </button>
+        <button onClick={toggleMute}>
+          Mute/Unmute
         </button>
         <input
           type="range"
