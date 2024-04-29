@@ -407,7 +407,7 @@ let playerStatus2 = {
 };
 let gameStarted2 = false;
 let playerTurnIndex2;
-
+let _playerMoney;
 let _totalPot = 0;
 let _seatChipCount1 = 0;
 let _seatChipCount2 = 0;
@@ -432,7 +432,7 @@ const PokerTableWithPlayers = (props) => {
   let _seatName4 =props.user.userName;
   let _seatName5 =props.user.userName;
   let _seatName6 =props.user.userName;
-
+  _playerMoney = props.playerMoney;
   const [seatChipCount1, setSeatChipCount1] = useState(0);
   const [seatChipCount2, setSeatChipCount2] = useState(0);
   const [seatChipCount3, setSeatChipCount3] = useState(0);
@@ -631,17 +631,17 @@ const PokerTableWithPlayers = (props) => {
           //props.setPlayerMoney(props.playerMoney + 10000);
           const api = new API();
           console.log("currentChipcount for player UI",  eval(`_seatChipCount${currentSeat2}`));
-          console.log("UI gamemoney total pot, ", _totalPot, "playermoney ",  props.playerMoney);
+          console.log("UI gamemoney total pot, ", _totalPot, "playermoney ",  _playerMoney);
           console.log("getwinners stuff", result[0].seatNumber, "current Seat", currentSeat2);
           try {
-              if(result[0].seatNumber === currentSeat){
-                const userInfo = await api.updateGameMoney(props.playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
-                props.setPlayerMoney(props.playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`));
+              if(result[0].seatNumber === currentSeat2){
+                const userInfo = await api.updateGameMoney(_playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+                props.setPlayerMoney(_playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`));
               }
               else{
 
-                const userInfo = await api.updateGameMoney(props.playerMoney+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
-                props.setPlayerMoney(props.playerMoney + eval(`_seatChipCount${currentSeat2}`));
+                const userInfo = await api.updateGameMoney(_playerMoney+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+                props.setPlayerMoney(_playerMoney + eval(`_seatChipCount${currentSeat2}`));
               }
   
           }catch (error) {
@@ -1502,9 +1502,10 @@ const dealHoleCards = () => {
           lastRaise2 = data.lastRaiseSeat;
           newEndingCycle = data.newEndingCycle;
           setAmmountToCall(data.minBet);
+          console.log("totalPot", _totalPot, "deduct", data.deduct);
           setTotalPot(totalPot + data.deduct)
           _totalPot = _totalPot + data.deduct;
-
+          console.log("totalPot-after", _totalPot, "deduct", data.deduct);
 
       })
       
@@ -1530,16 +1531,16 @@ const dealHoleCards = () => {
         setWinnerName(data[0].seatNumber);
         const api = new API();
         console.log("currentChipcount for player UE",  eval(`_seatChipCount${currentSeat2}`));
-        console.log("useEffect gamemoney total pot, ", _totalPot, "playermoney ",  props.playerMoney);
+        console.log("useEffect gamemoney total pot, ", _totalPot, "playermoney ",  _playerMoney);
         console.log("getwinners stuff UE", data[0].seatNumber, "current Seat", currentSeat2);
         try {
-            if(data[0].seatNumber === currentSeat){
-              const userInfo = await api.updateGameMoney(props.playerMoney+ _totalPot+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
-              props.setPlayerMoney(props.playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`));
+            if(data[0].seatNumber === currentSeat2){
+              const userInfo = await api.updateGameMoney(_playerMoney+ _totalPot+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+              props.setPlayerMoney(_playerMoney + _totalPot+ eval(`_seatChipCount${currentSeat2}`));
             }
             else{
-              const userInfo = await api.updateGameMoney(props.playerMoney+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
-              props.setPlayerMoney(props.playerMoney + eval(`_seatChipCount${currentSeat2}`));
+              const userInfo = await api.updateGameMoney(_playerMoney+ eval(`_seatChipCount${currentSeat2}`),props.user.userName);
+              props.setPlayerMoney(_playerMoney + eval(`_seatChipCount${currentSeat2}`));
 
             }
 
@@ -1819,8 +1820,10 @@ const dealHoleCards = () => {
     tempPlayerMoney[`player${currentSeat}`] += amountToDeduct;
     setPlayerMoney(tempPlayerMoney);
     console.log("new Player Money is : ", tempPlayerMoney);
-    setTotalPot(totalPot +  (minBet * 2) - playerMoney[`player${currentSeat}`])
-    _totalPot +=(minBet - tempPlayerMoney[`player${currentSeat}`]);
+    console.log("totalPot UI", _totalPot, "deduct", amountToDeduct);
+    setTotalPot(totalPot +  (minBet * 2) - amountToDeduct)
+    _totalPot +=(amountToDeduct);
+    console.log("totalPot-after UI", _totalPot, "deduct", amountToDeduct);
 
     
     
@@ -2220,7 +2223,7 @@ const onCanvasCreated = ({ camera }) => {
       ))}
   
     </Box>
-    <PlayerNamesAndCards players={players} username ={props.user.userName} showdown={showdown} winner = {winnerName} bestHands = {bestHands}/>
+    <PlayerNamesAndCards players={players} username ={props.user.userName} showdown={showdown} winner = {winnerName} bestHands = {bestHands} playerTurnIndex={playerTurnIndex}/>
     </>
   );
 };

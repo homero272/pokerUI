@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 
-const PlayerNamesAndCards = ({ players , username, showdown, winner, bestHands}) => {
+const PlayerNamesAndCards = ({ players , username, showdown, winner, bestHands, playerTurnIndex}) => {
 
     if (!players || !Array.isArray(players)) {
         // This check ensures 'players' is not undefined and is an array
@@ -41,10 +41,10 @@ const PlayerNamesAndCards = ({ players , username, showdown, winner, bestHands})
             flexDirection: 'row',
             alignItems: 'center',
             gap: '10px',
-            backgroundColor: winner == player.seatNumber ? "green" : '',
+            backgroundColor: winner == player.seatNumber ? "green" : showdown ? "" : playerTurnIndex == player.seatNumber ? "yellow" : "",
           }}
         >
-          <Typography variant="body1" color="white">
+          <Typography variant="body1" color={playerTurnIndex === player.seatNumber ? 'black' : 'white'}>
             {player.name}
           </Typography>
           <Box
