@@ -12,6 +12,9 @@ import { PointerLockControls } from '@react-three/drei';
 import { Card } from '../poker_logic/Card';
 import PlayerNamesAndCards from './PlayerNamesAndCards';
 import API from '../API-Interface/API-Interface';
+import { useGlobalAudioPlayer } from 'react-use-audio-player';
+import lobbyMusic from '../Music/funk-casino-163105.mp3'
+
 
 extend({ Html, Box, Typography });
 const { Deck } = require('../poker_logic/Deck');
@@ -350,6 +353,17 @@ let _seatChipCount6 = 0;
 
 
 const PokerTableWithPlayers = (props) => {
+
+  const { load } = useGlobalAudioPlayer();
+
+  useEffect(() => {
+    // This will only run once when the component mounts
+    load(lobbyMusic, {
+      autoplay: true,
+      
+    });
+  }, [load]);
+  
 
   const [seatName1, setSeatName1] = useState(props.user.userName);
   const [seatName2, setSeatName2] = useState(props.user.userName);
@@ -1166,7 +1180,7 @@ const dealHoleCards = () => {
 
       props.socket.on("recievedUpdateChipCount", data => {
         console.log("^&^&^&^&^&^%$%U&JNHY%", data)
-        setAmmountToCall(data.data.amount);
+        //setAmmountToCall(data.data.amount);
         // console.log(data.data.amount, "socked use effect updatachipcount");
         // let tempPlayerMoney = {...playerMoney};
         // tempPlayerMoney[`player${data.data.seatNumber}`] += data.data.amount;
@@ -1441,7 +1455,10 @@ const dealHoleCards = () => {
           console.log("totalPot", _totalPot, "deduct", data.deduct);
           setTotalPot(totalPot + data.deduct)
           _totalPot = _totalPot + data.deduct;
-          console.log("totalPot-after", _totalPot, "deduct", data.deduct);
+          console.log("totalPot-after", _totalPot, "deduct", data.deduct, "new min bet is: ", data.minBet);
+
+      })
+      props.socket.on("recievedAllInAction", (data)=>{
 
       })
       
@@ -1747,11 +1764,51 @@ const dealHoleCards = () => {
     console.log("totalPot UI", _totalPot, "deduct", amountToDeduct);
     setTotalPot(totalPot +  (minBet * 2) - amountToDeduct)
     _totalPot +=(amountToDeduct);
-    console.log("totalPot-after UI", _totalPot, "deduct", amountToDeduct);
+    console.log("totalPot-after UI", _totalPot, "deduct", amountToDeduct, "total player money: ", tempPlayerMoney, " min bet: ", minBet * 2);
 
     
     
       props.socket.emit("raiseAction", {minBet:minBet * 2, roomName:props.roomName ,type:"raiseAction", lastRaiseSeat:currentSeat, newEndingCycle: newEndingCycle, deduct: amountToDeduct});
+    checkAction();
+  }
+
+  const allInAction = (obj) =>{
+    let maxBet = eval(`seatChipCount${currentSeat2}`);
+    setLastRaise(currentSeat);
+    lastRaise2 = currentSeat;
+    for(let i = currentSeat + 1; i < currentSeat + 6; ++i){
+      const adjustedIndex = (i - 1) % 6 + 1; // To maintain 1-based indexing
+      console.log("seat value is ", adjustedIndex)
+      // If 'tempArr' at the adjusted index is false, return the adjusted index
+      if (visibility2[`player${adjustedIndex}`]) {
+        console.log("new seat is ", adjustedIndex)
+          
+          newEndingCycle = adjustedIndex;
+          break;
+      }
+    }
+    // if(lastRaise != -1 && playerToLeft == playerTurnIndex){
+    //   //same logic
+    // }
+    setAmmountToCall(maxBet);
+    setMinBet(maxBet);
+    setFirstRound(false);
+
+
+    let amountToDeduct = maxBet;
+    deductChips(currentSeat, maxBet);
+    let tempPlayerMoney = {...playerMoney};
+    tempPlayerMoney[`player${currentSeat}`] += amountToDeduct;
+    setPlayerMoney(tempPlayerMoney);
+    console.log("new Player Money is : ", tempPlayerMoney);
+    console.log("totalPot UI", _totalPot, "deduct", amountToDeduct);
+    setTotalPot(totalPot +  maxBet)
+    _totalPot +=(amountToDeduct);
+    console.log("totalPot-after UI", _totalPot, "deduct", amountToDeduct, "total player money: ", tempPlayerMoney, " min bet: ", maxBet);
+
+    
+    
+      props.socket.emit("raiseAction", {minBet:maxBet, roomName:props.roomName ,type:"raiseAction", lastRaiseSeat:currentSeat, newEndingCycle: newEndingCycle, deduct: amountToDeduct});
     checkAction();
   }
 
@@ -2216,18 +2273,22 @@ const onCanvasCreated = ({ camera }) => {
                   Check 
                   </Button> : ""
                 }
-                {console.log("Amount put in for current player",playerMoney[`player${currentSeat2}`], " and amount to call is:", ammountToCall)}
+                {console.log("Amount put in for current player",playerMoney[`player${currentSeat2}`], " and minbet is:", minBet)}
                 {/* minBet - playerMoney[`player${currentSeat2}`] */}
 
-                {ammountToCall - playerMoney[`player${currentSeat2}`] <=0 ? "":
+                {ammountToCall - playerMoney[`player${currentSeat2}`] <=0 ? "": eval(`_seatChipCount${currentSeat2}`) <= 0 ? "":
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, callAction)}>
                     {/* Call ${currentSeat === bigBlind && firstRound === true ? minBet-bigBlindAmount : currentSeat === smallBlind && firstRound === true ? minBet-smallBlindAmount:minBet } */}
-                    Call ${minBet - playerMoney[`player${currentSeat}`]}
+                    Call ${minBet - playerMoney[`player${currentSeat2}`]}
                 </Button>
                 }
-
+                  {eval(`_seatChipCount${currentSeat2}`) <= 0 ? "" :
                 <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, raiseAction)}>
                     {ammountToCall === 0 ? "Bet" : "Raise" } ${minBet*2}
+                </Button>
+                }
+                <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, allInAction)}>
+                    All-in
                 </Button>
 
                 </Fragment>
