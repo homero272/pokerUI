@@ -15,6 +15,30 @@ import API from '../API-Interface/API-Interface';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import lobbyMusic from '../Music/funk-casino-163105.mp3'
 
+import logo2 from '../croppedLogo.png';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const heavy = createTheme({
+  typography: {
+    fontFamily: [
+      'heavy',
+
+    ].join(','),
+  },
+  palette: {
+      primary: {
+        main: '#9caab7', // replace with your desired hex color
+      },
+      secondary:{
+        main:'#0000ff'
+      },
+      third:{
+        main:'#BF40BF'
+      }
+      // ... other color settings
+    },
+});
+
 
 extend({ Html, Box, Typography });
 const { Deck } = require('../poker_logic/Deck');
@@ -353,6 +377,8 @@ let _seatChipCount6 = 0;
 
 
 const PokerTableWithPlayers = (props) => {
+
+
   const[isMuted, setIsMuted] = useState(false);
   const { load } = useGlobalAudioPlayer();
   const audioRef = useRef(new Audio(lobbyMusic));
@@ -2152,15 +2178,35 @@ const onCanvasCreated = ({ camera }) => {
 
 
 
-
   return (
     <>
+    <ThemeProvider theme={heavy}>
   <Canvas
-    style={{ backgroundColor: 'white', position: 'absolute', top: 0, left: 0 }}
+    style={{ backgroundColor: '#00000b', position: 'absolute', top: 0, left: 0 }}
     onCreated={onCanvasCreated}
     adjustCamera={true} // Allows Three.js to adjust the camera based on canvas dimensions initially
 >
-        <Suspense fallback={null}>
+<Suspense fallback={
+  <Html center>
+    <img src={logo2} alt="Logo" style={{
+      position: 'absolute', // Position it absolutely within the relative parent
+
+      transform: 'translate(-40%, -70%)', // This will center the logo
+      background: 'transparent',
+      width: '400px',
+      height: '400px',
+      borderRadius: '50%',
+      border: '2px solid black',
+    }} />
+    <Typography style={{
+      position: 'absolute', // Position it absolutely within the relative parent
+      top: 'calc(50% + 150px)', // Move it down by 50% plus half the height of the logo
+      left: 35,
+      transform: 'translate(-60%, -70%)', // Center the text
+      color: 'white'
+    }}>...Loading</Typography>
+  </Html>
+}>
           <ambientLight intensity={0.1} />
 
           <Stage
@@ -2239,14 +2285,14 @@ const onCanvasCreated = ({ camera }) => {
 
         </Suspense>
       </Canvas>
-      <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
-        <button onClick={(event) =>handleClickAvoidFPS(event,handleLeaveGame)}>
+      <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 100, gap:200, }}>
+        <Button variant="contained" color="error"onClick={(event) =>handleClickAvoidFPS(event,handleLeaveGame)}>
           Leave
-        </button>
-        <button onClick={toggleMute}>
+        </Button>
+        <Button  variant="contained" color="primary"onClick={toggleMute}>
           Mute/Unmute
-        </button>
-        <input
+        </Button>
+        {/* <input
           type="range"
           min="0.5"
           max="200"
@@ -2254,11 +2300,11 @@ const onCanvasCreated = ({ camera }) => {
           value={cameraZoom}
           onChange={handleZoomChange}
           style={{ width: '300px' }}
-        />
+        /> */}
         <div>
-          <p>Position: {cameraData.position.join(', ')}</p>
+          {/* <p>Position: {cameraData.position.join(', ')}</p>
           <p>Rotation: {cameraData.rotation.join(', ')}</p>
-          <p>Zoom: {cameraData.zoom.toFixed(2)}</p>
+          <p>Zoom: {cameraData.zoom.toFixed(2)}</p> */}
           
         </div>
       </div>
@@ -2286,17 +2332,17 @@ const onCanvasCreated = ({ camera }) => {
                 {/* minBet - playerMoney[`player${currentSeat2}`] */}
 
                 {ammountToCall - playerMoney[`player${currentSeat2}`] <=0 ? "": eval(`_seatChipCount${currentSeat2}`) <= 0 ? "":
-                <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, callAction)}>
+                <Button variant='contained' color='secondary' onClick={(event) =>handleClickAvoidFPS(event, callAction)}>
                     {/* Call ${currentSeat === bigBlind && firstRound === true ? minBet-bigBlindAmount : currentSeat === smallBlind && firstRound === true ? minBet-smallBlindAmount:minBet } */}
                     Call ${minBet - playerMoney[`player${currentSeat2}`]}
                 </Button>
                 }
                   {eval(`_seatChipCount${currentSeat2}`) <= 0 ? "" :
-                <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, raiseAction)}>
+                <Button variant='contained' color='success' onClick={(event) =>handleClickAvoidFPS(event, raiseAction)}>
                     {ammountToCall === 0 ? "Bet" : "Raise" } ${minBet*2}
                 </Button>
                 }
-                <Button variant='contained' color='primary' onClick={(event) =>handleClickAvoidFPS(event, allInAction)}>
+                <Button variant='contained' color='third' onClick={(event) =>handleClickAvoidFPS(event, allInAction)}>
                     All-in
                 </Button>
 
@@ -2351,6 +2397,7 @@ const onCanvasCreated = ({ camera }) => {
 <Button variant ='contained' onClick={() => displayOverlay(false)}>Test Loser Overlay</Button> */}
 
 
+</ThemeProvider>
     </>
   );
 };
